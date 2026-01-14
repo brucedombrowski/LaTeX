@@ -17,13 +17,13 @@ $DOC = $args[0]
 if (-not $DOC) {
     Write-Host ""
     Write-Host "Which document would you like to build?"
-    Write-Host "  1) moa_template.tex (Memorandum of Agreement - brief)"
+    Write-Host "  1) decision_memo.tex (Decision Memorandum - brief)"
     Write-Host "  2) decision_document.tex (Comprehensive Decision Document)"
     Write-Host "  3) Both"
     Write-Host ""
     $choice = Read-Host "Enter choice [1-3]"
     switch ($choice) {
-        "1" { $DOC = "moa_template" }
+        "1" { $DOC = "decision_memo" }
         "2" { $DOC = "decision_document" }
         "3" { $DOC = "both" }
         default { Write-Host "Invalid choice" -ForegroundColor Red; exit 1 }
@@ -69,7 +69,7 @@ function Compile-Document {
 $buildFailed = $false
 
 if ($DOC -eq "both") {
-    foreach ($doc in @("moa_template", "decision_document")) {
+    foreach ($doc in @("decision_memo", "decision_document")) {
         if (-not (Compile-Document $doc)) {
             $buildFailed = $true
             break

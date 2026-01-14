@@ -25,13 +25,13 @@ DOC="$1"
 if [ -z "$DOC" ]; then
     echo ""
     echo "Which document would you like to build?"
-    echo "  1) moa_template.tex (Memorandum of Agreement - brief)"
+    echo "  1) decision_memo.tex (Decision Memorandum - brief)"
     echo "  2) decision_document.tex (Comprehensive Decision Document)"
     echo "  3) Both"
     echo ""
     read -p "Enter choice [1-3]: " choice
     case $choice in
-        1) DOC="moa_template" ;;
+        1) DOC="decision_memo" ;;
         2) DOC="decision_document" ;;
         3) DOC="both" ;;
         *) echo -e "${RED}Invalid choice${NC}"; exit 1 ;;
@@ -71,7 +71,7 @@ compile_doc() {
 build_failed=0
 
 if [ "$DOC" = "both" ]; then
-    for doc in moa_template decision_document; do
+    for doc in decision_memo decision_document; do
         if ! compile_doc "$doc"; then
             build_failed=1
             break
@@ -94,7 +94,7 @@ if [ $build_failed -eq 1 ]; then
         echo ""
         # Retry build
         if [ "$DOC" = "both" ]; then
-            for doc in moa_template decision_document; do
+            for doc in decision_memo decision_document; do
                 compile_doc "$doc"
             done
         else

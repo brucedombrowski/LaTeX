@@ -6,14 +6,14 @@ LaTeX templates for formal program decision documentation, adapted from NASA's M
 
 | Template | Description | Use Case |
 |----------|-------------|----------|
-| `moa_template.tex` | Memorandum of Agreement | Brief, single-page decisions with standard memo format |
+| `decision_memo.tex` | Decision Memorandum | Brief, single-page decisions with standard memo format |
 | `decision_document.tex` | Comprehensive Decision Document | Detailed decisions requiring full documentation |
 
 ## Files
 
 ```
 DecisionDocument/
-├── moa_template.tex        # Brief MOA template
+├── decision_memo.tex       # Brief Decision Memorandum template
 ├── decision_document.tex   # Comprehensive decision template
 ├── logo_placeholder.png    # Placeholder logo for header
 ├── Template.docx           # Original Word template (reference)
@@ -59,7 +59,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 The build script provides three options:
 
-1. **MOA Template** - Builds `moa_template.pdf`
+1. **Decision Memorandum** - Builds `decision_memo.pdf`
 2. **Comprehensive Decision Document** - Builds `decision_document.pdf`
 3. **Both** - Builds both PDFs
 
@@ -67,25 +67,25 @@ You can also specify the document directly:
 
 ```bash
 # macOS/Linux
-./build.sh moa_template
+./build.sh decision_memo
 ./build.sh decision_document
 ./build.sh both
 
 # Windows
-.\build.ps1 moa_template
+.\build.ps1 decision_memo
 .\build.ps1 decision_document
 .\build.ps1 both
 ```
 
 ## Template Customization
 
-### MOA Template (`moa_template.tex`)
+### Decision Memorandum (`decision_memo.tex`)
 
 Edit the document variables near the top of the file:
 
 ```latex
-\newcommand{\UniqueID}{MOA-2025-001}
-\newcommand{\DocumentDate}{October XX, 20XX}
+\newcommand{\UniqueID}{DM-YYYY-NNN}
+\newcommand{\DocumentDate}{MMMM DD, YYYY}
 \newcommand{\AuthorName}{Author Name}
 \newcommand{\AuthorTitle}{Title}
 \newcommand{\ToField}{Distribution}
@@ -94,7 +94,7 @@ Edit the document variables near the top of the file:
 ```
 
 **Structure:**
-- Header with logo and "Memorandum of Agreement"
+- Header with logo and "Decision Memorandum"
 - Signature block with author info
 - Memo fields (DATE, TO, SUBJECT, OFFICE OF PRIMARY RESPONSIBILITY)
 - Numbered sections: Purpose, Background, Scope, Agreement
@@ -159,9 +159,9 @@ If you prefer not to use the build scripts:
 
 ```bash
 # Run pdflatex 3 times for proper TOC and page references
-pdflatex moa_template.tex
-pdflatex moa_template.tex
-pdflatex moa_template.tex
+pdflatex decision_memo.tex
+pdflatex decision_memo.tex
+pdflatex decision_memo.tex
 
 # Clean up auxiliary files
 rm -f *.aux *.log *.out *.toc
@@ -196,12 +196,27 @@ brew install opensc poppler nss
 # - nss: certutil and pk12util for certificate management
 ```
 
+```powershell
+# Windows (Chocolatey)
+choco install openssl poppler
+
+# For smart card support, install OpenSC from:
+# https://github.com/OpenSC/OpenSC/releases
+
+# Optional: JSignPDF for an alternative signing tool
+# http://jsignpdf.sourceforge.net/
+```
+
 ### Interactive Mode
 
 Run the script without arguments for a user-friendly menu:
 
 ```bash
+# macOS/Linux
 ./sign.sh
+
+# Windows PowerShell
+.\sign.ps1
 ```
 
 This presents options to:
@@ -213,6 +228,7 @@ This presents options to:
 
 ### Command-Line Usage
 
+**macOS/Linux:**
 ```bash
 # Make script executable (first time only)
 chmod +x sign.sh
@@ -231,6 +247,24 @@ chmod +x sign.sh
 
 # List certificates on smart card
 ./sign.sh list
+```
+
+**Windows PowerShell:**
+```powershell
+# Create a self-signed test certificate
+.\sign.ps1 create-cert
+
+# Sign with smart card (PIV/CAC)
+.\sign.ps1 sign decision_document.pdf
+
+# Sign with software certificate (.p12/.pfx)
+.\sign.ps1 sign-p12 mycert.p12 decision_document.pdf
+
+# Verify signatures
+.\sign.ps1 verify decision_document_signed.pdf
+
+# List certificates on smart card
+.\sign.ps1 list
 ```
 
 ### Certificate Creation
@@ -259,14 +293,16 @@ Example output:
 ```
 Digital Signature Info of: decision_document_signed.pdf
 Signature #1:
-  - Signer Certificate Common Name: Test Signer
-  - Signer full Distinguished Name: C=US,O=Test Org,CN=Test Signer
-  - Signing Time: Jan 13 2026 21:36:17
+  - Signer Certificate Common Name: Claude Code Agent
+  - Signer full Distinguished Name: CN=Claude Code Agent,OU=commit:1376440,O=AI Agent,C=US
+  - Signing Time: Jan 13 2026 22:06:48
   - Signing Hash Algorithm: SHA-256
   - Signature Type: adbe.pkcs7.detached
   - Signature Validation: Signature is Valid.
   - Certificate Validation: Certificate issuer is unknown.
 ```
+
+The `OU=commit:<hash>` field links the signature to the specific git commit, providing cryptographic traceability.
 
 The "Certificate issuer is unknown" warning is expected for self-signed certificates. For production use, obtain certificates from a trusted Certificate Authority (CA) or use PIV/CAC smart cards.
 
@@ -279,7 +315,7 @@ The "Certificate issuer is unknown" warning is expected for self-signed certific
 
 ## Usage Tips
 
-1. **MOA Template**: Best for straightforward decisions that need formal documentation but don't require extensive detail
+1. **Decision Memorandum**: Best for straightforward decisions that need formal documentation but don't require extensive detail
 2. **Comprehensive Template**: Use when decisions require full traceability, risk assessment, and multiple stakeholder agreements
 3. **Signatures**: Obtain all required signatures before distribution
 4. **Version Control**: Update the revision history table with each document change
