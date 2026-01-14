@@ -48,6 +48,7 @@ function Test-Tools {
 
     # Check for JSignPDF
     $jsignPaths = @(
+        "$ScriptDir\JSignPdf.jar",
         "$env:ProgramFiles\JSignPdf\JSignPdf.jar",
         "$env:ProgramFiles(x86)\JSignPdf\JSignPdf.jar",
         "$env:LOCALAPPDATA\JSignPdf\JSignPdf.jar",
@@ -84,13 +85,68 @@ function Test-Tools {
     if (-not $toolFound) {
         Write-Warn "Warning: No PDF signing tool found."
         Write-Host ""
-        Write-Host "For signing, install one of the following:"
-        Write-Host "  JSignPDF:  Download from http://jsignpdf.sourceforge.net/"
-        Write-Host "  Poppler:   Install via chocolatey: choco install poppler"
+        Write-Host "JSignPDF is required for PDF signing."
         Write-Host ""
     }
 
     return $toolFound
+}
+
+function Install-JSignPDF {
+    # Download JSignPDF JAR to script directory
+    Write-Host ""
+    Write-Warn "Downloading JSignPDF..."
+    Write-Host ""
+
+    # Check for Java first
+    if (-not (Get-Command "java" -ErrorAction SilentlyContinue)) {
+        Write-Err "Java is required but not found."
+        Write-Host "Please install Java Runtime Environment (JRE) first."
+        return $false
+    }
+
+    $jarPath = Join-Path $ScriptDir "JSignPdf.jar"
+
+    # JSignPDF download URL (SourceForge direct link to latest stable)
+    # Version 2.2.2 is stable and widely used
+    $downloadUrl = "https://sourceforge.net/projects/jsignpdf/files/stable/JSignPdf-2.2.2/JSignPdf.jar/download"
+
+    try {
+        Write-Host "Downloading from SourceForge..."
+        Write-Host "Target: $jarPath"
+        Write-Host ""
+
+        # Use .NET WebClient for download (more reliable than Invoke-WebRequest on some systems)
+        $webClient = New-Object System.Net.WebClient
+        $webClient.Headers.Add("User-Agent", "PowerShell")
+        $webClient.DownloadFile($downloadUrl, $jarPath)
+
+        if (Test-Path $jarPath) {
+            $fileSize = (Get-Item $jarPath).Length
+            if ($fileSize -gt 100000) {  # JAR should be > 100KB
+                Write-Success "JSignPDF downloaded successfully!"
+                Write-Host "Location: $jarPath"
+                $script:JSignJar = $jarPath
+                $script:SignTool = "jsignpdf"
+                return $true
+            }
+            else {
+                Write-Err "Download appears incomplete (file too small)."
+                Remove-Item $jarPath -Force -ErrorAction SilentlyContinue
+            }
+        }
+    }
+    catch {
+        Write-Err "Download failed: $_"
+        Write-Host ""
+        Write-Host "Please download manually from:"
+        Write-Host "  http://jsignpdf.sourceforge.net/"
+        Write-Host ""
+        Write-Host "Then place JSignPdf.jar in:"
+        Write-Host "  $ScriptDir"
+    }
+
+    return $false
 }
 
 function Find-PKCS11Library {
@@ -245,8 +301,15 @@ function Sign-WithWindowsCert {
         Write-Err "Cannot export certificate private key."
         Write-Host "This is expected for smart card certificates."
         Write-Host ""
-        Write-Host "To sign with smart cards, install JSignPDF:"
-        Write-Host "  Download from http://jsignpdf.sourceforge.net/"
+        Write-Host "JSignPDF is required for smart card signing."
+        Write-Host ""
+        $install = Read-Host "Would you like to download JSignPDF now? (y/n)"
+        if ($install -match "^[Yy]") {
+            if (Install-JSignPDF) {
+                Write-Host ""
+                Write-Host "Please try signing again."
+            }
+        }
         return $false
     }
 }
@@ -607,20 +670,33 @@ function Show-InteractiveMenu {
     Write-Host "  2) Verify a signed PDF"
     Write-Host "  3) Create a test certificate"
     Write-Host "  4) List smart card certificates"
-    Write-Host "  5) Show command-line usage"
-    Write-Host "  6) Exit"
+    Write-Host "  5) Install/Update JSignPDF (required for signing)"
+    Write-Host "  6) Show command-line usage"
+    Write-Host "  7) Exit"
     Write-Host ""
-    $choice = Read-Host "Enter choice [1-6]"
+
+    # Show tool status
+    if ($script:JSignJar) {
+        Write-Host "  [Signing tool: JSignPDF ready]" -ForegroundColor Green
+    } elseif ($script:SignTool -eq "pdfsig") {
+        Write-Host "  [Signing tool: pdfsig ready]" -ForegroundColor Green
+    } else {
+        Write-Host "  [Signing tool: Not installed - use option 5]" -ForegroundColor Yellow
+    }
+    Write-Host ""
+
+    $choice = Read-Host "Enter choice [1-7]"
 
     switch ($choice) {
         "1" { Sign-Interactive }
         "2" { Verify-Interactive }
         "3" { Create-TestCertificate; Pause-Continue; Show-InteractiveMenu }
         "4" { Get-SmartCardCertificates; Pause-Continue; Show-InteractiveMenu }
-        "5" { Show-Usage; Pause-Continue; Show-InteractiveMenu }
-        "6" { Write-Host "Goodbye!"; exit 0 }
+        "5" { Install-JSignPDF; Pause-Continue; Show-InteractiveMenu }
+        "6" { Show-Usage; Pause-Continue; Show-InteractiveMenu }
+        "7" { Write-Host "Goodbye!"; exit 0 }
         default {
-            Write-Err "Invalid choice. Please enter 1-6."
+            Write-Err "Invalid choice. Please enter 1-7."
             Show-InteractiveMenu
         }
     }
