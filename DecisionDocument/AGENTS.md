@@ -166,6 +166,7 @@ DecisionDocument/
 ├── decision_document.pdf         # Example generated PDF
 ├── decision_document_signed.pdf  # Example signed PDF
 ├── logo.png                      # Header logo (orbit-styled "Logo")
+├── logo.svg                      # Logo source file (editable vector)
 ├── Template.docx                 # Original Word template (reference)
 ├── build.sh                      # Build script (macOS/Linux)
 ├── build.ps1                     # Build script (Windows)
