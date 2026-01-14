@@ -6,6 +6,15 @@ Instructions for AI agents working with this repository.
 
 This repository contains LaTeX templates for formal program decision documentation, adapted from NASA's Memorandum of Agreement format.
 
+## Target Environment
+
+**Airgapped Windows 11** with security hardening. Users are expected to run on:
+- CIS Windows 11 Enterprise baseline
+- DISA STIG Windows 11 baseline
+- Microsoft Security Baseline
+
+See README.md for baseline references and VM download links.
+
 ## Templates
 
 | File | Description |
@@ -21,17 +30,17 @@ Use the provided build scripts:
 # macOS/Linux
 ./build.sh [decision_memo|decision_document|both]
 
-# Windows
+# Windows (batch - double-click friendly)
+build.bat [decision_memo|decision_document|both]
+
+# Windows (PowerShell)
 .\build.ps1 [decision_memo|decision_document|both]
 ```
 
 The build scripts:
 - Run pdflatex 3 times (for TOC and page references)
 - Automatically clean up auxiliary files
-- Prompt to install missing LaTeX packages if needed
-- Optional `--docx` flag generates Word documents via pandoc
-
-**Word output note:** The `--docx` flag is for user convenience only. AI agents should always use PDF output for signing. Digital signatures are not supported for Word documents. Word output includes a "DRAFT - FOR REVIEW" watermark.
+- Check for MiKTeX and prompt installation if missing
 
 ## AI Agent Build and Sign Workflow
 
@@ -166,14 +175,14 @@ Use ANSI/NIST standard date format placeholders:
 DecisionDocument/
 ├── decision_memo.tex             # Brief Decision Memorandum template
 ├── decision_document.tex         # Comprehensive decision template
-├── decision_document.pdf         # Example generated PDF
-├── decision_document_signed.pdf  # Example signed PDF
 ├── logo.png                      # Header logo (orbit-styled "Logo")
 ├── logo.svg                      # Logo source file (editable vector)
+├── build.bat                     # Build script (Windows batch - double-click)
+├── build.ps1                     # Build script (Windows PowerShell)
 ├── build.sh                      # Build script (macOS/Linux)
-├── build.ps1                     # Build script (Windows)
+├── sign.bat                      # PDF signing script (Windows batch - double-click)
+├── sign.ps1                      # PDF signing script (Windows PowerShell)
 ├── sign.sh                       # PDF signing script (macOS/Linux)
-├── sign.ps1                      # PDF signing script (Windows)
 ├── PdfSigner.exe                 # Windows PDF signing tool (self-contained)
 ├── .gitignore                    # Git ignore rules
 ├── README.md                     # User documentation
@@ -212,99 +221,60 @@ sudo tlmgr install titlesec enumitem booktabs longtable lastpage datetime2 tabul
 
 ## Digital Signatures
 
-The repository includes scripts for digitally signing PDFs. Both `sign.sh` (macOS/Linux) and `sign.ps1` (Windows) have feature parity.
+The repository includes scripts for digitally signing PDFs.
 
-### Windows Smart Card Signing (PIV/CAC)
+### Windows (Primary Target)
 
-Windows users with PIV/CAC badges can sign PDFs using the pre-built `PdfSigner.exe` tool. No Java or SDK installation required.
+Double-click `sign.bat` for interactive mode, or use command line:
 
-**Usage:**
-```powershell
-# Via sign.ps1 (automatically detects PdfSigner.exe)
-.\sign.ps1
+```batch
+:: Interactive mode
+sign.bat
 
-# Direct usage - console mode (default)
-.\PdfSigner.exe document.pdf
+:: Sign a specific PDF
+sign.bat document.pdf
 
-# Direct usage - GUI certificate picker
-.\PdfSigner.exe document.pdf --gui
+:: Verify a signature
+sign.bat verify document_signed.pdf
 
-# List available certificates
-.\PdfSigner.exe --list
+:: Create a test certificate (requires OpenSSL)
+sign.bat create-cert
+
+:: List available certificates
+sign.bat list
 ```
 
-**Features:**
-- Filters certificates to only show valid signing certs (not expired, has Digital Signature key usage)
-- Groups certificates by type: PIV/CAC (smart card) shown first, then Other
-- Shows issuer, expiration date, and days remaining for each cert
-- `--gui` flag opens native Windows certificate picker dialog
-- Triggers Windows Security PIN dialog automatically when signing
+**PdfSigner.exe** handles signing via Windows Certificate Store. Features:
+- PIV/CAC smart card support (triggers Windows Security PIN dialog)
+- Software certificate support
+- Only shows valid signing certs (not expired, has Digital Signature key usage)
+- PIV/CAC certificates prioritized over other certificates
 
-**Certificate filtering:**
-- Only certificates with Digital Signature key usage are shown
-- Expired certificates are hidden
-- PIV/CAC certificates (DOD, NASA, FPKI, etc.) are prioritized
+**PdfSigner source code:** [github.com/brucedombrowski/PDFSigner](https://github.com/brucedombrowski/PDFSigner)
 
-**PdfSigner source code:** Available at [github.com/brucedombrowski/PDFSigner](https://github.com/brucedombrowski/PDFSigner)
+### macOS/Linux
 
-### Sign a PDF
-
-**macOS/Linux:**
 ```bash
-# Interactive mode (recommended)
+# Interactive mode
 ./sign.sh
 
-# Command-line: sign with software certificate
-./sign.sh sign-p12 mycert.p12 document.pdf
-
-# Command-line: sign with smart card (PIV/CAC)
+# Sign with smart card
 ./sign.sh sign document.pdf
 
-# Verify a signature
+# Sign with software certificate
+./sign.sh sign-p12 mycert.p12 document.pdf
+
+# Verify
 ./sign.sh verify document_signed.pdf
-```
 
-**Windows PowerShell:**
-```powershell
-# Interactive mode (recommended) - uses PdfSigner.exe if available
-.\sign.ps1
-
-# Command-line: sign with software certificate
-.\sign.ps1 sign-p12 mycert.p12 document.pdf
-
-# Command-line: sign with smart card (PIV/CAC)
-.\sign.ps1 sign document.pdf
-
-# Verify a signature
-.\sign.ps1 verify document_signed.pdf
-```
-
-### Create a test certificate
-
-```bash
-# macOS/Linux
+# Create test certificate
 ./sign.sh create-cert
-
-# Windows
-.\sign.ps1 create-cert
 ```
 
-This generates:
-- `<name>_key.pem` - Private key (never commit!)
-- `<name>_cert.pem` - Public certificate
-- `<name>.p12` - PKCS#12 bundle for signing
-
-### Dependencies for signing
-
-**macOS/Linux:**
+**Dependencies:**
 ```bash
-# Homebrew
 brew install opensc poppler nss
 ```
-
-**Windows:**
-- **PdfSigner.exe** (recommended): Pre-built in repository, no dependencies
-- **Alternative**: JSignPDF requires Java Runtime Environment
 
 ## Testing Changes
 
