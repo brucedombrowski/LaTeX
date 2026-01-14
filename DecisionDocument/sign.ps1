@@ -1,6 +1,7 @@
 # Digital signature script for Decision Documents
 # Supports smart card (PIV/CAC) and software certificate (.p12/.pfx) signing
-# Requires: OpenSC for smart cards, OpenSSL for certificate creation
+# Smart card signing uses Windows Certificate Store (preferred) or OpenSC as fallback
+# Requires: OpenSSL for certificate creation (optional)
 
 param(
     [Parameter(Position=0)]
@@ -33,6 +34,7 @@ $script:PKCS11Lib = ""
 $script:JSignJar = ""
 $script:HasOpenSSL = $false
 $script:HasCertUtil = $false
+$script:HasWindowsSmartCard = $false
 
 function Test-Tools {
     $toolFound = $false
@@ -112,21 +114,155 @@ function Find-PKCS11Library {
     return $false
 }
 
+function Test-WindowsSmartCard {
+    # Check if smart card certificates are available via Windows Certificate Store
+    # This works without OpenSC if the smart card middleware is installed by Windows/enterprise
+    try {
+        $smartCardCerts = Get-ChildItem -Path Cert:\CurrentUser\My | Where-Object {
+            $_.HasPrivateKey -and
+            ($_.EnhancedKeyUsageList.FriendlyName -contains "Document Signing" -or
+             $_.EnhancedKeyUsageList.FriendlyName -contains "Code Signing" -or
+             $_.Extensions | Where-Object { $_.Oid.FriendlyName -eq "Key Usage" -and $_.Format(0) -match "Digital Signature" })
+        }
+
+        if ($smartCardCerts -and $smartCardCerts.Count -gt 0) {
+            $script:HasWindowsSmartCard = $true
+            Write-Success "Found Windows Certificate Store signing certificates"
+            return $true
+        }
+    }
+    catch {
+        # Certificate store access failed
+    }
+    return $false
+}
+
+function Get-WindowsSigningCertificates {
+    # Get certificates suitable for document signing from Windows Certificate Store
+    try {
+        $certs = Get-ChildItem -Path Cert:\CurrentUser\My | Where-Object {
+            $_.HasPrivateKey -and
+            ($_.EnhancedKeyUsageList.FriendlyName -contains "Document Signing" -or
+             $_.EnhancedKeyUsageList.FriendlyName -contains "Code Signing" -or
+             $_.Extensions | Where-Object { $_.Oid.FriendlyName -eq "Key Usage" -and $_.Format(0) -match "Digital Signature" })
+        }
+        return $certs
+    }
+    catch {
+        return @()
+    }
+}
+
+function Show-WindowsCertificates {
+    Write-Host ""
+    Write-Warn "Certificates in Windows Certificate Store (suitable for signing):"
+    Write-Host ""
+
+    $certs = Get-WindowsSigningCertificates
+    if ($certs.Count -eq 0) {
+        Write-Host "  No signing certificates found in Windows Certificate Store."
+        Write-Host ""
+        Write-Host "  If your smart card is inserted, certificates should appear here"
+        Write-Host "  if Windows recognizes your card's middleware."
+        return
+    }
+
+    $i = 1
+    foreach ($cert in $certs) {
+        $subject = $cert.Subject
+        $issuer = $cert.Issuer -replace ".*CN=([^,]+).*", '$1'
+        $expires = $cert.NotAfter.ToString("yyyy-MM-dd")
+        Write-Host "  $i) $subject"
+        Write-Host "     Issuer: $issuer | Expires: $expires"
+        Write-Host "     Thumbprint: $($cert.Thumbprint)"
+        Write-Host ""
+        $i++
+    }
+}
+
+function Sign-WithWindowsCert {
+    param($InputPdf, $OutputPdf, $CertThumbprint)
+
+    Write-Host ""
+    Write-Warn "Signing with Windows Certificate Store..."
+
+    # Get the certificate
+    $cert = Get-ChildItem -Path Cert:\CurrentUser\My | Where-Object { $_.Thumbprint -eq $CertThumbprint }
+    if (-not $cert) {
+        Write-Err "Certificate not found with thumbprint: $CertThumbprint"
+        return $false
+    }
+
+    Write-Host "Using certificate: $($cert.Subject)"
+
+    # Check if JSignPDF is available (it can use Windows keystore via SunMSCAPI)
+    if ($script:JSignJar) {
+        Write-Host "Signing via JSignPDF with Windows keystore..."
+
+        $outDir = Split-Path -Parent $OutputPdf
+        if (-not $outDir) { $outDir = "." }
+
+        # JSignPDF can use Windows-MY keystore
+        $javaArgs = @(
+            "-jar", $script:JSignJar,
+            "--keystore-type", "WINDOWS-MY",
+            "--key-alias", $cert.Subject,
+            "--out-directory", $outDir,
+            "--out-suffix", "_signed",
+            $InputPdf
+        )
+
+        & java $javaArgs
+        return $LASTEXITCODE -eq 0
+    }
+
+    # Fallback: Export cert to temp P12 and use existing P12 signing
+    # This requires the private key to be exportable (may not work for smart cards)
+    Write-Warn "JSignPDF not found. Attempting export-based signing..."
+    Write-Host "Note: This may not work if the certificate's private key is non-exportable (smart cards)."
+
+    try {
+        $tempP12 = Join-Path $env:TEMP "temp_sign_$(Get-Random).p12"
+        $tempPassword = [System.Guid]::NewGuid().ToString()
+
+        # Try to export (will fail for non-exportable keys like smart cards)
+        $certBytes = $cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, $tempPassword)
+        [System.IO.File]::WriteAllBytes($tempP12, $certBytes)
+
+        $result = Sign-WithP12 $InputPdf $OutputPdf $tempP12 $tempPassword
+
+        # Clean up
+        Remove-Item $tempP12 -Force -ErrorAction SilentlyContinue
+
+        return $result
+    }
+    catch {
+        Write-Err "Cannot export certificate private key."
+        Write-Host "This is expected for smart card certificates."
+        Write-Host ""
+        Write-Host "To sign with smart cards, install JSignPDF:"
+        Write-Host "  Download from http://jsignpdf.sourceforge.net/"
+        return $false
+    }
+}
+
 function Get-SmartCardCertificates {
     Write-Host ""
     Write-Warn "Checking for smart card certificates..."
 
+    # First, show Windows Certificate Store certificates (preferred method)
+    Show-WindowsCertificates
+
+    # Also try OpenSC if available
     if ($script:PKCS11Lib -and (Get-Command "pkcs11-tool" -ErrorAction SilentlyContinue)) {
+        Write-Host ""
+        Write-Warn "OpenSC PKCS#11 certificates:"
         try {
             & pkcs11-tool --module $script:PKCS11Lib --list-objects --type cert 2>&1
         }
         catch {
-            Write-Warn "Could not list certificates. Is your smart card inserted?"
+            Write-Warn "Could not list OpenSC certificates. Is your smart card inserted?"
         }
-    }
-    else {
-        Write-Warn "PKCS#11 library or pkcs11-tool not found."
-        Write-Host "Install OpenSC from: https://github.com/OpenSC/OpenSC/releases"
     }
 }
 
@@ -610,17 +746,100 @@ function Sign-WithSmartCardInteractive {
     Write-Warn "Smart Card Signing"
     Write-Host ""
 
+    # First, try Windows Certificate Store (works without OpenSC if Windows recognizes the card)
+    $winCerts = Get-WindowsSigningCertificates
+    if ($winCerts -and $winCerts.Count -gt 0) {
+        Write-Success "Found certificates in Windows Certificate Store!"
+        Write-Host ""
+        Write-Host "This method works with your existing Windows smart card setup."
+        Write-Host "No additional software (OpenSC) is required."
+        Write-Host ""
+
+        # List certificates
+        $i = 1
+        foreach ($cert in $winCerts) {
+            $subject = $cert.Subject
+            $issuer = $cert.Issuer -replace ".*CN=([^,]+).*", '$1'
+            $expires = $cert.NotAfter.ToString("yyyy-MM-dd")
+            Write-Host "  $i) $subject"
+            Write-Host "     Issuer: $issuer | Expires: $expires"
+            Write-Host ""
+            $i++
+        }
+        Write-Host "  $i) Use OpenSC/PKCS#11 instead"
+        $i++
+        Write-Host "  $i) Back to main menu"
+        Write-Host ""
+        $certChoice = Read-Host "Select certificate [1-$i]"
+
+        if ($certChoice -eq ($i - 1).ToString()) {
+            # Fall through to OpenSC method
+            Sign-WithSmartCardOpenSC
+            return
+        }
+        elseif ($certChoice -eq $i.ToString()) {
+            Show-InteractiveMenu
+            return
+        }
+        elseif ([int]$certChoice -ge 1 -and [int]$certChoice -le $winCerts.Count) {
+            $selectedCert = $winCerts[[int]$certChoice - 1]
+
+            # Select PDF file
+            $pdfFile = Select-PdfFile
+            if (-not $pdfFile) {
+                Show-InteractiveMenu
+                return
+            }
+
+            # Sign the PDF
+            $baseName = [System.IO.Path]::GetFileNameWithoutExtension($pdfFile)
+            $directory = Split-Path -Parent $pdfFile
+            if (-not $directory) { $directory = "." }
+            $outputPdf = Join-Path $directory "${baseName}_signed.pdf"
+
+            $result = Sign-WithWindowsCert $pdfFile $outputPdf $selectedCert.Thumbprint
+
+            if ($result -and (Test-Path $outputPdf)) {
+                Write-Host ""
+                Write-Success "Successfully signed: $outputPdf"
+            }
+
+            Pause-Continue
+            Show-InteractiveMenu
+            return
+        }
+        else {
+            Write-Err "Invalid choice."
+            Sign-WithSmartCardInteractive
+            return
+        }
+    }
+
+    # No Windows certs found, try OpenSC
+    Sign-WithSmartCardOpenSC
+}
+
+function Sign-WithSmartCardOpenSC {
+    Write-Host ""
+    Write-Warn "OpenSC/PKCS#11 Smart Card Signing"
+    Write-Host ""
+
     # Check if smart card support is available
     if (-not $script:PKCS11Lib) {
         Write-Err "No PKCS#11 library found."
-        Write-Host "Please ensure OpenSC is installed."
-        Write-Host "Download from: https://github.com/OpenSC/OpenSC/releases"
+        Write-Host ""
+        Write-Host "No signing certificates were found in Windows Certificate Store,"
+        Write-Host "and OpenSC is not installed."
+        Write-Host ""
+        Write-Host "Options:"
+        Write-Host "  1) Insert your smart card and try again (if Windows recognizes it)"
+        Write-Host "  2) Install OpenSC from: https://github.com/OpenSC/OpenSC/releases"
         Pause-Continue
         Show-InteractiveMenu
         return
     }
 
-    Write-Host "Checking for smart card..."
+    Write-Host "Checking for smart card via OpenSC..."
     if (Get-Command "pkcs11-tool" -ErrorAction SilentlyContinue) {
         $slotInfo = & pkcs11-tool --module $script:PKCS11Lib --list-slots 2>&1
         if ($slotInfo -notmatch "token present") {
@@ -636,7 +855,7 @@ function Sign-WithSmartCardInteractive {
                 Show-InteractiveMenu
                 return
             }
-            Sign-WithSmartCardInteractive
+            Sign-WithSmartCardOpenSC
             return
         }
     }
@@ -646,7 +865,9 @@ function Sign-WithSmartCardInteractive {
 
     # List certificates
     Write-Host "Certificates on card:"
-    Get-SmartCardCertificates
+    if (Get-Command "pkcs11-tool" -ErrorAction SilentlyContinue) {
+        & pkcs11-tool --module $script:PKCS11Lib --list-objects --type cert 2>&1
+    }
     Write-Host ""
 
     # Select PDF file
@@ -719,6 +940,7 @@ function Verify-Interactive {
 # Main script
 Test-Tools | Out-Null
 Find-PKCS11Library | Out-Null
+Test-WindowsSmartCard | Out-Null
 
 switch ($Action) {
     "sign" {
