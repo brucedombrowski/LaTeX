@@ -105,6 +105,8 @@ Edit the document variables near the top of the file:
 Edit the document variables near the top of the file:
 
 ```latex
+\newcommand{\OrganizationName}{Organization Name}
+\newcommand{\OrganizationUnit}{Division/Directorate Name}
 \newcommand{\DocumentTitle}{Program Decision Document}
 \newcommand{\DocumentNumber}{PDD-XXXX-XXX}
 \newcommand{\DocumentVersion}{1.0}
