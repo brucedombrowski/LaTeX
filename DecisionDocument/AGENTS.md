@@ -38,40 +38,63 @@ When building and signing PDFs as an AI agent, use this automated workflow:
 # 1. Delete old certificates
 rm -f *.pem *.p12
 
-# 2. Get git commit hash for traceability
-COMMIT_HASH=$(git rev-parse --short HEAD)
-
-# 3. Create new AI agent certificate with commit hash (non-interactive)
-openssl req -x509 -newkey rsa:2048 \
-  -keyout ai_agent_key.pem -out ai_agent_cert.pem \
-  -days 365 -nodes \
-  -subj "/C=US/O=AI Agent/OU=commit:${COMMIT_HASH}/CN=Claude Code Agent" \
-  -addext "keyUsage=digitalSignature" \
-  -addext "extendedKeyUsage=emailProtection"
-
-# 4. Create PKCS#12 bundle
-openssl pkcs12 -export -out ai_agent.p12 \
-  -inkey ai_agent_key.pem -in ai_agent_cert.pem \
-  -passout pass:agent123
-
-# 5. Build PDFs
+# 2. Build PDFs first
 ./build.sh both
 
-# 6. Sign PDFs (pipe password to avoid interactive prompt)
-./sign.sh sign-p12 ai_agent.p12 decision_memo.pdf <<< "agent123"
-./sign.sh sign-p12 ai_agent.p12 decision_document.pdf <<< "agent123"
+# 3. Sign each PDF with a certificate containing its source .tex hash
+# This creates per-document traceability from signed PDF back to source
 
-# 7. Verify signatures
+# Sign decision_memo.pdf
+TEX_HASH=$(shasum -a 256 decision_memo.tex | cut -c1-12)
+openssl req -x509 -newkey rsa:2048 \
+  -keyout memo_key.pem -out memo_cert.pem \
+  -days 365 -nodes \
+  -subj "/C=US/O=AI Agent/OU=sha256:${TEX_HASH}/CN=decision_memo.tex" \
+  -addext "keyUsage=digitalSignature" \
+  -addext "extendedKeyUsage=emailProtection" 2>/dev/null
+openssl pkcs12 -export -out memo.p12 \
+  -inkey memo_key.pem -in memo_cert.pem \
+  -passout pass:agent123
+./sign.sh sign-p12 memo.p12 decision_memo.pdf <<< "agent123"
+
+# Sign decision_document.pdf
+TEX_HASH=$(shasum -a 256 decision_document.tex | cut -c1-12)
+openssl req -x509 -newkey rsa:2048 \
+  -keyout doc_key.pem -out doc_cert.pem \
+  -days 365 -nodes \
+  -subj "/C=US/O=AI Agent/OU=sha256:${TEX_HASH}/CN=decision_document.tex" \
+  -addext "keyUsage=digitalSignature" \
+  -addext "extendedKeyUsage=emailProtection" 2>/dev/null
+openssl pkcs12 -export -out doc.p12 \
+  -inkey doc_key.pem -in doc_cert.pem \
+  -passout pass:agent123
+./sign.sh sign-p12 doc.p12 decision_document.pdf <<< "agent123"
+
+# 4. Verify signatures
 ./sign.sh verify decision_memo_signed.pdf
 ./sign.sh verify decision_document_signed.pdf
+
+# 5. Clean up certificates
+rm -f *.pem *.p12
 ```
 
 **Certificate details:**
-- Common Name: `Claude Code Agent`
+- Common Name: `<source-filename>.tex` (e.g., `decision_document.tex`)
 - Organization: `AI Agent`
-- Organizational Unit: `commit:<git-short-hash>` (links signature to repo state)
+- Organizational Unit: `sha256:<first-12-chars-of-tex-hash>` (links signature to source .tex file)
 - Country: `US`
 - Password: `agent123`
+
+**Verifying source traceability:**
+```bash
+# Get the hash from the signed PDF
+./sign.sh verify decision_document_signed.pdf | grep "OU=sha256"
+
+# Compare with the current .tex file hash
+shasum -a 256 decision_document.tex | cut -c1-12
+```
+
+If the hashes match, the PDF was generated from that exact .tex source.
 
 **Output files:**
 - `decision_memo_signed.pdf`

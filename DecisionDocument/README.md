@@ -289,20 +289,46 @@ After signing, verify with:
 ./sign.sh verify decision_document_signed.pdf
 ```
 
-Example output:
+**Example output (human signer):**
 ```
 Digital Signature Info of: decision_document_signed.pdf
 Signature #1:
-  - Signer Certificate Common Name: Claude Code Agent
-  - Signer full Distinguished Name: CN=Claude Code Agent,OU=commit:1376440,O=AI Agent,C=US
-  - Signing Time: Jan 13 2026 22:06:48
+  - Signer Certificate Common Name: Test Signer
+  - Signer full Distinguished Name: CN=Test Signer,O=Test Organization,C=US
+  - Signing Time: Jan 13 2026 22:40:00
   - Signing Hash Algorithm: SHA-256
   - Signature Type: adbe.pkcs7.detached
   - Signature Validation: Signature is Valid.
   - Certificate Validation: Certificate issuer is unknown.
 ```
 
-The `OU=commit:<hash>` field links the signature to the specific git commit, providing cryptographic traceability.
+**Example output (AI agent signer):**
+```
+Digital Signature Info of: decision_document_signed.pdf
+Signature #1:
+  - Signer Certificate Common Name: decision_document.tex
+  - Signer full Distinguished Name: CN=decision_document.tex,OU=sha256:2479bac33557,O=AI Agent,C=US
+  - Signing Time: Jan 13 2026 22:35:00
+  - Signing Hash Algorithm: SHA-256
+  - Signature Type: adbe.pkcs7.detached
+  - Signature Validation: Signature is Valid.
+  - Certificate Validation: Certificate issuer is unknown.
+```
+
+For AI agent signatures, the certificate provides source traceability:
+- **CN** (Common Name): The source `.tex` filename that generated the PDF
+- **OU** (Organizational Unit): `sha256:<hash>` - first 12 characters of the source file's SHA-256 hash
+
+To verify an AI-signed PDF was generated from a specific `.tex` file:
+```bash
+# Get hash from signature
+./sign.sh verify decision_document_signed.pdf | grep "OU=sha256"
+
+# Compare with current source file
+shasum -a 256 decision_document.tex | cut -c1-12
+```
+
+If the hashes match, the PDF was generated from that exact source.
 
 The "Certificate issuer is unknown" warning is expected for self-signed certificates. For production use, obtain certificates from a trusted Certificate Authority (CA) or use PIV/CAC smart cards.
 
