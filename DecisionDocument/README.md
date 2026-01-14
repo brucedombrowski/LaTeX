@@ -25,6 +25,11 @@ DecisionDocument/
 ├── build.ps1               # Build script (Windows)
 ├── sign.sh                 # PDF signing script (macOS/Linux)
 ├── sign.ps1                # PDF signing script (Windows)
+├── bin/                    # Pre-built tools
+│   └── PdfSigner.exe       # Windows PDF signing tool (self-contained)
+├── PdfSigner/              # Source code for PdfSigner (optional rebuild)
+│   ├── PdfSigner.csproj    # .NET 6.0 project file
+│   └── Program.cs          # Signing logic using iText7
 ├── .gitignore              # Git ignore rules
 ├── AGENTS.md               # AI agent guidance
 └── README.md               # This file
@@ -219,10 +224,9 @@ This provides tamper-detection - any modification to the signed PDF will invalid
 
 ### Requirements
 
-Install the required tools:
-
+**macOS/Linux:**
 ```bash
-# macOS (Homebrew)
+# Homebrew
 brew install opensc poppler nss
 
 # The tools provide:
@@ -231,15 +235,31 @@ brew install opensc poppler nss
 # - nss: certutil and pk12util for certificate management
 ```
 
+**Windows (Recommended - PdfSigner):**
+
+The `PdfSigner` tool provides native Windows smart card support without requiring Java or additional SDK installation. It uses the Windows Certificate Store directly, triggering the standard Windows Security PIN dialog for PIV/CAC cards.
+
+A pre-built `PdfSigner.exe` is included in the `bin/` folder. Simply run:
+
 ```powershell
-# Windows (Chocolatey)
-choco install openssl poppler
+.\sign.ps1
+```
 
-# For smart card support, install OpenSC from:
-# https://github.com/OpenSC/OpenSC/releases
+The script will automatically detect and use `bin\PdfSigner.exe`. When signing with a smart card, Windows Security will prompt for your PIN - the same dialog you see when logging in.
 
-# Optional: JSignPDF for an alternative signing tool
-# http://jsignpdf.sourceforge.net/
+**Windows (Alternative - JSignPDF):**
+
+If you cannot install the .NET SDK (enterprise restrictions), use the Java-based fallback:
+
+```powershell
+# JSignPDF is included in the repository (JSignPdf.jar)
+# Requires Java Runtime Environment (JRE)
+
+# Check if Java is available:
+java -version
+
+# Run the signing script - it will use JSignPdf.jar automatically
+.\sign.ps1
 ```
 
 ### Interactive Mode

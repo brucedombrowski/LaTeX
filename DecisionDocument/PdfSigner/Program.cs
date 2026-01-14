@@ -1,12 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using iText.Kernel.Pdf;
 using iText.Signatures;
+using iText.Bouncycastle.X509;
 using Org.BouncyCastle.X509;
 
-namespace PdfSigner
+namespace PdfSignerApp
 {
     class Program
     {
@@ -54,12 +56,10 @@ namespace PdfSigner
                 }
 
                 Console.WriteLine();
-                Console.WriteLine($"Selected certificate: {cert.Subject}");
-                Console.WriteLine($"Issuer: {cert.Issuer}");
-                Console.WriteLine($"Valid: {cert.NotBefore:yyyy-MM-dd} to {cert.NotAfter:yyyy-MM-dd}");
+                Console.WriteLine($"Selected: {cert.Subject}");
                 Console.WriteLine();
 
-                // Sign the PDF
+                // Sign the PDF - Windows will prompt for PIN if smart card
                 SignPdf(inputPdf, outputPdf, cert);
 
                 Console.WriteLine();
@@ -77,6 +77,10 @@ namespace PdfSigner
             {
                 Console.WriteLine();
                 Console.WriteLine($"Error: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner: {ex.InnerException.Message}");
+                }
                 return 1;
             }
         }
@@ -89,43 +93,32 @@ namespace PdfSigner
             return Path.Combine(dir, $"{name}_signed{ext}");
         }
 
+        static List<X509Certificate2> GetSigningCertificates()
+        {
+            var result = new List<X509Certificate2>();
+
+            using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadOnly);
+
+            foreach (var cert in store.Certificates)
+            {
+                if (cert.HasPrivateKey)
+                {
+                    result.Add(cert);
+                }
+            }
+
+            return result;
+        }
+
         static void ListCertificates()
         {
             Console.WriteLine("Available signing certificates in Windows Certificate Store:");
             Console.WriteLine();
 
-            using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            store.Open(OpenFlags.ReadOnly);
+            var certs = GetSigningCertificates();
 
-            int index = 0;
-            foreach (var cert in store.Certificates)
-            {
-                // Check if cert can be used for digital signatures
-                bool canSign = false;
-                foreach (var ext in cert.Extensions)
-                {
-                    if (ext is X509KeyUsageExtension keyUsage)
-                    {
-                        canSign = (keyUsage.KeyUsages & X509KeyUsageFlags.DigitalSignature) != 0;
-                        break;
-                    }
-                }
-
-                // Also check if it has a private key
-                if (cert.HasPrivateKey)
-                {
-                    index++;
-                    string smartCard = IsSmartCardCert(cert) ? " [SMART CARD]" : "";
-                    Console.WriteLine($"[{index}] {cert.Subject}{smartCard}");
-                    Console.WriteLine($"    Issuer: {cert.Issuer}");
-                    Console.WriteLine($"    Expires: {cert.NotAfter:yyyy-MM-dd}");
-                    Console.WriteLine($"    Thumbprint: {cert.Thumbprint}");
-                    Console.WriteLine($"    Can Sign: {canSign}");
-                    Console.WriteLine();
-                }
-            }
-
-            if (index == 0)
+            if (certs.Count == 0)
             {
                 Console.WriteLine("No signing certificates found.");
                 Console.WriteLine();
@@ -133,73 +126,84 @@ namespace PdfSigner
                 Console.WriteLine("  1. The card reader drivers are installed");
                 Console.WriteLine("  2. The smart card middleware is configured");
                 Console.WriteLine("  3. The certificate appears in certmgr.msc");
+                return;
             }
-        }
 
-        static bool IsSmartCardCert(X509Certificate2 cert)
-        {
-            // Smart card certs typically have CSP info indicating hardware
-            try
+            int index = 0;
+            foreach (var cert in certs)
             {
-                if (cert.HasPrivateKey)
-                {
-                    using var key = cert.GetRSAPrivateKey();
-                    if (key is RSACng rsaCng)
-                    {
-                        var keyHandle = rsaCng.Key;
-                        // Hardware-based keys will have different properties
-                        return keyHandle.IsEphemeral == false;
-                    }
-                }
+                index++;
+                Console.WriteLine($"[{index}] {cert.Subject}");
+                Console.WriteLine($"    Issuer: {cert.Issuer}");
+                Console.WriteLine($"    Expires: {cert.NotAfter:yyyy-MM-dd}");
+                Console.WriteLine($"    Thumbprint: {cert.Thumbprint}");
+                Console.WriteLine();
             }
-            catch
-            {
-                // If we can't access the key without PIN, it's likely a smart card
-                return true;
-            }
-            return false;
         }
 
         static X509Certificate2? SelectSigningCertificate()
         {
-            using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
-            store.Open(OpenFlags.ReadOnly);
+            var certs = GetSigningCertificates();
 
-            // Filter to certificates with private keys that can sign
-            var signingCerts = new X509Certificate2Collection();
-            foreach (var cert in store.Certificates)
-            {
-                if (cert.HasPrivateKey)
-                {
-                    signingCerts.Add(cert);
-                }
-            }
-
-            if (signingCerts.Count == 0)
+            if (certs.Count == 0)
             {
                 Console.WriteLine("No certificates with private keys found.");
+                Console.WriteLine();
+                Console.WriteLine("Ensure your smart card is inserted and recognized by Windows.");
                 return null;
             }
 
-            // Show Windows certificate selection dialog
-            // This will show smart card certificates and prompt for PIN when needed
-            var selected = X509Certificate2UI.SelectFromCollection(
-                signingCerts,
-                "Select Signing Certificate",
-                "Choose a certificate to sign the PDF document:",
-                X509SelectionFlag.SingleSelection);
+            if (certs.Count == 1)
+            {
+                // Only one cert available - use it automatically
+                Console.WriteLine($"Using certificate: {certs[0].Subject}");
+                return certs[0];
+            }
 
-            return selected.Count > 0 ? selected[0] : null;
+            // Multiple certs - let user choose
+            Console.WriteLine("Available certificates:");
+            Console.WriteLine();
+
+            int index = 0;
+            foreach (var cert in certs)
+            {
+                index++;
+                // Extract just the CN for cleaner display
+                string displayName = cert.Subject;
+                if (displayName.StartsWith("CN="))
+                {
+                    int comma = displayName.IndexOf(',');
+                    if (comma > 0)
+                        displayName = displayName.Substring(3, comma - 3);
+                    else
+                        displayName = displayName.Substring(3);
+                }
+                Console.WriteLine($"  [{index}] {displayName}");
+                Console.WriteLine($"      Expires: {cert.NotAfter:yyyy-MM-dd}");
+            }
+
+            Console.WriteLine();
+            Console.Write($"Select certificate [1-{certs.Count}]: ");
+
+            string? input = Console.ReadLine();
+            if (int.TryParse(input, out int choice) && choice >= 1 && choice <= certs.Count)
+            {
+                return certs[choice - 1];
+            }
+
+            Console.WriteLine("Invalid selection.");
+            return null;
         }
 
         static void SignPdf(string inputPath, string outputPath, X509Certificate2 cert)
         {
             Console.WriteLine("Signing PDF...");
-            Console.WriteLine("(Windows Security may prompt for your PIN)");
+            Console.WriteLine("(Windows Security will prompt for your PIN if using a smart card)");
 
-            // Convert .NET cert to BouncyCastle cert for iText
+            // Convert .NET cert to iText-wrapped BouncyCastle cert
             var bcCert = new X509CertificateParser().ReadCertificate(cert.RawData);
-            var chain = new Org.BouncyCastle.X509.X509Certificate[] { bcCert };
+            var wrappedCert = new X509CertificateBC(bcCert);
+            var chain = new iText.Commons.Bouncycastle.Cert.IX509Certificate[] { wrappedCert };
 
             // Create external signature using Windows CNG (triggers PIN dialog)
             var externalSignature = new X509Certificate2Signature(cert, "SHA256");
@@ -207,23 +211,22 @@ namespace PdfSigner
             using var reader = new PdfReader(inputPath);
             using var outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
 
-            var signer = new PdfSigner(reader, outputStream, new StampingProperties());
+            var signer = new iText.Signatures.PdfSigner(reader, outputStream, new StampingProperties());
 
-            // Set signature appearance
-            var appearance = signer.GetSignatureAppearance();
-            appearance
-                .SetReason("Document Approval")
-                .SetLocation("Digital Signature")
-                .SetContact(cert.Subject);
+            // Set signature field name
+            signer.SetFieldName("Signature1");
 
             // Perform the signature - this triggers the PIN dialog for smart cards
-            signer.SignDetached(externalSignature, chain, null, null, null, 0, PdfSigner.CryptoStandard.CMS);
+            signer.SignDetached(externalSignature, chain, null, null, null, 0,
+                iText.Signatures.PdfSigner.CryptoStandard.CMS);
         }
     }
 
     /// <summary>
-    /// External signature implementation using Windows Certificate Store
-    /// This class bridges iText's signature interface with .NET's X509Certificate2
+    /// External signature implementation using Windows Certificate Store.
+    /// This bridges iText's signature interface with .NET's X509Certificate2.
+    /// When accessing a smart card private key, Windows CNG automatically
+    /// displays the PIN prompt dialog.
     /// </summary>
     public class X509Certificate2Signature : IExternalSignature
     {
@@ -253,8 +256,8 @@ namespace PdfSigner
 
         public byte[] Sign(byte[] message)
         {
-            // This is where the magic happens - Windows CNG will prompt for PIN
-            // when accessing a smart card private key
+            // This is where Windows CNG prompts for PIN when accessing
+            // a smart card private key
 
             var rsaKey = _certificate.GetRSAPrivateKey();
             if (rsaKey != null)

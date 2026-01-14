@@ -42,10 +42,13 @@ function Test-Tools {
     $toolFound = $false
 
     # Check for PdfSigner.exe (.NET tool - preferred, no Java dependency)
+    # Pre-built exe is in bin/ folder, or user can build it themselves
     $pdfSignerPaths = @(
+        "$ScriptDir\bin\PdfSigner.exe",
+        "$ScriptDir\PdfSigner.exe",
+        "$ScriptDir\PdfSigner\bin\Release\net6.0-windows\win-x64\PdfSigner.exe",
         "$ScriptDir\PdfSigner\bin\Release\net6.0\PdfSigner.exe",
         "$ScriptDir\PdfSigner\bin\Debug\net6.0\PdfSigner.exe",
-        "$ScriptDir\PdfSigner.exe",
         "$env:LOCALAPPDATA\PdfSigner\PdfSigner.exe"
     )
 
