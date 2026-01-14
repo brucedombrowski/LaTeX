@@ -11,6 +11,8 @@ LaTeX templates for formal program decision documentation, adapted from NASA's M
 
 ## Files
 
+Source files included in the repository (generated PDFs and certificates not listed):
+
 ```
 DecisionDocument/
 ├── decision_memo.tex       # Brief Decision Memorandum template
@@ -21,6 +23,7 @@ DecisionDocument/
 ├── build.ps1               # Build script (Windows)
 ├── sign.sh                 # PDF signing script (macOS/Linux)
 ├── sign.ps1                # PDF signing script (Windows)
+├── .gitignore              # Git ignore rules
 ├── AGENTS.md               # AI agent guidance
 └── README.md               # This file
 ```
