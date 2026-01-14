@@ -15,7 +15,7 @@ LaTeX templates for formal program decision documentation, adapted from NASA's M
 DecisionDocument/
 ├── decision_memo.tex       # Brief Decision Memorandum template
 ├── decision_document.tex   # Comprehensive decision template
-├── logo_placeholder.png    # Placeholder logo for header
+├── logo.png                # Header logo (Word-style blue "Org")
 ├── Template.docx           # Original Word template (reference)
 ├── build.sh                # Build script (macOS/Linux)
 ├── build.ps1               # Build script (Windows)
@@ -136,7 +136,7 @@ Edit the document variables near the top of the file:
 
 ### Adding Your Logo
 
-Replace `logo_placeholder.png` with your organization's logo. The logo should be approximately 1 inch tall for optimal header display.
+Replace `logo.png` with your organization's logo. The logo should be approximately 1 inch tall for optimal header display.
 
 ## Installing Missing Packages
 
