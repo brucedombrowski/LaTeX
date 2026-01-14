@@ -176,9 +176,6 @@ DecisionDocument/
 ├── sign.ps1                      # PDF signing script (Windows)
 ├── bin/                          # Pre-built tools
 │   └── PdfSigner.exe             # Windows PDF signing tool (self-contained)
-├── PdfSigner/                    # Source code for PdfSigner
-│   ├── PdfSigner.csproj          # .NET 6.0 project file
-│   └── Program.cs                # Signing logic using iText7
 ├── .gitignore                    # Git ignore rules
 ├── README.md                     # User documentation
 └── AGENTS.md                     # This file
@@ -249,18 +246,7 @@ Windows users with PIV/CAC badges can sign PDFs using the pre-built `PdfSigner.e
 - Expired certificates are hidden
 - PIV/CAC certificates (DOD, NASA, FPKI, etc.) are prioritized
 
-**Rebuilding PdfSigner:**
-```bash
-# From macOS/Linux (cross-compile)
-cd PdfSigner
-dotnet publish -c Release -r win-x64 --self-contained true
-cp bin/Release/net6.0-windows/win-x64/publish/PdfSigner.exe ../bin/
-
-# From Windows
-cd PdfSigner
-dotnet publish -c Release
-copy bin\Release\net6.0-windows\win-x64\publish\PdfSigner.exe ..\bin\
-```
+**PdfSigner source code:** Available at [github.com/brucedombrowski/PDFSigner](https://github.com/brucedombrowski/PDFSigner)
 
 ### Sign a PDF
 

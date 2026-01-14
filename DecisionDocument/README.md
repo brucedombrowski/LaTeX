@@ -27,9 +27,6 @@ DecisionDocument/
 ├── sign.ps1                # PDF signing script (Windows)
 ├── bin/                    # Pre-built tools
 │   └── PdfSigner.exe       # Windows PDF signing tool (self-contained)
-├── PdfSigner/              # Source code for PdfSigner (optional rebuild)
-│   ├── PdfSigner.csproj    # .NET 6.0 project file
-│   └── Program.cs          # Signing logic using iText7
 ├── .gitignore              # Git ignore rules
 ├── AGENTS.md               # AI agent guidance
 └── README.md               # This file
@@ -239,7 +236,7 @@ brew install opensc poppler nss
 
 The `PdfSigner` tool provides native Windows smart card support without requiring Java or additional SDK installation. It uses the Windows Certificate Store directly, triggering the standard Windows Security PIN dialog for PIV/CAC cards.
 
-A pre-built `PdfSigner.exe` is included in the `bin/` folder. Simply run:
+A pre-built `PdfSigner.exe` is included in the `bin/` folder. Source code is available at [github.com/brucedombrowski/PDFSigner](https://github.com/brucedombrowski/PDFSigner). Simply run:
 
 ```powershell
 # Console mode - filtered certificate list
