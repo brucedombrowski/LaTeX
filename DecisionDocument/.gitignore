@@ -26,7 +26,5 @@ Thumbs.db
 *.crt
 *.cer
 
-# .NET build artifacts
-PdfSigner/bin/
-PdfSigner/obj/
+# .NET debug symbols
 *.pdb

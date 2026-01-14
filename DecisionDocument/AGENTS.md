@@ -174,8 +174,7 @@ DecisionDocument/
 ├── build.ps1                     # Build script (Windows)
 ├── sign.sh                       # PDF signing script (macOS/Linux)
 ├── sign.ps1                      # PDF signing script (Windows)
-├── bin/                          # Pre-built tools
-│   └── PdfSigner.exe             # Windows PDF signing tool (self-contained)
+├── PdfSigner.exe                 # Windows PDF signing tool (self-contained)
 ├── .gitignore                    # Git ignore rules
 ├── README.md                     # User documentation
 └── AGENTS.md                     # This file
@@ -225,13 +224,13 @@ Windows users with PIV/CAC badges can sign PDFs using the pre-built `PdfSigner.e
 .\sign.ps1
 
 # Direct usage - console mode (default)
-.\bin\PdfSigner.exe document.pdf
+.\PdfSigner.exe document.pdf
 
 # Direct usage - GUI certificate picker
-.\bin\PdfSigner.exe document.pdf --gui
+.\PdfSigner.exe document.pdf --gui
 
 # List available certificates
-.\bin\PdfSigner.exe --list
+.\PdfSigner.exe --list
 ```
 
 **Features:**
@@ -304,7 +303,7 @@ brew install opensc poppler nss
 ```
 
 **Windows:**
-- **PdfSigner.exe** (recommended): Pre-built in `bin/` folder, no dependencies
+- **PdfSigner.exe** (recommended): Pre-built in repository, no dependencies
 - **Alternative**: JSignPDF requires Java Runtime Environment
 
 ## Testing Changes
