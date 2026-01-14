@@ -309,24 +309,344 @@ main() {
             create_test_certificate
             ;;
         *)
-            echo ""
-            echo "Usage: $0 <action> [options]"
-            echo ""
-            echo "Actions:"
-            echo "  sign <file.pdf>                    - Sign PDF with smart card (PIV/CAC)"
-            echo "  sign-p12 <cert.p12> <file.pdf>     - Sign PDF with software certificate"
-            echo "  verify <file.pdf>                  - Verify signatures in a PDF"
-            echo "  list                               - List certificates on smart card"
-            echo "  create-cert                        - Create a self-signed test certificate"
-            echo ""
-            echo "Examples:"
-            echo "  $0 sign decision_document.pdf"
-            echo "  $0 sign-p12 test_signer.p12 decision_document.pdf"
-            echo "  $0 verify decision_document_signed.pdf"
-            echo "  $0 list"
-            echo "  $0 create-cert"
+            # Interactive menu when no action specified
+            interactive_menu
             ;;
     esac
+}
+
+# Interactive menu for user-friendly operation
+interactive_menu() {
+    echo ""
+    echo -e "${YELLOW}What would you like to do?${NC}"
+    echo ""
+    echo "  1) Sign a PDF document"
+    echo "  2) Verify a signed PDF"
+    echo "  3) Create a test certificate"
+    echo "  4) List smart card certificates"
+    echo "  5) Show command-line usage"
+    echo "  6) Exit"
+    echo ""
+    read -p "Enter choice [1-6]: " choice
+
+    case "$choice" in
+        1)
+            sign_interactive
+            ;;
+        2)
+            verify_interactive
+            ;;
+        3)
+            create_test_certificate
+            ;;
+        4)
+            list_certificates
+            ;;
+        5)
+            show_usage
+            ;;
+        6)
+            echo "Goodbye!"
+            exit 0
+            ;;
+        *)
+            echo -e "${RED}Invalid choice. Please enter 1-6.${NC}"
+            interactive_menu
+            ;;
+    esac
+}
+
+# Interactive signing flow
+sign_interactive() {
+    echo ""
+    echo -e "${YELLOW}How would you like to sign?${NC}"
+    echo ""
+    echo "  1) Use a software certificate (.p12 file)"
+    echo "  2) Use a smart card (PIV/CAC)"
+    echo "  3) Back to main menu"
+    echo ""
+    read -p "Enter choice [1-3]: " sign_choice
+
+    case "$sign_choice" in
+        1)
+            sign_with_software_cert
+            ;;
+        2)
+            sign_with_smart_card
+            ;;
+        3)
+            interactive_menu
+            ;;
+        *)
+            echo -e "${RED}Invalid choice.${NC}"
+            sign_interactive
+            ;;
+    esac
+}
+
+# Sign with software certificate flow
+sign_with_software_cert() {
+    echo ""
+
+    # Check for existing .p12 files
+    local p12_files=($(ls "$SCRIPT_DIR"/*.p12 2>/dev/null))
+
+    if [ ${#p12_files[@]} -eq 0 ]; then
+        echo -e "${YELLOW}No .p12 certificate files found.${NC}"
+        echo ""
+        echo "  1) Create a new test certificate"
+        echo "  2) Enter path to existing .p12 file"
+        echo "  3) Back to main menu"
+        echo ""
+        read -p "Enter choice [1-3]: " cert_choice
+
+        case "$cert_choice" in
+            1)
+                create_test_certificate
+                echo ""
+                read -p "Press Enter to continue signing..."
+                sign_with_software_cert
+                return
+                ;;
+            2)
+                read -p "Enter full path to .p12 file: " p12_file
+                ;;
+            3)
+                interactive_menu
+                return
+                ;;
+            *)
+                echo -e "${RED}Invalid choice.${NC}"
+                sign_with_software_cert
+                return
+                ;;
+        esac
+    else
+        echo "Available certificates:"
+        echo ""
+        local i=1
+        for f in "${p12_files[@]}"; do
+            echo "  $i) $(basename "$f")"
+            ((i++))
+        done
+        echo "  $i) Enter a different path"
+        ((i++))
+        echo "  $i) Back to main menu"
+        echo ""
+        read -p "Select certificate [1-$i]: " cert_num
+
+        if [ "$cert_num" -eq "$((i-1))" ] 2>/dev/null; then
+            read -p "Enter full path to .p12 file: " p12_file
+        elif [ "$cert_num" -eq "$i" ] 2>/dev/null; then
+            interactive_menu
+            return
+        elif [ "$cert_num" -ge 1 ] && [ "$cert_num" -le "${#p12_files[@]}" ] 2>/dev/null; then
+            p12_file="${p12_files[$((cert_num-1))]}"
+        else
+            echo -e "${RED}Invalid choice.${NC}"
+            sign_with_software_cert
+            return
+        fi
+    fi
+
+    # Select PDF file
+    echo ""
+    local pdf_files=($(ls *.pdf 2>/dev/null))
+
+    if [ ${#pdf_files[@]} -eq 0 ]; then
+        echo -e "${YELLOW}No PDF files found in current directory.${NC}"
+        read -p "Enter full path to PDF file: " pdf_file
+    else
+        echo "Available PDF files:"
+        echo ""
+        local i=1
+        for f in "${pdf_files[@]}"; do
+            echo "  $i) $f"
+            ((i++))
+        done
+        echo "  $i) Enter a different path"
+        echo ""
+        read -p "Select PDF [1-$i]: " pdf_num
+
+        if [ "$pdf_num" -eq "$i" ] 2>/dev/null; then
+            read -p "Enter full path to PDF file: " pdf_file
+        elif [ "$pdf_num" -ge 1 ] && [ "$pdf_num" -le "${#pdf_files[@]}" ] 2>/dev/null; then
+            pdf_file="${pdf_files[$((pdf_num-1))]}"
+        else
+            echo -e "${RED}Invalid choice.${NC}"
+            sign_with_software_cert
+            return
+        fi
+    fi
+
+    # Get password
+    echo ""
+    read -s -p "Enter certificate password: " p12_pass
+    echo ""
+
+    # Sign the PDF
+    local base_name="${pdf_file%.pdf}"
+    local output_pdf="${base_name}_signed.pdf"
+
+    sign_with_p12 "$pdf_file" "$output_pdf" "$p12_file" "$p12_pass"
+
+    if [ -f "$output_pdf" ]; then
+        echo ""
+        echo -e "${GREEN}Successfully signed: $output_pdf${NC}"
+    fi
+
+    echo ""
+    read -p "Press Enter to continue..."
+    interactive_menu
+}
+
+# Sign with smart card flow
+sign_with_smart_card() {
+    echo ""
+    echo -e "${YELLOW}Smart Card Signing${NC}"
+    echo ""
+
+    # Check if smart card is detected
+    if [ -z "$PKCS11_LIB" ]; then
+        echo -e "${RED}No PKCS#11 library found.${NC}"
+        echo "Please ensure OpenSC is installed: brew install opensc"
+        echo ""
+        read -p "Press Enter to continue..."
+        interactive_menu
+        return
+    fi
+
+    echo "Checking for smart card..."
+    if ! pkcs11-tool --module "$PKCS11_LIB" --list-slots 2>/dev/null | grep -q "token present"; then
+        echo ""
+        echo -e "${YELLOW}No smart card detected.${NC}"
+        echo ""
+        echo "Please:"
+        echo "  1) Insert your PIV/CAC smart card"
+        echo "  2) Ensure your card reader is connected"
+        echo ""
+        read -p "Press Enter when ready, or 'q' to go back: " ready
+        if [ "$ready" = "q" ]; then
+            interactive_menu
+            return
+        fi
+        sign_with_smart_card
+        return
+    fi
+
+    echo -e "${GREEN}Smart card detected!${NC}"
+    echo ""
+
+    # List certificates on card
+    echo "Certificates on card:"
+    pkcs11-tool --module "$PKCS11_LIB" --list-objects --type cert 2>/dev/null || true
+    echo ""
+
+    # Select PDF file
+    local pdf_files=($(ls *.pdf 2>/dev/null))
+
+    if [ ${#pdf_files[@]} -eq 0 ]; then
+        echo -e "${YELLOW}No PDF files found in current directory.${NC}"
+        read -p "Enter full path to PDF file: " pdf_file
+    else
+        echo "Available PDF files:"
+        echo ""
+        local i=1
+        for f in "${pdf_files[@]}"; do
+            echo "  $i) $f"
+            ((i++))
+        done
+        echo "  $i) Enter a different path"
+        echo ""
+        read -p "Select PDF [1-$i]: " pdf_num
+
+        if [ "$pdf_num" -eq "$i" ] 2>/dev/null; then
+            read -p "Enter full path to PDF file: " pdf_file
+        elif [ "$pdf_num" -ge 1 ] && [ "$pdf_num" -le "${#pdf_files[@]}" ] 2>/dev/null; then
+            pdf_file="${pdf_files[$((pdf_num-1))]}"
+        else
+            echo -e "${RED}Invalid choice.${NC}"
+            sign_with_smart_card
+            return
+        fi
+    fi
+
+    # Sign the PDF
+    sign_pdf "$pdf_file"
+
+    echo ""
+    read -p "Press Enter to continue..."
+    interactive_menu
+}
+
+# Interactive verify flow
+verify_interactive() {
+    echo ""
+
+    # Look for signed PDFs first, then all PDFs
+    local signed_files=($(ls *_signed.pdf 2>/dev/null))
+    local pdf_files=($(ls *.pdf 2>/dev/null))
+
+    if [ ${#pdf_files[@]} -eq 0 ]; then
+        echo -e "${YELLOW}No PDF files found in current directory.${NC}"
+        read -p "Enter full path to PDF file: " pdf_file
+    else
+        echo "Available PDF files:"
+        echo ""
+        local i=1
+        for f in "${pdf_files[@]}"; do
+            if [[ "$f" == *"_signed.pdf" ]]; then
+                echo -e "  $i) $f ${GREEN}(signed)${NC}"
+            else
+                echo "  $i) $f"
+            fi
+            ((i++))
+        done
+        echo "  $i) Enter a different path"
+        echo ""
+        read -p "Select PDF to verify [1-$i]: " pdf_num
+
+        if [ "$pdf_num" -eq "$i" ] 2>/dev/null; then
+            read -p "Enter full path to PDF file: " pdf_file
+        elif [ "$pdf_num" -ge 1 ] && [ "$pdf_num" -le "${#pdf_files[@]}" ] 2>/dev/null; then
+            pdf_file="${pdf_files[$((pdf_num-1))]}"
+        else
+            echo -e "${RED}Invalid choice.${NC}"
+            verify_interactive
+            return
+        fi
+    fi
+
+    verify_pdf "$pdf_file"
+
+    echo ""
+    read -p "Press Enter to continue..."
+    interactive_menu
+}
+
+# Show command-line usage
+show_usage() {
+    echo ""
+    echo "Command-line Usage: $0 <action> [options]"
+    echo ""
+    echo "Actions:"
+    echo "  sign <file.pdf>                    - Sign PDF with smart card (PIV/CAC)"
+    echo "  sign-p12 <cert.p12> <file.pdf>     - Sign PDF with software certificate"
+    echo "  verify <file.pdf>                  - Verify signatures in a PDF"
+    echo "  list                               - List certificates on smart card"
+    echo "  create-cert                        - Create a self-signed test certificate"
+    echo ""
+    echo "Examples:"
+    echo "  $0 sign decision_document.pdf"
+    echo "  $0 sign-p12 test_signer.p12 decision_document.pdf"
+    echo "  $0 verify decision_document_signed.pdf"
+    echo "  $0 list"
+    echo "  $0 create-cert"
+    echo ""
+    echo "Run without arguments for interactive mode."
+    echo ""
+    read -p "Press Enter to continue..."
+    interactive_menu
 }
 
 # Create a self-signed test certificate
