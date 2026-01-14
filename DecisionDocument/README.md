@@ -30,7 +30,7 @@ DecisionDocument/
 
 ## Requirements
 
-- LaTeX distribution (TeX Live, MiKTeX, or MacTeX)
+- [LaTeX distribution](https://www.latex-project.org/get/#tex-distributions) (TeX Live, MiKTeX, or MacTeX)
 - Required packages:
   - geometry, graphicx, fancyhdr, lastpage
   - titlesec, enumitem, booktabs, longtable
