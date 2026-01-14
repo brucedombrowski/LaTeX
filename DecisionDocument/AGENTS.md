@@ -247,10 +247,35 @@ sign.bat list
 **PdfSigner.exe** handles signing via Windows Certificate Store. Features:
 - PIV/CAC smart card support (triggers Windows Security PIN dialog)
 - Software certificate support
-- Only shows valid signing certs (not expired, has Digital Signature key usage)
+- Multi-signature support (add multiple signatures to one PDF)
+- Only shows valid signing certs (Email Protection or Document Signing EKU)
+- Excludes VPN/network security certs, device certs, and authentication-only certs
 - PIV/CAC certificates prioritized over other certificates
 
 **PdfSigner source code:** [github.com/brucedombrowski/PDFSigner](https://github.com/brucedombrowski/PDFSigner)
+
+### Multi-Signature Workflow (Windows)
+
+The sign.bat menu provides option [2] to add signatures to already-signed PDFs:
+
+```batch
+:: Interactive menu
+sign.bat
+::   [1] Sign a PDF              - initial signature
+::   [2] Add signature to signed PDF  - additional signatures
+::   [3] Verify a signed PDF
+::   [4] Create test certificate
+::   [5] List certificates
+```
+
+Or via command line:
+```batch
+:: First signature
+sign.bat document.pdf
+
+:: Add second signature to the signed PDF
+sign.bat document_signed.pdf
+```
 
 ### macOS/Linux
 
