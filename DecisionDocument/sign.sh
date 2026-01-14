@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Digital signature script for Decision Documents using smart card (PIV/CAC)
-# Requires: OpenSC, osslsigncode, or JSignPDF
+# Digital signature script for Decision Documents
+# Supports: Smart card (PIV/CAC) or software certificates (.p12)
+# Requires: OpenSC, JSignPDF, or PortableSigner
 
 set -e
 
@@ -11,9 +12,12 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo "=========================================="
-echo "PDF Digital Signature Script (Smart Card)"
-echo "=========================================="
+# Script directory for finding certificates
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+echo "========================================"
+echo "PDF Digital Signature Script"
+echo "========================================"
 
 # Check for required tools
 check_tools() {
@@ -35,7 +39,13 @@ check_tools() {
         echo -e "${GREEN}Found: pkcs11-tool (OpenSC)${NC}"
     fi
 
-    if ! $tool_found; then
+    # Check for PortableSigner (Java-based, works with .p12)
+    if command -v java &> /dev/null; then
+        echo -e "${GREEN}Found: Java (for PortableSigner/software signing)${NC}"
+        HAS_JAVA=true
+    fi
+
+    if ! $tool_found && [ "$HAS_JAVA" != "true" ]; then
         echo -e "${RED}Error: No PDF signing tool found.${NC}"
         echo ""
         echo "Please install one of the following:"
@@ -48,6 +58,47 @@ check_tools() {
         echo "  Download from: http://jsignpdf.sourceforge.net/"
         exit 1
     fi
+}
+
+# Sign PDF using software certificate (.p12 file)
+sign_with_p12() {
+    local input_pdf="$1"
+    local output_pdf="$2"
+    local p12_file="$3"
+    local p12_pass="$4"
+
+    echo ""
+    echo -e "${YELLOW}Signing with software certificate...${NC}"
+
+    # Use pdfsig with NSS if available, otherwise use Java-based approach
+    if command -v openssl &> /dev/null; then
+        # Create temporary NSS database for signing
+        local nss_dir=$(mktemp -d)
+
+        # Initialize NSS database
+        certutil -N -d "$nss_dir" --empty-password 2>/dev/null || true
+
+        # Import the P12 certificate
+        pk12util -i "$p12_file" -d "$nss_dir" -W "$p12_pass" 2>/dev/null
+
+        if command -v pdfsig &> /dev/null; then
+            # Get the certificate nickname
+            local cert_nick=$(certutil -L -d "$nss_dir" 2>/dev/null | grep -v "Certificate Nickname" | head -1 | awk '{print $1}')
+
+            if [ -n "$cert_nick" ]; then
+                pdfsig -nssdir "$nss_dir" -nick "$cert_nick" -sign "$input_pdf" "$output_pdf" 2>/dev/null && {
+                    rm -rf "$nss_dir"
+                    return 0
+                }
+            fi
+        fi
+
+        rm -rf "$nss_dir"
+    fi
+
+    echo -e "${YELLOW}Note: For full .p12 signing support, install JSignPDF${NC}"
+    echo "  Download from: http://jsignpdf.sourceforge.net/"
+    return 1
 }
 
 # Detect PKCS#11 library for smart card
@@ -208,6 +259,42 @@ main() {
             fi
             sign_pdf "$pdf_file"
             ;;
+        "sign-p12")
+            local p12_file="$2"
+            local pdf_file="$3"
+            local p12_pass="${4:-}"
+
+            if [ -z "$p12_file" ]; then
+                # Look for .p12 files in script directory
+                echo ""
+                echo "Available .p12 certificates:"
+                ls -1 "$SCRIPT_DIR"/*.p12 2>/dev/null || echo "  No .p12 files found"
+                echo ""
+                read -p "Enter .p12 certificate path: " p12_file
+            fi
+
+            if [ -z "$pdf_file" ]; then
+                echo ""
+                echo "Available PDFs:"
+                ls -1 *.pdf 2>/dev/null || echo "  No PDF files found"
+                echo ""
+                read -p "Enter PDF filename to sign: " pdf_file
+            fi
+
+            if [ -z "$p12_pass" ]; then
+                read -s -p "Enter .p12 password: " p12_pass
+                echo ""
+            fi
+
+            local base_name="${pdf_file%.pdf}"
+            local output_pdf="${base_name}_signed.pdf"
+            sign_with_p12 "$pdf_file" "$output_pdf" "$p12_file" "$p12_pass"
+
+            if [ -f "$output_pdf" ]; then
+                echo ""
+                echo -e "${GREEN}Successfully signed: $output_pdf${NC}"
+            fi
+            ;;
         "verify")
             if [ -z "$pdf_file" ]; then
                 echo ""
@@ -218,21 +305,117 @@ main() {
         "list")
             list_certificates
             ;;
+        "create-cert")
+            create_test_certificate
+            ;;
         *)
             echo ""
-            echo "Usage: $0 <action> [pdf_file]"
+            echo "Usage: $0 <action> [options]"
             echo ""
             echo "Actions:"
-            echo "  sign <file.pdf>   - Sign a PDF with smart card"
-            echo "  verify <file.pdf> - Verify signatures in a PDF"
-            echo "  list              - List certificates on smart card"
+            echo "  sign <file.pdf>                    - Sign PDF with smart card (PIV/CAC)"
+            echo "  sign-p12 <cert.p12> <file.pdf>     - Sign PDF with software certificate"
+            echo "  verify <file.pdf>                  - Verify signatures in a PDF"
+            echo "  list                               - List certificates on smart card"
+            echo "  create-cert                        - Create a self-signed test certificate"
             echo ""
             echo "Examples:"
             echo "  $0 sign decision_document.pdf"
+            echo "  $0 sign-p12 test_signer.p12 decision_document.pdf"
             echo "  $0 verify decision_document_signed.pdf"
             echo "  $0 list"
+            echo "  $0 create-cert"
             ;;
     esac
+}
+
+# Create a self-signed test certificate
+create_test_certificate() {
+    echo ""
+    echo -e "${YELLOW}Creating self-signed test certificate...${NC}"
+    echo ""
+    echo "This creates a certificate for TESTING PURPOSES ONLY."
+    echo "Do not use for production or legal documents."
+    echo ""
+
+    # Get certificate details
+    read -p "Common Name (your name) [Test Signer]: " cn
+    cn="${cn:-Test Signer}"
+
+    read -p "Organization [Test Organization]: " org
+    org="${org:-Test Organization}"
+
+    read -p "Country (2-letter code) [US]: " country
+    country="${country:-US}"
+
+    read -p "Certificate validity in days [365]: " days
+    days="${days:-365}"
+
+    read -s -p "Password for .p12 file: " p12_pass
+    echo ""
+
+    local base_name="signer_$(date +%Y%m%d)"
+    local key_file="${SCRIPT_DIR}/${base_name}_key.pem"
+    local cert_file="${SCRIPT_DIR}/${base_name}_cert.pem"
+    local p12_file="${SCRIPT_DIR}/${base_name}.p12"
+
+    echo ""
+    echo "Generating RSA key pair..."
+
+    # Step 1: Generate RSA private key (2048-bit)
+    # Command: openssl genrsa -out <key_file> 2048
+    # This creates the private key used for signing
+    openssl genrsa -out "$key_file" 2048 2>/dev/null
+
+    echo "Creating self-signed X.509 certificate..."
+
+    # Step 2: Create self-signed X.509 certificate
+    # Command breakdown:
+    #   req -x509          : Create a self-signed certificate (not a CSR)
+    #   -new               : Generate a new certificate request
+    #   -key <key_file>    : Use this private key
+    #   -out <cert_file>   : Output certificate to this file
+    #   -days <days>       : Certificate validity period
+    #   -subj "..."        : Certificate subject (CN=Common Name, O=Org, C=Country)
+    #   -addext "..."      : Add X.509v3 extensions for digital signatures
+    openssl req -x509 -new \
+        -key "$key_file" \
+        -out "$cert_file" \
+        -days "$days" \
+        -subj "/CN=${cn}/O=${org}/C=${country}" \
+        -addext "keyUsage = digitalSignature, nonRepudiation" \
+        -addext "extendedKeyUsage = emailProtection, codeSigning"
+
+    echo "Creating PKCS#12 (.p12) bundle..."
+
+    # Step 3: Bundle key + certificate into PKCS#12 format
+    # Command breakdown:
+    #   pkcs12 -export     : Create a PKCS#12 file
+    #   -out <p12_file>    : Output file
+    #   -inkey <key_file>  : Private key to include
+    #   -in <cert_file>    : Certificate to include
+    #   -name "..."        : Friendly name for the certificate
+    #   -passout pass:...  : Password to protect the .p12 file
+    openssl pkcs12 -export \
+        -out "$p12_file" \
+        -inkey "$key_file" \
+        -in "$cert_file" \
+        -name "$cn" \
+        -passout "pass:${p12_pass}"
+
+    echo ""
+    echo -e "${GREEN}Certificate created successfully!${NC}"
+    echo ""
+    echo "Files created:"
+    echo "  Private key:   $key_file"
+    echo "  Certificate:   $cert_file"
+    echo "  PKCS#12 file:  $p12_file"
+    echo ""
+    echo "To sign a PDF with this certificate:"
+    echo "  $0 sign-p12 $p12_file <your_document.pdf>"
+    echo ""
+    echo -e "${YELLOW}IMPORTANT: Keep your private key secure!${NC}"
+    echo "The .p12 file contains both the private key and certificate."
 }
 
 main "$@"

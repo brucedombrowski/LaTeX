@@ -19,6 +19,9 @@ DecisionDocument/
 ├── Template.docx           # Original Word template (reference)
 ├── build.sh                # Build script (macOS/Linux)
 ├── build.ps1               # Build script (Windows)
+├── sign.sh                 # PDF signing script (macOS/Linux)
+├── sign.ps1                # PDF signing script (Windows)
+├── AGENTS.md               # AI agent guidance
 └── README.md               # This file
 ```
 
@@ -161,6 +164,48 @@ pdflatex moa_template.tex
 # Clean up auxiliary files
 rm -f *.aux *.log *.out *.toc
 ```
+
+## Digital Signatures
+
+The repository includes scripts for digitally signing PDFs using smart cards (PIV/CAC) or software certificates.
+
+### Requirements
+
+- **Smart card signing**: OpenSC (`brew install opensc`)
+- **Verification**: Poppler (`brew install poppler`)
+- **Software signing**: JSignPDF (optional, for .p12 certificates)
+
+### Usage
+
+```bash
+# Make script executable (first time only)
+chmod +x sign.sh
+
+# Create a self-signed test certificate
+./sign.sh create-cert
+
+# Sign with smart card (PIV/CAC)
+./sign.sh sign decision_document.pdf
+
+# Sign with software certificate (.p12)
+./sign.sh sign-p12 signer.p12 decision_document.pdf
+
+# Verify signatures
+./sign.sh verify decision_document_signed.pdf
+
+# List certificates on smart card
+./sign.sh list
+```
+
+### Certificate Creation
+
+The `create-cert` command generates a self-signed certificate for testing:
+
+1. **Generates RSA private key** (2048-bit)
+2. **Creates X.509 certificate** with digital signature extensions
+3. **Bundles into PKCS#12 (.p12)** format for signing
+
+**Note**: Self-signed certificates are for testing only. Use CA-issued certificates or smart cards for production documents.
 
 ## Usage Tips
 
