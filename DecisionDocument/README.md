@@ -16,7 +16,7 @@ Source files included in the repository (generated PDFs and certificates not lis
 ```
 DecisionDocument/
 ├── decision_memo.tex       # Brief Decision Memorandum template
-├── decision_document.tex   # Comprehensive decision template
+├── decision_document.tex   # Comprehensive Decision Document template
 ├── logo.png                # Header logo (orbit-styled "Logo")
 ├── logo.svg                # Logo source file (editable vector)
 ├── build.sh                # Build script (macOS/Linux)
