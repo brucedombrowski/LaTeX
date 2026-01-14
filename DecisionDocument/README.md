@@ -77,6 +77,32 @@ You can also specify the document directly:
 .\build.ps1 both
 ```
 
+### Word Document Generation
+
+For users who prefer Microsoft Word, you can generate `.docx` files from the LaTeX source using the `--docx` flag:
+
+```bash
+# macOS/Linux
+./build.sh decision_memo --docx
+./build.sh both --docx
+
+# Windows
+.\build.ps1 decision_memo --docx
+.\build.ps1 both --docx
+```
+
+This requires [pandoc](https://pandoc.org/installing.html):
+
+```bash
+# macOS
+brew install pandoc
+
+# Windows
+choco install pandoc
+```
+
+**Note:** The generated Word documents are provided for convenience only. Digital signatures are only supported for PDF output. For formal, signed documents, use the PDF workflow.
+
 ## Template Customization
 
 ### Decision Memorandum (`decision_memo.tex`)

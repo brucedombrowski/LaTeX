@@ -38,6 +38,14 @@ if [ -z "$DOC" ]; then
     esac
 fi
 
+# Check for --docx flag
+GENERATE_DOCX=0
+for arg in "$@"; do
+    if [ "$arg" = "--docx" ]; then
+        GENERATE_DOCX=1
+    fi
+done
+
 # Check for required packages and install if missing
 PACKAGES="titlesec enumitem booktabs longtable lastpage datetime2 tabularx"
 
@@ -63,6 +71,30 @@ compile_doc() {
         echo -e "${GREEN}${docname}.pdf built successfully!${NC}"
         return 0
     else
+        return 1
+    fi
+}
+
+# Convert LaTeX to Word using pandoc
+convert_to_docx() {
+    local docname=$1
+
+    if ! command -v pandoc &> /dev/null; then
+        echo -e "${YELLOW}pandoc not found. Install with: brew install pandoc${NC}"
+        echo -e "${YELLOW}Skipping .docx generation.${NC}"
+        return 1
+    fi
+
+    echo -e "${YELLOW}Converting ${docname}.tex to Word...${NC}"
+
+    if pandoc "${docname}.tex" -o "${docname}.docx" \
+        --from=latex \
+        --to=docx \
+        --standalone 2>/dev/null; then
+        echo -e "${GREEN}${docname}.docx created successfully!${NC}"
+        return 0
+    else
+        echo -e "${RED}Failed to convert ${docname}.tex to Word.${NC}"
         return 1
     fi
 }
@@ -105,6 +137,18 @@ if [ $build_failed -eq 1 ]; then
         echo "  sudo tlmgr update --self"
         echo "  sudo tlmgr install $PACKAGES"
         exit 1
+    fi
+fi
+
+# Generate Word documents if --docx flag was passed
+if [ $GENERATE_DOCX -eq 1 ]; then
+    echo ""
+    if [ "$DOC" = "both" ]; then
+        for doc in decision_memo decision_document; do
+            convert_to_docx "$doc"
+        done
+    else
+        convert_to_docx "$DOC"
     fi
 fi
 

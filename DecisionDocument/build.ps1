@@ -12,8 +12,18 @@ if (-not (Get-Command pdflatex -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-# Determine which document to build
-$DOC = $args[0]
+# Determine which document to build and check for --docx flag
+$DOC = $null
+$GENERATE_DOCX = $false
+
+foreach ($arg in $args) {
+    if ($arg -eq "--docx") {
+        $GENERATE_DOCX = $true
+    } elseif (-not $DOC) {
+        $DOC = $arg
+    }
+}
+
 if (-not $DOC) {
     Write-Host ""
     Write-Host "Which document would you like to build?"
@@ -65,6 +75,29 @@ function Compile-Document {
     return $true
 }
 
+function Convert-ToDocx {
+    param([string]$docname)
+
+    if (-not (Get-Command pandoc -ErrorAction SilentlyContinue)) {
+        Write-Host "pandoc not found. Install with: choco install pandoc" -ForegroundColor Yellow
+        Write-Host "Skipping .docx generation." -ForegroundColor Yellow
+        return $false
+    }
+
+    Write-Host "Converting ${docname}.tex to Word..." -ForegroundColor Yellow
+
+    try {
+        & pandoc "${docname}.tex" -o "${docname}.docx" --from=latex --to=docx --standalone 2>$null
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "${docname}.docx created successfully!" -ForegroundColor Green
+            return $true
+        }
+    } catch {
+        Write-Host "Failed to convert ${docname}.tex to Word." -ForegroundColor Red
+    }
+    return $false
+}
+
 # Main build logic
 $buildFailed = $false
 
@@ -90,6 +123,18 @@ if ($buildFailed) {
         Install-Packages
     }
     exit 1
+}
+
+# Generate Word documents if --docx flag was passed
+if ($GENERATE_DOCX) {
+    Write-Host ""
+    if ($DOC -eq "both") {
+        foreach ($doc in @("decision_memo", "decision_document")) {
+            Convert-ToDocx $doc
+        }
+    } else {
+        Convert-ToDocx $DOC
+    }
 }
 
 # Clean up auxiliary files by default

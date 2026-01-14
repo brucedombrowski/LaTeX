@@ -29,6 +29,9 @@ The build scripts:
 - Run pdflatex 3 times (for TOC and page references)
 - Automatically clean up auxiliary files
 - Prompt to install missing LaTeX packages if needed
+- Optional `--docx` flag generates Word documents via pandoc
+
+**Word output note:** The `--docx` flag is for user convenience only. AI agents should always use PDF output for signing. Digital signatures are not supported for Word documents.
 
 ## AI Agent Build and Sign Workflow
 
