@@ -2,6 +2,8 @@
 
 LaTeX templates for formal program decision documentation, adapted from NASA's Memorandum of Agreement format.
 
+[![Open in Overleaf](https://img.shields.io/badge/Open%20in-Overleaf-47A141?logo=overleaf&logoColor=white)](https://www.overleaf.com/docs?snip_uri=https://github.com/brucedombrowski/LaTeX/archive/refs/heads/main.zip)
+
 ## Templates
 
 | Template | Description | Use Case |
