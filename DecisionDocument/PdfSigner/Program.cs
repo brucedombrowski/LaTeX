@@ -100,12 +100,12 @@ namespace PdfSignerApp
             using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadOnly);
 
+            // Add all certificates from the personal store
+            // We don't check HasPrivateKey here because that can trigger
+            // smart card access and cause hangs
             foreach (var cert in store.Certificates)
             {
-                if (cert.HasPrivateKey)
-                {
-                    result.Add(cert);
-                }
+                result.Add(cert);
             }
 
             return result;
@@ -147,7 +147,7 @@ namespace PdfSignerApp
 
             if (certs.Count == 0)
             {
-                Console.WriteLine("No certificates with private keys found.");
+                Console.WriteLine("No certificates found in Windows Certificate Store.");
                 Console.WriteLine();
                 Console.WriteLine("Ensure your smart card is inserted and recognized by Windows.");
                 return null;
