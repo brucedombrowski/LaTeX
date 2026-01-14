@@ -317,13 +317,27 @@ The "Certificate issuer is unknown" warning is expected for self-signed certific
 
 When creating documents containing sensitive information (CUI, PII, proprietary data, ITAR, etc.), follow these practices to prevent accidental disclosure.
 
+### Getting Started: Fork First
+
+**Always start by forking this template repository.** This creates your own copy that you fully control.
+
+1. Click **Fork** on GitHub (or your Git hosting platform)
+2. Clone your fork (not the original):
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/LaTeX.git
+   cd LaTeX/DecisionDocument
+   ```
+3. Your fork is now your working repository
+
+This keeps the original template clean and gives you full control over your copy.
+
 ### Option 1: Local-Only Development (Recommended for Sensitive Data)
 
-Clone the template repository, then disconnect from remote:
+After forking, disconnect from all remotes for air-tight security:
 
 ```bash
-# Clone the template
-git clone https://github.com/yourusername/LaTeX.git
+# Clone your fork
+git clone https://github.com/YOUR-USERNAME/LaTeX.git
 cd LaTeX/DecisionDocument
 
 # Remove remote connection to prevent accidental push
@@ -338,26 +352,30 @@ git add .
 git commit -m "Initial document draft"
 ```
 
-Your document history stays entirely local. No risk of pushing to a public repository.
+Your document history stays entirely local. No risk of pushing anywhere.
 
-### Option 2: Private Repository
+### Option 2: Private Fork
 
-For team collaboration on sensitive documents:
+For team collaboration on sensitive documents, fork to a private repository:
 
 ```bash
-# Clone template
-git clone https://github.com/yourusername/LaTeX.git my-secure-project
-cd my-secure-project/DecisionDocument
+# Fork to your organization's private GitHub/GitLab
+# Then clone the private fork
+git clone https://github.com/YOUR-ORG/private-decisions.git
+cd private-decisions/DecisionDocument
+```
+
+Or convert your fork to private after cloning:
+```bash
+# Clone your public fork first
+git clone https://github.com/YOUR-USERNAME/LaTeX.git
+cd LaTeX
 
 # Change remote to your private repository
-git remote set-url origin https://github.com/yourorg/private-decisions.git
+git remote set-url origin git@your-private-server:decisions.git
 
-# Or remove origin and add new private remote
-git remote remove origin
-git remote add origin git@your-private-server:decisions.git
-
-# Verify
-git remote -v
+# Push to establish the private copy
+git push -u origin main
 ```
 
 Ensure your private repository has appropriate access controls.
@@ -371,9 +389,9 @@ For maximum isolation, work without git entirely:
 # From GitHub: Code → Download ZIP
 
 # Or clone and remove git
-git clone https://github.com/yourusername/LaTeX.git
-cd LaTeX/DecisionDocument
-rm -rf ../.git
+git clone https://github.com/YOUR-USERNAME/LaTeX.git
+cd LaTeX
+rm -rf .git
 
 # No version control - just edit files directly
 ```
