@@ -78,6 +78,8 @@ compile_doc() {
 # Convert LaTeX to Word using pandoc
 convert_to_docx() {
     local docname=$1
+    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local ref_doc="${script_dir}/reference.docx"
 
     if ! command -v pandoc &> /dev/null; then
         echo -e "${YELLOW}pandoc not found. Install with: brew install pandoc${NC}"
@@ -85,12 +87,18 @@ convert_to_docx() {
         return 1
     fi
 
-    echo -e "${YELLOW}Converting ${docname}.tex to Word...${NC}"
+    echo -e "${YELLOW}Converting ${docname}.tex to Word (with DRAFT watermark)...${NC}"
+
+    # Use reference.docx for watermark if available
+    local ref_arg=""
+    if [ -f "$ref_doc" ]; then
+        ref_arg="--reference-doc=$ref_doc"
+    fi
 
     if pandoc "${docname}.tex" -o "${docname}.docx" \
         --from=latex \
         --to=docx \
-        --standalone 2>/dev/null; then
+        --standalone $ref_arg 2>/dev/null; then
         echo -e "${GREEN}${docname}.docx created successfully!${NC}"
         return 0
     else

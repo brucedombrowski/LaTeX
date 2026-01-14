@@ -17,6 +17,7 @@ DecisionDocument/
 ├── decision_document.tex   # Comprehensive decision template
 ├── logo.png                # Header logo (orbit-styled "Logo")
 ├── logo.svg                # Logo source file (editable vector)
+├── reference.docx          # Word template with DRAFT watermark
 ├── build.sh                # Build script (macOS/Linux)
 ├── build.ps1               # Build script (Windows)
 ├── sign.sh                 # PDF signing script (macOS/Linux)
@@ -102,6 +103,8 @@ choco install pandoc
 ```
 
 **Note:** The generated Word documents are provided for convenience only. Digital signatures are only supported for PDF output. For formal, signed documents, use the PDF workflow.
+
+**Watermark:** Word documents include a diagonal "DRAFT - FOR REVIEW" watermark to clearly indicate they are not the authoritative version.
 
 **Use case:** Word documents are useful for sending to reviewers via email when collaborating across organizations. Recipients can use Track Changes and comments for feedback, then the final version is rebuilt as PDF for signing.
 

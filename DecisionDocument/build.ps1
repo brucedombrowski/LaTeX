@@ -84,10 +84,18 @@ function Convert-ToDocx {
         return $false
     }
 
-    Write-Host "Converting ${docname}.tex to Word..." -ForegroundColor Yellow
+    Write-Host "Converting ${docname}.tex to Word (with DRAFT watermark)..." -ForegroundColor Yellow
+
+    # Use reference.docx for watermark if available
+    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    $refDoc = Join-Path $scriptDir "reference.docx"
+    $refArg = @()
+    if (Test-Path $refDoc) {
+        $refArg = @("--reference-doc=$refDoc")
+    }
 
     try {
-        & pandoc "${docname}.tex" -o "${docname}.docx" --from=latex --to=docx --standalone 2>$null
+        & pandoc "${docname}.tex" -o "${docname}.docx" --from=latex --to=docx --standalone @refArg 2>$null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "${docname}.docx created successfully!" -ForegroundColor Green
             return $true

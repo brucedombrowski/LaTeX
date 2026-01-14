@@ -31,7 +31,7 @@ The build scripts:
 - Prompt to install missing LaTeX packages if needed
 - Optional `--docx` flag generates Word documents via pandoc
 
-**Word output note:** The `--docx` flag is for user convenience only. AI agents should always use PDF output for signing. Digital signatures are not supported for Word documents.
+**Word output note:** The `--docx` flag is for user convenience only. AI agents should always use PDF output for signing. Digital signatures are not supported for Word documents. Word output includes a "DRAFT - FOR REVIEW" watermark.
 
 ## AI Agent Build and Sign Workflow
 
@@ -170,6 +170,7 @@ DecisionDocument/
 ├── decision_document_signed.pdf  # Example signed PDF
 ├── logo.png                      # Header logo (orbit-styled "Logo")
 ├── logo.svg                      # Logo source file (editable vector)
+├── reference.docx                # Word template with DRAFT watermark
 ├── build.sh                      # Build script (macOS/Linux)
 ├── build.ps1                     # Build script (Windows)
 ├── sign.sh                       # PDF signing script (macOS/Linux)
