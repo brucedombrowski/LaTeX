@@ -15,7 +15,7 @@ LaTeX templates for formal program decision documentation, adapted from NASA's M
 DecisionDocument/
 ├── decision_memo.tex       # Brief Decision Memorandum template
 ├── decision_document.tex   # Comprehensive decision template
-├── logo.png                # Header logo (orbit-styled "LOgO")
+├── logo.png                # Header logo (orbit-styled "Logo")
 ├── Template.docx           # Original Word template (reference)
 ├── build.sh                # Build script (macOS/Linux)
 ├── build.ps1               # Build script (Windows)
