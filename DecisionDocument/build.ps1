@@ -84,25 +84,25 @@ function Convert-ToDocx {
         return $false
     }
 
-    Write-Host "Converting ${docname}.tex to Word (with DRAFT watermark)..." -ForegroundColor Yellow
+    Write-Host "Converting ${docname}.tex to Word..." -ForegroundColor Yellow
 
-    # Use reference.docx for watermark if available
-    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-    $refDoc = Join-Path $scriptDir "reference.docx"
-    $refArg = @()
-    if (Test-Path $refDoc) {
-        $refArg = @("--reference-doc=$refDoc")
-    }
+    # Create temp file with DRAFT notice inserted after \begin{document}
+    $tempFile = [System.IO.Path]::GetTempFileName()
+    $content = Get-Content "${docname}.tex" -Raw
+    $content = $content -replace '\\begin\{document\}', "\begin{document}`n`n\begin{center}\textbf{\Large *** DRAFT - FOR REVIEW ONLY ***}\end{center}`n"
+    Set-Content -Path $tempFile -Value $content
 
     try {
-        & pandoc "${docname}.tex" -o "${docname}.docx" --from=latex --to=docx --standalone @refArg 2>$null
+        & pandoc $tempFile -o "${docname}.docx" --from=latex --to=docx --standalone 2>$null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "${docname}.docx created successfully!" -ForegroundColor Green
+            Remove-Item $tempFile -ErrorAction SilentlyContinue
             return $true
         }
     } catch {
         Write-Host "Failed to convert ${docname}.tex to Word." -ForegroundColor Red
     }
+    Remove-Item $tempFile -ErrorAction SilentlyContinue
     return $false
 }
 

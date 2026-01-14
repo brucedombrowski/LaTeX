@@ -17,7 +17,6 @@ DecisionDocument/
 ├── decision_document.tex   # Comprehensive decision template
 ├── logo.png                # Header logo (orbit-styled "Logo")
 ├── logo.svg                # Logo source file (editable vector)
-├── reference.docx          # Word template with DRAFT watermark
 ├── build.sh                # Build script (macOS/Linux)
 ├── build.ps1               # Build script (Windows)
 ├── sign.sh                 # PDF signing script (macOS/Linux)
