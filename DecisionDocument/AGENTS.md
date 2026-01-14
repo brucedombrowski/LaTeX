@@ -174,6 +174,11 @@ DecisionDocument/
 ├── build.ps1                     # Build script (Windows)
 ├── sign.sh                       # PDF signing script (macOS/Linux)
 ├── sign.ps1                      # PDF signing script (Windows)
+├── bin/                          # Pre-built tools
+│   └── PdfSigner.exe             # Windows PDF signing tool (self-contained)
+├── PdfSigner/                    # Source code for PdfSigner
+│   ├── PdfSigner.csproj          # .NET 6.0 project file
+│   └── Program.cs                # Signing logic using iText7
 ├── .gitignore                    # Git ignore rules
 ├── README.md                     # User documentation
 └── AGENTS.md                     # This file
@@ -213,6 +218,50 @@ sudo tlmgr install titlesec enumitem booktabs longtable lastpage datetime2 tabul
 
 The repository includes scripts for digitally signing PDFs. Both `sign.sh` (macOS/Linux) and `sign.ps1` (Windows) have feature parity.
 
+### Windows Smart Card Signing (PIV/CAC)
+
+Windows users with PIV/CAC badges can sign PDFs using the pre-built `PdfSigner.exe` tool. No Java or SDK installation required.
+
+**Usage:**
+```powershell
+# Via sign.ps1 (automatically detects PdfSigner.exe)
+.\sign.ps1
+
+# Direct usage - console mode (default)
+.\bin\PdfSigner.exe document.pdf
+
+# Direct usage - GUI certificate picker
+.\bin\PdfSigner.exe document.pdf --gui
+
+# List available certificates
+.\bin\PdfSigner.exe --list
+```
+
+**Features:**
+- Filters certificates to only show valid signing certs (not expired, has Digital Signature key usage)
+- Groups certificates by type: PIV/CAC (smart card) shown first, then Other
+- Shows issuer, expiration date, and days remaining for each cert
+- `--gui` flag opens native Windows certificate picker dialog
+- Triggers Windows Security PIN dialog automatically when signing
+
+**Certificate filtering:**
+- Only certificates with Digital Signature key usage are shown
+- Expired certificates are hidden
+- PIV/CAC certificates (DOD, NASA, FPKI, etc.) are prioritized
+
+**Rebuilding PdfSigner:**
+```bash
+# From macOS/Linux (cross-compile)
+cd PdfSigner
+dotnet publish -c Release -r win-x64 --self-contained true
+cp bin/Release/net6.0-windows/win-x64/publish/PdfSigner.exe ../bin/
+
+# From Windows
+cd PdfSigner
+dotnet publish -c Release
+copy bin\Release\net6.0-windows\win-x64\publish\PdfSigner.exe ..\bin\
+```
+
 ### Sign a PDF
 
 **macOS/Linux:**
@@ -232,7 +281,7 @@ The repository includes scripts for digitally signing PDFs. Both `sign.sh` (macO
 
 **Windows PowerShell:**
 ```powershell
-# Interactive mode (recommended)
+# Interactive mode (recommended) - uses PdfSigner.exe if available
 .\sign.ps1
 
 # Command-line: sign with software certificate
@@ -262,16 +311,15 @@ This generates:
 
 ### Dependencies for signing
 
+**macOS/Linux:**
 ```bash
-# macOS (Homebrew)
+# Homebrew
 brew install opensc poppler nss
 ```
 
-```powershell
-# Windows (Chocolatey)
-choco install openssl poppler
-# Also install OpenSC from: https://github.com/OpenSC/OpenSC/releases
-```
+**Windows:**
+- **PdfSigner.exe** (recommended): Pre-built in `bin/` folder, no dependencies
+- **Alternative**: JSignPDF requires Java Runtime Environment
 
 ## Testing Changes
 
