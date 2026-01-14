@@ -6,7 +6,7 @@
 
 param(
     [Parameter(Position=0)]
-    [ValidateSet("sign", "sign-p12", "verify", "list", "create-cert", "")]
+    [ValidateSet("sign", "sign-p12", "verify", "list", "create-cert", "gui", "")]
     [string]$Action = "",
 
     [Parameter(Position=1)]
@@ -1129,6 +1129,41 @@ switch ($Action) {
     }
     "create-cert" {
         Create-TestCertificate
+    }
+    "gui" {
+        # GUI mode - use PdfSigner with --gui flag
+        if (-not $script:PdfSignerExe) {
+            Write-Err "PdfSigner.exe not found. GUI mode requires PdfSigner."
+            Write-Host ""
+            Write-Host "Expected location: $ScriptDir\bin\PdfSigner.exe"
+            exit 1
+        }
+        if (-not $Param1) {
+            Write-Host ""
+            Write-Host "Available PDFs:"
+            Get-ChildItem -Filter "*.pdf" -Name 2>$null | ForEach-Object { Write-Host "  $_" }
+            Write-Host ""
+            $Param1 = Read-Host "Enter PDF filename to sign"
+        }
+        if (-not (Test-Path $Param1)) {
+            Write-Err "PDF file not found: $Param1"
+            exit 1
+        }
+        $baseName = [System.IO.Path]::GetFileNameWithoutExtension($Param1)
+        $directory = Split-Path -Parent $Param1
+        if (-not $directory) { $directory = "." }
+        $outputPdf = Join-Path $directory "${baseName}_signed.pdf"
+
+        Write-Host ""
+        Write-Host "Input:  $Param1"
+        Write-Host "Output: $outputPdf"
+        Write-Host ""
+
+        & $script:PdfSignerExe $Param1 $outputPdf --gui
+        if ($LASTEXITCODE -eq 0 -and (Test-Path $outputPdf)) {
+            Write-Host ""
+            Write-Success "Successfully signed: $outputPdf"
+        }
     }
     default {
         Show-InteractiveMenu
