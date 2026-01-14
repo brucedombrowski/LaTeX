@@ -242,8 +242,17 @@ The `PdfSigner` tool provides native Windows smart card support without requirin
 A pre-built `PdfSigner.exe` is included in the `bin/` folder. Simply run:
 
 ```powershell
+# Console mode - filtered certificate list
 .\sign.ps1
+
+# GUI mode - native Windows certificate picker dialog
+.\sign.ps1 gui
 ```
+
+**Certificate filtering:**
+- Only valid signing certificates are shown (not expired, has Digital Signature key usage)
+- PIV/CAC certificates (DOD, NASA, FPKI, etc.) are grouped first
+- Shows issuer, expiration date, and days remaining
 
 The script will automatically detect and use `bin\PdfSigner.exe`. When signing with a smart card, Windows Security will prompt for your PIN - the same dialog you see when logging in.
 
@@ -309,8 +318,11 @@ chmod +x sign.sh
 # Create a self-signed test certificate
 .\sign.ps1 create-cert
 
-# Sign with smart card (PIV/CAC)
+# Sign with smart card (PIV/CAC) - console mode
 .\sign.ps1 sign decision_document.pdf
+
+# Sign with smart card (PIV/CAC) - GUI certificate picker
+.\sign.ps1 gui decision_document.pdf
 
 # Sign with software certificate (.p12/.pfx)
 .\sign.ps1 sign-p12 mycert.p12 decision_document.pdf
