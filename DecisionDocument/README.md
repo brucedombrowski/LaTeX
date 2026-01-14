@@ -167,15 +167,49 @@ rm -f *.aux *.log *.out *.toc
 
 ## Digital Signatures
 
-The repository includes scripts for digitally signing PDFs using smart cards (PIV/CAC) or software certificates.
+The repository includes scripts for digitally signing PDFs using smart cards (PIV/CAC) or software certificates. Digital signatures provide cryptographic proof of document authenticity and integrity.
+
+### How It Works
+
+Digital signatures embed cryptographic data into the PDF metadata (not visible on the page). When you open a signed PDF in Adobe Acrobat, Preview, or other PDF readers, the signature panel displays:
+
+- **Signer identity**: Certificate common name and organization
+- **Signing time**: When the document was signed
+- **Document integrity**: Whether the document has been modified since signing
+- **Certificate validity**: Trust chain status (valid CA vs. self-signed)
+
+This provides tamper-detection - any modification to the signed PDF will invalidate the signature.
 
 ### Requirements
 
-- **Smart card signing**: OpenSC (`brew install opensc`)
-- **Verification**: Poppler (`brew install poppler`)
-- **Software signing**: JSignPDF (optional, for .p12 certificates)
+Install the required tools:
 
-### Usage
+```bash
+# macOS (Homebrew)
+brew install opensc poppler nss
+
+# The tools provide:
+# - opensc: Smart card (PIV/CAC) support
+# - poppler: pdfsig for signing and verification
+# - nss: certutil and pk12util for certificate management
+```
+
+### Interactive Mode
+
+Run the script without arguments for a user-friendly menu:
+
+```bash
+./sign.sh
+```
+
+This presents options to:
+1. Sign a PDF (software cert or smart card)
+2. Verify a signed PDF
+3. Create a test certificate
+4. List smart card certificates
+5. Show command-line usage
+
+### Command-Line Usage
 
 ```bash
 # Make script executable (first time only)
@@ -188,7 +222,7 @@ chmod +x sign.sh
 ./sign.sh sign decision_document.pdf
 
 # Sign with software certificate (.p12)
-./sign.sh sign-p12 signer.p12 decision_document.pdf
+./sign.sh sign-p12 mycert.p12 decision_document.pdf
 
 # Verify signatures
 ./sign.sh verify decision_document_signed.pdf
@@ -201,11 +235,45 @@ chmod +x sign.sh
 
 The `create-cert` command generates a self-signed certificate for testing:
 
-1. **Generates RSA private key** (2048-bit)
-2. **Creates X.509 certificate** with digital signature extensions
-3. **Bundles into PKCS#12 (.p12)** format for signing
+1. **Prompts for signer information**: Name, organization, country, password
+2. **Generates RSA private key** (2048-bit) saved as `<name>_key.pem`
+3. **Creates X.509 certificate** with digital signature extensions saved as `<name>_cert.pem`
+4. **Bundles into PKCS#12 (.p12)** format for signing
 
-**Note**: Self-signed certificates are for testing only. Use CA-issued certificates or smart cards for production documents.
+Example output files for "Test Signer":
+- `test_signer_key.pem` - Private key (keep secure!)
+- `test_signer_cert.pem` - Public certificate
+- `test_signer.p12` - Combined bundle for signing
+
+### Verifying Signatures
+
+After signing, verify with:
+
+```bash
+./sign.sh verify decision_document_signed.pdf
+```
+
+Example output:
+```
+Digital Signature Info of: decision_document_signed.pdf
+Signature #1:
+  - Signer Certificate Common Name: Test Signer
+  - Signer full Distinguished Name: C=US,O=Test Org,CN=Test Signer
+  - Signing Time: Jan 13 2026 21:36:17
+  - Signing Hash Algorithm: SHA-256
+  - Signature Type: adbe.pkcs7.detached
+  - Signature Validation: Signature is Valid.
+  - Certificate Validation: Certificate issuer is unknown.
+```
+
+The "Certificate issuer is unknown" warning is expected for self-signed certificates. For production use, obtain certificates from a trusted Certificate Authority (CA) or use PIV/CAC smart cards.
+
+### Security Notes
+
+- **Private keys** (`.pem`, `.p12`) are excluded from git via `.gitignore`
+- **Never commit** private keys or certificates to version control
+- **Self-signed certificates** are for testing only - they won't be trusted by default
+- **Production signing** should use CA-issued certificates or government-issued smart cards (PIV/CAC)
 
 ## Usage Tips
 
