@@ -1,0 +1,397 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in, headheight=14pt]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{lastpage}
+\usepackage{datetime2}
+
+% ============================================================================
+% DOCUMENT CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue
+}
+
+% Header/Footer Configuration
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[L]{\small\textbf{Decision Document}}
+\fancyhead[R]{\small Document No.: \DocumentNumber}
+\fancyfoot[L]{\small Effective Date: \EffectiveDate}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\fancyfoot[R]{\small Version: \DocumentVersion}
+
+% Section Formatting
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{0.5em}{}
+
+% ============================================================================
+% DOCUMENT VARIABLES - EDIT THESE
+% ============================================================================
+\newcommand{\DocumentTitle}{Program Decision Document}
+\newcommand{\DocumentNumber}{PDD-XXXX-XXX}
+\newcommand{\DocumentVersion}{1.0}
+\newcommand{\EffectiveDate}{\today}
+\newcommand{\ProgramName}{Program Name}
+\newcommand{\ProjectName}{Project Name}
+\newcommand{\DecisionTitle}{Decision Title}
+
+% ============================================================================
+% BEGIN DOCUMENT
+% ============================================================================
+\begin{document}
+
+% ----------------------------------------------------------------------------
+% TITLE PAGE
+% ----------------------------------------------------------------------------
+\begin{titlepage}
+    \centering
+    \vspace*{1in}
+
+    % Optional: Add organization logo
+    % \includegraphics[width=2in]{logo.png}\\[1cm]
+
+    {\Large\textbf{NATIONAL AERONAUTICS AND SPACE ADMINISTRATION}}\\[0.5cm]
+    {\large Center/Directorate Name}\\[2cm]
+
+    \rule{\textwidth}{1.5pt}\\[0.5cm]
+    {\LARGE\textbf{\DocumentTitle}}\\[0.3cm]
+    \rule{\textwidth}{1.5pt}\\[1.5cm]
+
+    {\Large\textbf{\DecisionTitle}}\\[1cm]
+
+    \begin{tabular}{ll}
+        \textbf{Program:} & \ProgramName \\[0.3cm]
+        \textbf{Project:} & \ProjectName \\[0.3cm]
+        \textbf{Document Number:} & \DocumentNumber \\[0.3cm]
+        \textbf{Version:} & \DocumentVersion \\[0.3cm]
+        \textbf{Effective Date:} & \EffectiveDate \\
+    \end{tabular}
+
+    \vfill
+
+    {\small\textit{This document records a formal program decision and the associated agreements between parties.}}
+
+\end{titlepage}
+
+% ----------------------------------------------------------------------------
+% DOCUMENT CONTROL
+% ----------------------------------------------------------------------------
+\section*{Document Control}
+
+\subsection*{Revision History}
+\begin{longtable}{|p{1.2cm}|p{2.5cm}|p{3cm}|p{6cm}|}
+    \hline
+    \textbf{Version} & \textbf{Date} & \textbf{Author} & \textbf{Description of Changes} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Version} & \textbf{Date} & \textbf{Author} & \textbf{Description of Changes} \\
+    \hline
+    \endhead
+    1.0 & \today & Author Name & Initial release \\
+    \hline
+    % Add additional rows as needed
+\end{longtable}
+
+\subsection*{Approval Signatures}
+\begin{longtable}{|p{4cm}|p{4cm}|p{2.5cm}|p{2.5cm}|}
+    \hline
+    \textbf{Role/Title} & \textbf{Name} & \textbf{Signature} & \textbf{Date} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Role/Title} & \textbf{Name} & \textbf{Signature} & \textbf{Date} \\
+    \hline
+    \endhead
+    Program Manager & & & \\
+    \hline
+    Project Manager & & & \\
+    \hline
+    Technical Lead & & & \\
+    \hline
+    Systems Engineer & & & \\
+    \hline
+    % Add additional signature lines as needed
+\end{longtable}
+
+\newpage
+
+% ----------------------------------------------------------------------------
+% TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+\tableofcontents
+\newpage
+
+% ============================================================================
+% MAIN CONTENT
+% ============================================================================
+
+\section{Purpose}
+This Decision Document establishes a formal record of the decision regarding \DecisionTitle{} for the \ProgramName{} / \ProjectName{}. This document:
+
+\begin{itemize}
+    \item Records the decision and its rationale
+    \item Identifies the parties responsible for implementation
+    \item Documents agreements between participating organizations
+    \item Establishes roles, responsibilities, and commitments
+    \item Provides traceability for future reference
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\section{Scope}
+\subsection{Applicability}
+This decision applies to:
+\begin{itemize}
+    \item List applicable organizations, projects, or elements
+    \item Add items as needed
+\end{itemize}
+
+\subsection{Period of Performance}
+This decision is effective from \EffectiveDate{} and remains in effect until:
+\begin{itemize}
+    \item Superseded by a subsequent decision document
+    \item Formally terminated by mutual agreement of the parties
+    \item Completion of the program/project phase
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\section{Background}
+\subsection{Context}
+Provide background information that led to the need for this decision. Include relevant history, constraints, and driving factors.
+
+\subsection{Problem Statement}
+Clearly state the problem or issue that required a decision.
+
+\subsection{Alternatives Considered}
+The following alternatives were evaluated:
+
+\begin{enumerate}
+    \item \textbf{Alternative 1:} Description
+        \begin{itemize}
+            \item Pros: List advantages
+            \item Cons: List disadvantages
+        \end{itemize}
+
+    \item \textbf{Alternative 2:} Description
+        \begin{itemize}
+            \item Pros: List advantages
+            \item Cons: List disadvantages
+        \end{itemize}
+
+    \item \textbf{Alternative 3:} Description
+        \begin{itemize}
+            \item Pros: List advantages
+            \item Cons: List disadvantages
+        \end{itemize}
+\end{enumerate}
+
+% ----------------------------------------------------------------------------
+\section{Decision}
+\subsection{Decision Statement}
+\begin{quote}
+    \textit{State the decision clearly and unambiguously. This should be a definitive statement of what was decided.}
+\end{quote}
+
+\subsection{Rationale}
+Explain why this decision was made. Reference the evaluation criteria used and how the selected option best meets program needs.
+
+\subsection{Key Assumptions}
+The following assumptions underpin this decision:
+\begin{enumerate}
+    \item Assumption 1
+    \item Assumption 2
+    \item Assumption 3
+\end{enumerate}
+
+\subsection{Constraints}
+This decision is subject to the following constraints:
+\begin{enumerate}
+    \item Constraint 1
+    \item Constraint 2
+    \item Constraint 3
+\end{enumerate}
+
+% ----------------------------------------------------------------------------
+\section{Roles and Responsibilities}
+
+\subsection{Responsible Organizations}
+\begin{longtable}{|p{3.5cm}|p{3.5cm}|p{6cm}|}
+    \hline
+    \textbf{Organization} & \textbf{Point of Contact} & \textbf{Responsibilities} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Organization} & \textbf{Point of Contact} & \textbf{Responsibilities} \\
+    \hline
+    \endhead
+    Organization 1 & POC Name & List key responsibilities \\
+    \hline
+    Organization 2 & POC Name & List key responsibilities \\
+    \hline
+    Organization 3 & POC Name & List key responsibilities \\
+    \hline
+\end{longtable}
+
+\subsection{Agreements}
+The parties to this decision agree to the following:
+
+\subsubsection{Party 1 Name Agrees To:}
+\begin{enumerate}
+    \item Commitment 1
+    \item Commitment 2
+    \item Commitment 3
+\end{enumerate}
+
+\subsubsection{Party 2 Name Agrees To:}
+\begin{enumerate}
+    \item Commitment 1
+    \item Commitment 2
+    \item Commitment 3
+\end{enumerate}
+
+% ----------------------------------------------------------------------------
+\section{Implementation}
+
+\subsection{Implementation Plan}
+\begin{longtable}{|p{0.5cm}|p{4cm}|p{3cm}|p{2.5cm}|p{2.5cm}|}
+    \hline
+    \textbf{\#} & \textbf{Action Item} & \textbf{Responsible Party} & \textbf{Due Date} & \textbf{Status} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{\#} & \textbf{Action Item} & \textbf{Responsible Party} & \textbf{Due Date} & \textbf{Status} \\
+    \hline
+    \endhead
+    1 & Action description & Owner & Date & Status \\
+    \hline
+    2 & Action description & Owner & Date & Status \\
+    \hline
+    3 & Action description & Owner & Date & Status \\
+    \hline
+\end{longtable}
+
+\subsection{Success Criteria}
+The following criteria will be used to determine successful implementation:
+\begin{enumerate}
+    \item Criterion 1
+    \item Criterion 2
+    \item Criterion 3
+\end{enumerate}
+
+\subsection{Verification Method}
+Describe how implementation success will be verified.
+
+% ----------------------------------------------------------------------------
+\section{Risk Assessment}
+
+\subsection{Identified Risks}
+\begin{longtable}{|p{0.5cm}|p{3.5cm}|p{1.5cm}|p{1.5cm}|p{5.5cm}|}
+    \hline
+    \textbf{\#} & \textbf{Risk Description} & \textbf{Likelihood} & \textbf{Impact} & \textbf{Mitigation Strategy} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{\#} & \textbf{Risk Description} & \textbf{Likelihood} & \textbf{Impact} & \textbf{Mitigation Strategy} \\
+    \hline
+    \endhead
+    1 & Risk description & L/M/H & L/M/H & Mitigation approach \\
+    \hline
+    2 & Risk description & L/M/H & L/M/H & Mitigation approach \\
+    \hline
+    3 & Risk description & L/M/H & L/M/H & Mitigation approach \\
+    \hline
+\end{longtable}
+
+% ----------------------------------------------------------------------------
+\section{Resources}
+
+\subsection{Funding}
+Describe funding arrangements, if applicable.
+
+\subsection{Personnel}
+Describe personnel commitments, if applicable.
+
+\subsection{Facilities and Equipment}
+Describe facility or equipment commitments, if applicable.
+
+% ----------------------------------------------------------------------------
+\section{Documentation and Reporting}
+
+\subsection{Related Documents}
+\begin{itemize}
+    \item Document title and number
+    \item Document title and number
+    \item Document title and number
+\end{itemize}
+
+\subsection{Reporting Requirements}
+Describe any reporting requirements associated with this decision.
+
+% ----------------------------------------------------------------------------
+\section{Dispute Resolution}
+In the event of a disagreement regarding the interpretation or implementation of this decision, the following escalation path shall be followed:
+\begin{enumerate}
+    \item Working-level discussion between affected parties
+    \item Escalation to Project Manager level
+    \item Escalation to Program Manager level
+    \item Additional levels as appropriate
+\end{enumerate}
+
+% ----------------------------------------------------------------------------
+\section{Amendment Procedures}
+This decision document may be amended by:
+\begin{enumerate}
+    \item Written request from any signatory party
+    \item Review and concurrence by all affected parties
+    \item Formal approval by the Decision Authority
+    \item Distribution of the revised document
+\end{enumerate}
+
+% ============================================================================
+% APPENDICES
+% ============================================================================
+\appendix
+
+\section{Supporting Data}
+Include any supporting data, analyses, or trade studies that informed the decision.
+
+\section{Acronyms and Definitions}
+\begin{longtable}{|p{3cm}|p{10cm}|}
+    \hline
+    \textbf{Term} & \textbf{Definition} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Term} & \textbf{Definition} \\
+    \hline
+    \endhead
+    Acronym/Term & Definition \\
+    \hline
+    Acronym/Term & Definition \\
+    \hline
+\end{longtable}
+
+\section{Reference Documents}
+\begin{enumerate}
+    \item Full citation for reference document
+    \item Full citation for reference document
+\end{enumerate}
+
+\end{document}

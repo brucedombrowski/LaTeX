@@ -1,0 +1,137 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in, top=1.5in, headheight=85pt]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tabularx}
+
+% ============================================================================
+% DOCUMENT VARIABLES - EDIT THESE
+% ============================================================================
+\newcommand{\UniqueID}{MOA-2025-001}
+\newcommand{\DocumentDate}{October XX, 20XX}
+\newcommand{\AuthorName}{Author Name}
+\newcommand{\AuthorTitle}{Title}
+\newcommand{\ToField}{Distribution}
+\newcommand{\SubjectField}{Subject Line Here}
+\newcommand{\OPRField}{Office Name}
+
+% ============================================================================
+% DOCUMENT CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=false,
+    pdfborder={0 0 0}
+}
+
+% Remove paragraph indentation
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% List formatting - match Word style
+\setlist[enumerate]{leftmargin=0.5in, labelwidth=0.25in, labelsep=0.1in, align=left, itemsep=12pt, topsep=12pt}
+\setlist[enumerate,1]{label=\arabic*.}
+\setlist[itemize]{leftmargin=0.5in, itemsep=3pt, topsep=6pt}
+
+% ============================================================================
+% HEADER AND FOOTER CONFIGURATION
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+
+% Header: Logo on left, "Memorandum of Agreement" on right
+\fancyhead[L]{%
+    \raisebox{-0.5\height}{\includegraphics[height=0.9in]{logo_placeholder.png}}%
+}
+\fancyhead[R]{%
+    \parbox[b]{3.5in}{\raggedleft\large\textbf{Memorandum of Agreement}}%
+}
+\renewcommand{\headrulewidth}{0pt}
+
+% Footer: Unique ID (left), Page X of Y (center), Date (right)
+\fancyfoot[L]{\small \UniqueID}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\fancyfoot[R]{\small \DocumentDate}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================================
+% CUSTOM COMMANDS
+% ============================================================================
+% Bold section headers for numbered sections
+\newcommand{\moasection}[1]{\item \textbf{#1}\par}
+
+% ============================================================================
+% BEGIN DOCUMENT
+% ============================================================================
+\begin{document}
+
+% ----------------------------------------------------------------------------
+% UNIQUE ID (top right)
+% ----------------------------------------------------------------------------
+\hfill \UniqueID
+
+\vspace{0.25in}
+
+% ----------------------------------------------------------------------------
+% SIGNATURE BLOCK
+% ----------------------------------------------------------------------------
+\underline{\hspace{2.5in}}\\[2pt]
+\AuthorName\\
+\AuthorTitle
+
+\vspace{0.25in}
+
+% ----------------------------------------------------------------------------
+% MEMO HEADER FIELDS
+% ----------------------------------------------------------------------------
+\textbf{DATE:} \DocumentDate
+
+\textbf{TO:} \ToField
+
+\textbf{SUBJECT:} \SubjectField
+
+\textbf{OFFICE OF PRIMARY RESPONSIBILITY:} \OPRField
+
+\vspace{0.25in}
+
+% ============================================================================
+% MAIN CONTENT - NUMBERED SECTIONS
+% ============================================================================
+\begin{enumerate}
+
+% ----------------------------------------------------------------------------
+\moasection{Purpose}
+
+Enter the purpose of this memorandum of agreement here. Describe what this document intends to accomplish and why it is being created.
+
+% ----------------------------------------------------------------------------
+\moasection{Background}
+
+Provide background information relevant to this agreement. Include context, history, and any pertinent details that led to the need for this memorandum.
+
+% ----------------------------------------------------------------------------
+\moasection{Scope}
+
+Define the scope of this agreement. Specify what is included and what is excluded, the boundaries of the agreement, and any limitations.
+
+% ----------------------------------------------------------------------------
+\moasection{Agreement}
+
+State the terms of the agreement here. This section should contain the specific commitments, responsibilities, and obligations of each party.
+
+\begin{itemize}
+    \item First agreement item or term
+    \item Second agreement item or term
+    \item Third agreement item or term
+\end{itemize}
+
+\end{enumerate}
+
+\end{document}
