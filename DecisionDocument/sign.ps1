@@ -118,11 +118,9 @@ function Test-WindowsSmartCard {
     # Check if smart card certificates are available via Windows Certificate Store
     # This works without OpenSC if the smart card middleware is installed by Windows/enterprise
     try {
+        # Look for any certificate with a private key - PIV cards may not have specific EKUs
         $smartCardCerts = Get-ChildItem -Path Cert:\CurrentUser\My | Where-Object {
-            $_.HasPrivateKey -and
-            ($_.EnhancedKeyUsageList.FriendlyName -contains "Document Signing" -or
-             $_.EnhancedKeyUsageList.FriendlyName -contains "Code Signing" -or
-             $_.Extensions | Where-Object { $_.Oid.FriendlyName -eq "Key Usage" -and $_.Format(0) -match "Digital Signature" })
+            $_.HasPrivateKey
         }
 
         if ($smartCardCerts -and $smartCardCerts.Count -gt 0) {
@@ -138,13 +136,12 @@ function Test-WindowsSmartCard {
 }
 
 function Get-WindowsSigningCertificates {
-    # Get certificates suitable for document signing from Windows Certificate Store
+    # Get certificates from Windows Certificate Store that can be used for signing
+    # PIV cards typically have multiple certificates - we show all with private keys
+    # and let the user choose which one to use for signing
     try {
         $certs = Get-ChildItem -Path Cert:\CurrentUser\My | Where-Object {
-            $_.HasPrivateKey -and
-            ($_.EnhancedKeyUsageList.FriendlyName -contains "Document Signing" -or
-             $_.EnhancedKeyUsageList.FriendlyName -contains "Code Signing" -or
-             $_.Extensions | Where-Object { $_.Oid.FriendlyName -eq "Key Usage" -and $_.Format(0) -match "Digital Signature" })
+            $_.HasPrivateKey
         }
         return $certs
     }
@@ -155,12 +152,12 @@ function Get-WindowsSigningCertificates {
 
 function Show-WindowsCertificates {
     Write-Host ""
-    Write-Warn "Certificates in Windows Certificate Store (suitable for signing):"
+    Write-Warn "Certificates in Windows Certificate Store (with private keys):"
     Write-Host ""
 
     $certs = Get-WindowsSigningCertificates
     if ($certs.Count -eq 0) {
-        Write-Host "  No signing certificates found in Windows Certificate Store."
+        Write-Host "  No certificates with private keys found in Windows Certificate Store."
         Write-Host ""
         Write-Host "  If your smart card is inserted, certificates should appear here"
         Write-Host "  if Windows recognizes your card's middleware."
@@ -172,8 +169,16 @@ function Show-WindowsCertificates {
         $subject = $cert.Subject
         $issuer = $cert.Issuer -replace ".*CN=([^,]+).*", '$1'
         $expires = $cert.NotAfter.ToString("yyyy-MM-dd")
+        # Get EKU (Extended Key Usage) to help identify certificate purpose
+        $ekuList = @()
+        if ($cert.EnhancedKeyUsageList) {
+            $ekuList = $cert.EnhancedKeyUsageList | ForEach-Object { $_.FriendlyName }
+        }
+        $ekuStr = if ($ekuList.Count -gt 0) { $ekuList -join ", " } else { "General Purpose" }
+
         Write-Host "  $i) $subject"
         Write-Host "     Issuer: $issuer | Expires: $expires"
+        Write-Host "     Usage: $ekuStr"
         Write-Host "     Thumbprint: $($cert.Thumbprint)"
         Write-Host ""
         $i++
@@ -761,8 +766,16 @@ function Sign-WithSmartCardInteractive {
             $subject = $cert.Subject
             $issuer = $cert.Issuer -replace ".*CN=([^,]+).*", '$1'
             $expires = $cert.NotAfter.ToString("yyyy-MM-dd")
+            # Get EKU to help identify certificate purpose
+            $ekuList = @()
+            if ($cert.EnhancedKeyUsageList) {
+                $ekuList = $cert.EnhancedKeyUsageList | ForEach-Object { $_.FriendlyName }
+            }
+            $ekuStr = if ($ekuList.Count -gt 0) { $ekuList -join ", " } else { "General Purpose" }
+
             Write-Host "  $i) $subject"
             Write-Host "     Issuer: $issuer | Expires: $expires"
+            Write-Host "     Usage: $ekuStr"
             Write-Host ""
             $i++
         }
