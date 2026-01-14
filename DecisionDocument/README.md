@@ -313,6 +313,206 @@ The "Certificate issuer is unknown" warning is expected for self-signed certific
 - **Self-signed certificates** are for testing only - they won't be trusted by default
 - **Production signing** should use CA-issued certificates or government-issued smart cards (PIV/CAC)
 
+## Secure Document Development
+
+When creating documents containing sensitive information (CUI, PII, proprietary data, ITAR, etc.), follow these practices to prevent accidental disclosure.
+
+### Option 1: Local-Only Development (Recommended for Sensitive Data)
+
+Clone the template repository, then disconnect from remote:
+
+```bash
+# Clone the template
+git clone https://github.com/yourusername/LaTeX.git
+cd LaTeX/DecisionDocument
+
+# Remove remote connection to prevent accidental push
+git remote remove origin
+
+# Verify no remotes exist
+git remote -v
+# (should show nothing)
+
+# Continue with local-only version control
+git add .
+git commit -m "Initial document draft"
+```
+
+Your document history stays entirely local. No risk of pushing to a public repository.
+
+### Option 2: Private Repository
+
+For team collaboration on sensitive documents:
+
+```bash
+# Clone template
+git clone https://github.com/yourusername/LaTeX.git my-secure-project
+cd my-secure-project/DecisionDocument
+
+# Change remote to your private repository
+git remote set-url origin https://github.com/yourorg/private-decisions.git
+
+# Or remove origin and add new private remote
+git remote remove origin
+git remote add origin git@your-private-server:decisions.git
+
+# Verify
+git remote -v
+```
+
+Ensure your private repository has appropriate access controls.
+
+### Option 3: No Version Control
+
+For maximum isolation, work without git entirely:
+
+```bash
+# Download as ZIP (no git history)
+# From GitHub: Code → Download ZIP
+
+# Or clone and remove git
+git clone https://github.com/yourusername/LaTeX.git
+cd LaTeX/DecisionDocument
+rm -rf ../.git
+
+# No version control - just edit files directly
+```
+
+### Sensitive Data Checklist
+
+Before committing or sharing any document:
+
+- [ ] **CUI**: Controlled Unclassified Information requires proper handling per 32 CFR Part 2002
+- [ ] **PII**: Remove or redact personally identifiable information
+- [ ] **Proprietary**: Ensure trade secrets and proprietary data are protected
+- [ ] **ITAR/EAR**: Export-controlled data requires authorized access
+- [ ] **FOUO**: For Official Use Only documents need appropriate distribution
+- [ ] **Attorney-Client**: Privileged communications require protection
+
+### Additional Safeguards
+
+1. **Work offline**: Disable network when editing sensitive documents
+2. **Encrypted storage**: Use FileVault (macOS) or BitLocker (Windows)
+3. **Secure deletion**: Use `srm` or secure empty trash for drafts
+4. **Air-gapped systems**: For classified or highly sensitive work
+5. **Access controls**: Restrict file permissions (`chmod 600 document.tex`)
+
+### Classification Markings
+
+Add classification banners to your documents by editing the header/footer in the `.tex` file:
+
+```latex
+% In the fancyhdr setup section, add:
+\lhead{\textcolor{red}{\textbf{CUI // SP-PRVCY}}}
+\rhead{\textcolor{red}{\textbf{CUI // SP-PRVCY}}}
+```
+
+Common CUI categories: `SP-PRVCY` (Privacy), `SP-PROPIN` (Proprietary), `SP-EXPT` (Export Controlled)
+
+### Working Across Boundaries
+
+When collaborating across organizational, classification, or network boundaries:
+
+**Cross-Domain Considerations:**
+- Never transfer files directly between classified and unclassified systems
+- Use approved cross-domain solutions (CDS) when authorized
+- Sanitize documents before moving to lower classification levels
+- Maintain separate working copies for each domain
+
+**Multi-Organization Collaboration:**
+```bash
+# Create separate branches for different stakeholders
+git checkout -b partner-review
+
+# Share only approved content
+git archive --format=zip HEAD:DecisionDocument -o approved_release.zip
+
+# Or export specific files without git history
+cp decision_document.pdf /path/to/shared/location/
+```
+
+**Template vs. Content Separation:**
+- Keep the template repository public (no sensitive data)
+- Keep document content in separate, controlled repositories
+- Use the template as a starting point, not a working repository
+
+**Air-Gap Workflows:**
+```bash
+# On connected system: export template
+git archive --format=zip HEAD -o template.zip
+
+# Transfer via approved removable media to air-gapped system
+# On air-gapped system:
+unzip template.zip -d my-document
+cd my-document/DecisionDocument
+# Edit documents locally, never connect to network
+```
+
+**Redaction Before Release:**
+1. Create a copy of the document for release
+2. Remove or redact sensitive sections
+3. Rebuild PDF from redacted `.tex` source
+4. Verify no metadata leakage (`pdfinfo`, `exiftool`)
+5. Document the redaction in revision history
+
+### Email and File Transfer
+
+Let's be realistic: at some point, a PDF is getting emailed.
+
+**Before Emailing Any Document:**
+1. Verify recipient is authorized to receive the content
+2. Confirm you're using an approved email system for the classification level
+3. Check that attachments don't exceed size limits (encrypt large files separately)
+
+**Email Encryption Options:**
+
+| Method | Use Case | Setup |
+|--------|----------|-------|
+| S/MIME | Org-to-org with PKI | Requires certificates from both parties |
+| PGP/GPG | Technical recipients | `gpg --encrypt --recipient user@example.com document.pdf` |
+| Password-protected ZIP | Quick sharing | `zip -e secure.zip document.pdf` (share password separately) |
+| Encrypted PDF | Built-in protection | Use `qpdf` or Adobe to add password |
+
+**Password-Protect a PDF:**
+```bash
+# Using qpdf (brew install qpdf)
+qpdf --encrypt userpass ownerpass 256 -- input.pdf protected.pdf
+
+# Using pdftk (brew install pdftk-java)
+pdftk input.pdf output protected.pdf user_pw PASSWORD
+```
+
+**For CUI via Email:**
+- Use organization-approved encrypted email (Microsoft 365 Message Encryption, Virtru, etc.)
+- Include CUI marking in subject line: `[CUI] Decision Document for Review`
+- Add distribution statement in email body
+- Request read receipt for accountability
+
+**Secure File Transfer Alternatives:**
+- DoD SAFE (Secure Access File Exchange)
+- Organization SharePoint/OneDrive with appropriate permissions
+- SFTP to controlled servers
+- Encrypted USB via approved courier
+
+**What NOT to Do:**
+- Never email classified information on unclassified systems
+- Don't use personal email for official documents
+- Avoid cloud storage (Dropbox, Google Drive) for sensitive data unless approved
+- Don't send passwords in the same email as encrypted files
+
+**Metadata Scrubbing Before Send:**
+```bash
+# Check what metadata exists
+pdfinfo document.pdf
+exiftool document.pdf
+
+# Remove metadata with exiftool
+exiftool -all= document.pdf
+
+# Or use qpdf to linearize (removes some metadata)
+qpdf --linearize input.pdf clean.pdf
+```
+
 ## Usage Tips
 
 1. **Decision Memorandum**: Best for straightforward decisions that need formal documentation but don't require extensive detail
