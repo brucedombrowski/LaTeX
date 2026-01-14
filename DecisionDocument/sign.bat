@@ -49,18 +49,20 @@ echo   Decision Document Signer
 echo ========================================
 echo.
 echo   [1] Sign a PDF
-echo   [2] Verify a signed PDF
-echo   [3] Create test certificate
-echo   [4] List certificates
+echo   [2] Add signature to signed PDF
+echo   [3] Verify a signed PDF
+echo   [4] Create test certificate
+echo   [5] List certificates
 echo   [0] Exit
 echo.
 set /p choice="Enter choice: "
 
 if "%choice%"=="0" exit /b 0
 if "%choice%"=="1" goto :sign_menu
-if "%choice%"=="2" goto :verify_menu
-if "%choice%"=="3" goto :create_cert
-if "%choice%"=="4" goto :list
+if "%choice%"=="2" goto :add_sig_menu
+if "%choice%"=="3" goto :verify_menu
+if "%choice%"=="4" goto :create_cert
+if "%choice%"=="5" goto :list
 goto :menu
 
 :sign_menu
@@ -98,6 +100,44 @@ if %fnum% gtr %count% goto :sign_menu
 call set "selected=%%file%fnum%%%"
 echo.
 echo Signing: %selected%
+echo.
+"%SCRIPTDIR%PdfSigner.exe" "%selected%" --gui
+echo.
+pause
+goto :menu
+
+:add_sig_menu
+echo.
+echo Signed PDFs (add another signature):
+echo.
+set "count=0"
+for %%f in (*_signed.pdf) do (
+    set /a count+=1
+    echo   [!count!] %%f
+    set "file!count!=%%f"
+)
+
+if %count%==0 (
+    echo   No signed PDFs found.
+    echo   Sign a PDF first using option [1].
+    echo.
+    pause
+    goto :menu
+)
+
+echo.
+echo   [0] Back
+echo.
+set /p achoice="Enter choice: "
+
+if "%achoice%"=="0" goto :menu
+set /a anum=%achoice% 2>nul
+if %anum% lss 1 goto :add_sig_menu
+if %anum% gtr %count% goto :add_sig_menu
+
+call set "selected=%%file%anum%%%"
+echo.
+echo Adding signature to: %selected%
 echo.
 "%SCRIPTDIR%PdfSigner.exe" "%selected%" --gui
 echo.
