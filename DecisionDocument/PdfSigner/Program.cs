@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using iText.Kernel.Pdf;
@@ -22,10 +23,12 @@ namespace PdfSignerApp
 
             if (args.Length == 0)
             {
-                Console.WriteLine("Usage: PdfSigner.exe <input.pdf> [output.pdf]");
+                Console.WriteLine("Usage: PdfSigner.exe <input.pdf> [output.pdf] [options]");
                 Console.WriteLine();
                 Console.WriteLine("Options:");
-                Console.WriteLine("  --list    List available signing certificates");
+                Console.WriteLine("  --list     List available signing certificates");
+                Console.WriteLine("  --gui      Use graphical certificate picker dialog");
+                Console.WriteLine("  --console  Use console certificate picker (default)");
                 Console.WriteLine();
                 return 1;
             }
@@ -36,8 +39,12 @@ namespace PdfSignerApp
                 return 0;
             }
 
-            string inputPdf = args[0];
-            string outputPdf = args.Length > 1 ? args[1] : GetOutputPath(inputPdf);
+            // Parse arguments
+            bool useGui = args.Contains("--gui");
+            var fileArgs = args.Where(a => !a.StartsWith("--")).ToArray();
+
+            string inputPdf = fileArgs[0];
+            string outputPdf = fileArgs.Length > 1 ? fileArgs[1] : GetOutputPath(inputPdf);
 
             if (!File.Exists(inputPdf))
             {
@@ -48,7 +55,7 @@ namespace PdfSignerApp
             try
             {
                 // Get signing certificate from Windows store (includes smart cards)
-                X509Certificate2? cert = SelectSigningCertificate();
+                X509Certificate2? cert = useGui ? SelectSigningCertificateGui() : SelectSigningCertificate();
                 if (cert == null)
                 {
                     Console.WriteLine("No certificate selected. Exiting.");
@@ -93,106 +100,287 @@ namespace PdfSignerApp
             return Path.Combine(dir, $"{name}_signed{ext}");
         }
 
-        static List<X509Certificate2> GetSigningCertificates()
+        // Known PIV/CAC/Government certificate issuers
+        static readonly string[] GovernmentIssuers = new[]
+        {
+            "DOD", "Department of Defense", "NASA", "FPKI", "Federal PKI",
+            "Entrust", "DigiCert Federal", "WidePoint", "Carillon",
+            "Treasury", "HHS", "GSA", "USDA", "DOE", "DOJ", "DHS"
+        };
+
+        static List<X509Certificate2> GetSigningCertificates(bool filterForSigning = true)
         {
             var result = new List<X509Certificate2>();
 
             using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
             store.Open(OpenFlags.ReadOnly);
 
-            // Add all certificates from the personal store
             // We don't check HasPrivateKey here because that can trigger
             // smart card access and cause hangs
             foreach (var cert in store.Certificates)
             {
+                if (!filterForSigning)
+                {
+                    result.Add(cert);
+                    continue;
+                }
+
+                // Filter: Must not be expired
+                if (cert.NotAfter < DateTime.Now)
+                    continue;
+
+                // Filter: Must have Digital Signature key usage
+                if (!HasDigitalSignatureUsage(cert))
+                    continue;
+
                 result.Add(cert);
             }
 
             return result;
         }
 
+        static bool HasDigitalSignatureUsage(X509Certificate2 cert)
+        {
+            // Check Key Usage extension
+            foreach (var ext in cert.Extensions)
+            {
+                if (ext is X509KeyUsageExtension keyUsage)
+                {
+                    if ((keyUsage.KeyUsages & X509KeyUsageFlags.DigitalSignature) != 0)
+                        return true;
+                }
+            }
+
+            // If no Key Usage extension, check Enhanced Key Usage
+            foreach (var ext in cert.Extensions)
+            {
+                if (ext is X509EnhancedKeyUsageExtension eku)
+                {
+                    // Common signing OIDs
+                    foreach (var oid in eku.EnhancedKeyUsages)
+                    {
+                        // Code Signing, Email Protection, Document Signing, Smart Card Logon
+                        if (oid.Value == "1.3.6.1.5.5.7.3.3" ||  // Code Signing
+                            oid.Value == "1.3.6.1.5.5.7.3.4" ||  // Email Protection
+                            oid.Value == "1.3.6.1.4.1.311.10.3.12" ||  // Document Signing
+                            oid.Value == "1.3.6.1.4.1.311.20.2.2")     // Smart Card Logon
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            // No usage extensions = assume can sign (older certs)
+            return cert.Extensions.Count == 0 ||
+                   !cert.Extensions.OfType<X509KeyUsageExtension>().Any();
+        }
+
+        static bool IsGovernmentCert(X509Certificate2 cert)
+        {
+            string issuer = cert.Issuer.ToUpperInvariant();
+            string subject = cert.Subject.ToUpperInvariant();
+
+            foreach (var keyword in GovernmentIssuers)
+            {
+                if (issuer.Contains(keyword.ToUpperInvariant()) ||
+                    subject.Contains(keyword.ToUpperInvariant()))
+                    return true;
+            }
+            return false;
+        }
+
+        static string GetCertCategory(X509Certificate2 cert)
+        {
+            if (IsGovernmentCert(cert))
+                return "PIV/CAC";
+
+            // Check for self-signed (test certs)
+            if (cert.Subject == cert.Issuer)
+                return "Self-signed";
+
+            return "Other";
+        }
+
+        static string ExtractCommonName(string distinguishedName)
+        {
+            if (distinguishedName.StartsWith("CN="))
+            {
+                int comma = distinguishedName.IndexOf(',');
+                if (comma > 0)
+                    return distinguishedName.Substring(3, comma - 3);
+                else
+                    return distinguishedName.Substring(3);
+            }
+            return distinguishedName;
+        }
+
         static void ListCertificates()
         {
-            Console.WriteLine("Available signing certificates in Windows Certificate Store:");
+            Console.WriteLine("All certificates in Windows Certificate Store:");
             Console.WriteLine();
 
-            var certs = GetSigningCertificates();
+            var certs = GetSigningCertificates(filterForSigning: false);
 
             if (certs.Count == 0)
             {
-                Console.WriteLine("No signing certificates found.");
-                Console.WriteLine();
-                Console.WriteLine("If you have a PIV/CAC smart card inserted, ensure:");
-                Console.WriteLine("  1. The card reader drivers are installed");
-                Console.WriteLine("  2. The smart card middleware is configured");
-                Console.WriteLine("  3. The certificate appears in certmgr.msc");
+                Console.WriteLine("No certificates found.");
                 return;
             }
 
-            int index = 0;
-            foreach (var cert in certs)
+            // Group by category
+            var grouped = certs.GroupBy(c => GetCertCategory(c)).OrderBy(g => g.Key == "PIV/CAC" ? 0 : g.Key == "Other" ? 1 : 2);
+
+            foreach (var group in grouped)
             {
-                index++;
-                Console.WriteLine($"[{index}] {cert.Subject}");
-                Console.WriteLine($"    Issuer: {cert.Issuer}");
-                Console.WriteLine($"    Expires: {cert.NotAfter:yyyy-MM-dd}");
-                Console.WriteLine($"    Thumbprint: {cert.Thumbprint}");
+                Console.WriteLine($"=== {group.Key} ===");
+                foreach (var cert in group)
+                {
+                    string status = cert.NotAfter < DateTime.Now ? "[EXPIRED]" :
+                                    HasDigitalSignatureUsage(cert) ? "[OK]" : "[No Sign]";
+                    Console.WriteLine($"  {status} {ExtractCommonName(cert.Subject)}");
+                    Console.WriteLine($"         Issuer: {ExtractCommonName(cert.Issuer)}");
+                    Console.WriteLine($"         Expires: {cert.NotAfter:yyyy-MM-dd}");
+                }
                 Console.WriteLine();
             }
         }
 
         static X509Certificate2? SelectSigningCertificate()
         {
-            var certs = GetSigningCertificates();
+            // Get filtered certs (valid, with signing capability)
+            var certs = GetSigningCertificates(filterForSigning: true);
 
             if (certs.Count == 0)
             {
-                Console.WriteLine("No certificates found in Windows Certificate Store.");
+                Console.WriteLine("No valid signing certificates found.");
+                Console.WriteLine();
+                Console.WriteLine("Certificates must be:");
+                Console.WriteLine("  - Not expired");
+                Console.WriteLine("  - Have Digital Signature key usage");
+                Console.WriteLine();
+                Console.WriteLine("Ensure your smart card is inserted and recognized by Windows.");
+                Console.WriteLine("Run with --list to see all certificates.");
+                return null;
+            }
+
+            // Sort: PIV/CAC first, then by expiration date (newest last = more time to use)
+            var sortedCerts = certs
+                .OrderByDescending(c => IsGovernmentCert(c))  // PIV/CAC first
+                .ThenBy(c => c.NotAfter)  // Expiring soonest first
+                .ToList();
+
+            if (sortedCerts.Count == 1)
+            {
+                var cert = sortedCerts[0];
+                string category = GetCertCategory(cert);
+                Console.WriteLine($"Using certificate: {ExtractCommonName(cert.Subject)} [{category}]");
+                return cert;
+            }
+
+            // Multiple certs - display nicely grouped
+            Console.WriteLine("Select a certificate for signing:");
+            Console.WriteLine();
+
+            // Group by category for display
+            var pivCerts = sortedCerts.Where(c => IsGovernmentCert(c)).ToList();
+            var otherCerts = sortedCerts.Where(c => !IsGovernmentCert(c)).ToList();
+
+            int index = 0;
+
+            if (pivCerts.Any())
+            {
+                Console.WriteLine("  --- PIV/CAC (Smart Card) ---");
+                foreach (var cert in pivCerts)
+                {
+                    index++;
+                    string name = ExtractCommonName(cert.Subject);
+                    string issuer = ExtractCommonName(cert.Issuer);
+                    int daysLeft = (int)(cert.NotAfter - DateTime.Now).TotalDays;
+                    Console.WriteLine($"  [{index}] {name}");
+                    Console.WriteLine($"      Issuer: {issuer}");
+                    Console.WriteLine($"      Expires: {cert.NotAfter:yyyy-MM-dd} ({daysLeft} days)");
+                    Console.WriteLine();
+                }
+            }
+
+            if (otherCerts.Any())
+            {
+                Console.WriteLine("  --- Other Certificates ---");
+                foreach (var cert in otherCerts)
+                {
+                    index++;
+                    string name = ExtractCommonName(cert.Subject);
+                    string issuer = ExtractCommonName(cert.Issuer);
+                    string selfSigned = cert.Subject == cert.Issuer ? " (self-signed)" : "";
+                    int daysLeft = (int)(cert.NotAfter - DateTime.Now).TotalDays;
+                    Console.WriteLine($"  [{index}] {name}{selfSigned}");
+                    Console.WriteLine($"      Issuer: {issuer}");
+                    Console.WriteLine($"      Expires: {cert.NotAfter:yyyy-MM-dd} ({daysLeft} days)");
+                    Console.WriteLine();
+                }
+            }
+
+            // Recommend PIV/CAC if available
+            if (pivCerts.Any())
+            {
+                Console.WriteLine("  TIP: PIV/CAC certificates are recommended for official documents.");
+                Console.WriteLine();
+            }
+
+            Console.Write($"Select certificate [1-{sortedCerts.Count}]: ");
+
+            string? input = Console.ReadLine();
+            if (int.TryParse(input, out int choice) && choice >= 1 && choice <= sortedCerts.Count)
+            {
+                return sortedCerts[choice - 1];
+            }
+
+            Console.WriteLine("Invalid selection.");
+            return null;
+        }
+
+        static X509Certificate2? SelectSigningCertificateGui()
+        {
+            // Get filtered certs (valid, with signing capability)
+            var certs = GetSigningCertificates(filterForSigning: true);
+
+            if (certs.Count == 0)
+            {
+                Console.WriteLine("No valid signing certificates found.");
+                Console.WriteLine();
+                Console.WriteLine("Certificates must be:");
+                Console.WriteLine("  - Not expired");
+                Console.WriteLine("  - Have Digital Signature key usage");
                 Console.WriteLine();
                 Console.WriteLine("Ensure your smart card is inserted and recognized by Windows.");
                 return null;
             }
 
-            if (certs.Count == 1)
-            {
-                // Only one cert available - use it automatically
-                Console.WriteLine($"Using certificate: {certs[0].Subject}");
-                return certs[0];
-            }
-
-            // Multiple certs - let user choose
-            Console.WriteLine("Available certificates:");
-            Console.WriteLine();
-
-            int index = 0;
+            // Convert to X509Certificate2Collection for the UI
+            var collection = new X509Certificate2Collection();
             foreach (var cert in certs)
             {
-                index++;
-                // Extract just the CN for cleaner display
-                string displayName = cert.Subject;
-                if (displayName.StartsWith("CN="))
-                {
-                    int comma = displayName.IndexOf(',');
-                    if (comma > 0)
-                        displayName = displayName.Substring(3, comma - 3);
-                    else
-                        displayName = displayName.Substring(3);
-                }
-                Console.WriteLine($"  [{index}] {displayName}");
-                Console.WriteLine($"      Expires: {cert.NotAfter:yyyy-MM-dd}");
+                collection.Add(cert);
             }
 
+            Console.WriteLine("Opening certificate selection dialog...");
             Console.WriteLine();
-            Console.Write($"Select certificate [1-{certs.Count}]: ");
 
-            string? input = Console.ReadLine();
-            if (int.TryParse(input, out int choice) && choice >= 1 && choice <= certs.Count)
+            // Use the native Windows certificate picker dialog
+            // This is part of System.Security.Cryptography.X509Certificates - no WinForms needed
+            var selected = X509Certificate2UI.SelectFromCollection(
+                collection,
+                "Select Signing Certificate",
+                "Choose a certificate to sign the PDF document.\nPIV/CAC certificates are recommended for official documents.",
+                X509SelectionFlag.SingleSelection);
+
+            if (selected.Count == 0)
             {
-                return certs[choice - 1];
+                return null;
             }
 
-            Console.WriteLine("Invalid selection.");
-            return null;
+            return selected[0];
         }
 
         static void SignPdf(string inputPath, string outputPath, X509Certificate2 cert)
