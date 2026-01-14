@@ -2,21 +2,27 @@
   <!-- Background rounded square - Word blue -->
   <rect x="5" y="5" width="90" height="90" rx="12" ry="12" fill="#2B579A"/>
 
-  <!-- Orbit path ellipse - tilted and behind text -->
-  <ellipse cx="50" cy="50" rx="32" ry="12"
+  <!-- First O - orbit ellipse with satellite -->
+  <ellipse cx="28" cy="52" rx="12" ry="8"
            fill="none"
-           stroke="rgba(255,255,255,0.6)"
+           stroke="rgba(255,255,255,0.7)"
            stroke-width="2.5"
-           transform="rotate(-25 50 50)"/>
+           transform="rotate(-20 28 52)"/>
+  <circle cx="38" cy="46" r="3" fill="white"/>
 
-  <!-- Small orbit dot/satellite -->
-  <circle cx="78" cy="38" r="4" fill="white"/>
-
-  <!-- Stylized "Org" for Organization - solid white -->
+  <!-- L - vertical bar with slight transparency -->
   <text x="50" y="68"
         font-family="Arial, Helvetica, sans-serif"
         font-size="36"
         font-weight="bold"
-        fill="white"
-        text-anchor="middle">Org</text>
+        fill="rgba(255,255,255,0.85)"
+        text-anchor="middle">L</text>
+
+  <!-- Second O - orbit ellipse with satellite -->
+  <ellipse cx="72" cy="52" rx="12" ry="8"
+           fill="none"
+           stroke="rgba(255,255,255,0.7)"
+           stroke-width="2.5"
+           transform="rotate(20 72 52)"/>
+  <circle cx="82" cy="46" r="3" fill="white"/>
 </svg>

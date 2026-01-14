@@ -142,7 +142,7 @@ DecisionDocument/
 ├── decision_document.tex         # Comprehensive decision template
 ├── decision_document.pdf         # Example generated PDF
 ├── decision_document_signed.pdf  # Example signed PDF
-├── logo.png                      # Header logo (Word-style blue "Org")
+├── logo.png                      # Header logo (orbit-styled "LOgO")
 ├── Template.docx                 # Original Word template (reference)
 ├── build.sh                      # Build script (macOS/Linux)
 ├── build.ps1                     # Build script (Windows)
