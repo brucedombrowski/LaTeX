@@ -24,7 +24,7 @@ if /i "%CMD%"=="list" goto :list
 
 :: Assume it's a file to sign
 if exist "%CMD%" (
-    "%SCRIPTDIR%PdfSigner.exe" "%CMD%"
+    "%SCRIPTDIR%PdfSigner.exe" "%CMD%" --gui
     goto :end
 )
 
@@ -99,7 +99,7 @@ call set "selected=%%file%fnum%%%"
 echo.
 echo Signing: %selected%
 echo.
-"%SCRIPTDIR%PdfSigner.exe" "%selected%"
+"%SCRIPTDIR%PdfSigner.exe" "%selected%" --gui
 echo.
 pause
 goto :menu
