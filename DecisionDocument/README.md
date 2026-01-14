@@ -103,6 +103,8 @@ choco install pandoc
 
 **Note:** The generated Word documents are provided for convenience only. Digital signatures are only supported for PDF output. For formal, signed documents, use the PDF workflow.
 
+**Use case:** Word documents are useful for sending to reviewers via email when collaborating across organizations. Recipients can use Track Changes and comments for feedback, then the final version is rebuilt as PDF for signing.
+
 ## Template Customization
 
 ### Decision Memorandum (`decision_memo.tex`)
