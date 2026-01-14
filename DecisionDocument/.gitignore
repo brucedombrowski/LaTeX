@@ -25,3 +25,8 @@ Thumbs.db
 *.key
 *.crt
 *.cer
+
+# .NET build artifacts
+PdfSigner/bin/
+PdfSigner/obj/
+*.pdb
