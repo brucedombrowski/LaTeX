@@ -2,6 +2,7 @@
 # Supports smart card (PIV/CAC) and software certificate (.p12/.pfx) signing
 # Smart card signing uses Windows Certificate Store (preferred) or OpenSC as fallback
 # Requires: OpenSSL for certificate creation (optional)
+# Preferred: PdfSigner.exe (.NET tool) for signing - no Java dependency
 
 param(
     [Parameter(Position=0)]
@@ -32,6 +33,7 @@ Write-Host "=========================================="
 $script:SignTool = ""
 $script:PKCS11Lib = ""
 $script:JSignJar = ""
+$script:PdfSignerExe = ""
 $script:HasOpenSSL = $false
 $script:HasCertUtil = $false
 $script:HasWindowsSmartCard = $false
@@ -39,14 +41,34 @@ $script:HasWindowsSmartCard = $false
 function Test-Tools {
     $toolFound = $false
 
+    # Check for PdfSigner.exe (.NET tool - preferred, no Java dependency)
+    $pdfSignerPaths = @(
+        "$ScriptDir\PdfSigner\bin\Release\net6.0\PdfSigner.exe",
+        "$ScriptDir\PdfSigner\bin\Debug\net6.0\PdfSigner.exe",
+        "$ScriptDir\PdfSigner.exe",
+        "$env:LOCALAPPDATA\PdfSigner\PdfSigner.exe"
+    )
+
+    foreach ($path in $pdfSignerPaths) {
+        if (Test-Path $path) {
+            Write-Success "Found: PdfSigner.exe at $path (recommended)"
+            $script:SignTool = "pdfsigner"
+            $script:PdfSignerExe = $path
+            $toolFound = $true
+            break
+        }
+    }
+
     # Check for pdfsig (from Poppler)
     if (Get-Command "pdfsig" -ErrorAction SilentlyContinue) {
         Write-Success "Found: pdfsig (Poppler)"
-        $script:SignTool = "pdfsig"
-        $toolFound = $true
+        if (-not $toolFound) {
+            $script:SignTool = "pdfsig"
+            $toolFound = $true
+        }
     }
 
-    # Check for JSignPDF
+    # Check for JSignPDF (fallback - requires Java)
     $jsignPaths = @(
         "$ScriptDir\JSignPdf.jar",
         "$env:ProgramFiles\JSignPdf\JSignPdf.jar",
@@ -57,8 +79,10 @@ function Test-Tools {
 
     foreach ($path in $jsignPaths) {
         if (Test-Path $path) {
-            Write-Success "Found: JSignPDF at $path"
-            $script:SignTool = "jsignpdf"
+            Write-Success "Found: JSignPDF at $path (fallback)"
+            if (-not $toolFound) {
+                $script:SignTool = "jsignpdf"
+            }
             $script:JSignJar = $path
             $toolFound = $true
             break
@@ -241,6 +265,20 @@ function Show-WindowsCertificates {
     }
 }
 
+function Sign-WithPdfSigner {
+    param($InputPdf, $OutputPdf)
+
+    Write-Host ""
+    Write-Warn "Signing with PdfSigner.exe (.NET)..."
+    Write-Host ""
+    Write-Host "Windows will prompt you to select a certificate."
+    Write-Host "If using a smart card, you'll be asked for your PIN."
+    Write-Host ""
+
+    & $script:PdfSignerExe $InputPdf $OutputPdf
+    return $LASTEXITCODE -eq 0
+}
+
 function Sign-WithWindowsCert {
     param($InputPdf, $OutputPdf, $CertThumbprint)
 
@@ -256,8 +294,19 @@ function Sign-WithWindowsCert {
 
     Write-Host "Using certificate: $($cert.Subject)"
 
-    # Check if JSignPDF is available (it can use Windows keystore via SunMSCAPI)
-    if ($script:JSignJar) {
+    # Preferred: Use PdfSigner.exe (.NET tool - no Java required)
+    if ($script:PdfSignerExe) {
+        Write-Host "Signing via PdfSigner.exe (Windows-native, no Java)..."
+        Write-Host ""
+        Write-Host "Windows Security will prompt for your PIN if using a smart card."
+        Write-Host ""
+
+        & $script:PdfSignerExe $InputPdf $OutputPdf
+        return $LASTEXITCODE -eq 0
+    }
+
+    # Fallback: Check if JSignPDF is available (it can use Windows keystore via SunMSCAPI)
+    if ($script:JSignJar -and (Get-Command "java" -ErrorAction SilentlyContinue)) {
         Write-Host "Signing via JSignPDF with Windows keystore..."
 
         $outDir = Split-Path -Parent $OutputPdf
@@ -277,9 +326,9 @@ function Sign-WithWindowsCert {
         return $LASTEXITCODE -eq 0
     }
 
-    # Fallback: Export cert to temp P12 and use existing P12 signing
+    # Last resort: Export cert to temp P12 and use existing P12 signing
     # This requires the private key to be exportable (may not work for smart cards)
-    Write-Warn "JSignPDF not found. Attempting export-based signing..."
+    Write-Warn "No signing tool found. Attempting export-based signing..."
     Write-Host "Note: This may not work if the certificate's private key is non-exportable (smart cards)."
 
     try {
@@ -301,15 +350,9 @@ function Sign-WithWindowsCert {
         Write-Err "Cannot export certificate private key."
         Write-Host "This is expected for smart card certificates."
         Write-Host ""
-        Write-Host "JSignPDF is required for smart card signing."
+        Write-Host "To sign with smart cards, build PdfSigner:"
+        Write-Host "  cd PdfSigner && dotnet build -c Release"
         Write-Host ""
-        $install = Read-Host "Would you like to download JSignPDF now? (y/n)"
-        if ($install -match "^[Yy]") {
-            if (Install-JSignPDF) {
-                Write-Host ""
-                Write-Host "Please try signing again."
-            }
-        }
         return $false
     }
 }
@@ -513,10 +556,14 @@ function Sign-Pdf {
 
     $success = $false
     switch ($script:SignTool) {
+        "pdfsigner" { $success = Sign-WithPdfSigner $InputPdf $outputPdf }
         "jsignpdf" { $success = Sign-WithJSignPDF $InputPdf $outputPdf $null $null }
         "pdfsig" { $success = Sign-WithPdfSig $InputPdf $outputPdf $null $null }
         default {
             Write-Err "No signing tool configured."
+            Write-Host ""
+            Write-Host "To enable signing, build PdfSigner:"
+            Write-Host "  cd PdfSigner && dotnet build -c Release"
             return $false
         }
     }
@@ -676,12 +723,14 @@ function Show-InteractiveMenu {
     Write-Host ""
 
     # Show tool status
-    if ($script:JSignJar) {
-        Write-Host "  [Signing tool: JSignPDF ready]" -ForegroundColor Green
+    if ($script:PdfSignerExe) {
+        Write-Host "  [Signing tool: PdfSigner.exe ready (recommended)]" -ForegroundColor Green
+    } elseif ($script:JSignJar) {
+        Write-Host "  [Signing tool: JSignPDF ready (requires Java)]" -ForegroundColor Green
     } elseif ($script:SignTool -eq "pdfsig") {
         Write-Host "  [Signing tool: pdfsig ready]" -ForegroundColor Green
     } else {
-        Write-Host "  [Signing tool: Not installed - use option 5]" -ForegroundColor Yellow
+        Write-Host "  [Signing tool: Not built - run: cd PdfSigner && dotnet build -c Release]" -ForegroundColor Yellow
     }
     Write-Host ""
 
