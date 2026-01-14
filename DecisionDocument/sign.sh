@@ -70,35 +70,77 @@ sign_with_p12() {
     echo ""
     echo -e "${YELLOW}Signing with software certificate...${NC}"
 
-    # Use pdfsig with NSS if available, otherwise use Java-based approach
-    if command -v openssl &> /dev/null; then
-        # Create temporary NSS database for signing
-        local nss_dir=$(mktemp -d)
-
-        # Initialize NSS database
-        certutil -N -d "$nss_dir" --empty-password 2>/dev/null || true
-
-        # Import the P12 certificate
-        pk12util -i "$p12_file" -d "$nss_dir" -W "$p12_pass" 2>/dev/null
-
-        if command -v pdfsig &> /dev/null; then
-            # Get the certificate nickname
-            local cert_nick=$(certutil -L -d "$nss_dir" 2>/dev/null | grep -v "Certificate Nickname" | head -1 | awk '{print $1}')
-
-            if [ -n "$cert_nick" ]; then
-                pdfsig -nssdir "$nss_dir" -nick "$cert_nick" -sign "$input_pdf" "$output_pdf" 2>/dev/null && {
-                    rm -rf "$nss_dir"
-                    return 0
-                }
-            fi
-        fi
-
-        rm -rf "$nss_dir"
+    # Check for required tools
+    if ! command -v certutil &> /dev/null || ! command -v pk12util &> /dev/null; then
+        echo -e "${RED}Error: NSS tools (certutil, pk12util) not found.${NC}"
+        echo "Install with: brew install nss"
+        return 1
     fi
 
-    echo -e "${YELLOW}Note: For full .p12 signing support, install JSignPDF${NC}"
-    echo "  Download from: http://jsignpdf.sourceforge.net/"
-    return 1
+    if ! command -v pdfsig &> /dev/null; then
+        echo -e "${RED}Error: pdfsig not found.${NC}"
+        echo "Install with: brew install poppler"
+        return 1
+    fi
+
+    # Create temporary NSS database for signing
+    local nss_dir=$(mktemp -d)
+
+    echo "Creating temporary NSS database..."
+
+    # Initialize NSS database (sql: prefix for newer format)
+    certutil -N -d "sql:$nss_dir" --empty-password 2>/dev/null
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to create NSS database.${NC}"
+        rm -rf "$nss_dir"
+        return 1
+    fi
+
+    echo "Importing certificate..."
+
+    # Import the P12 certificate
+    pk12util -i "$p12_file" -d "sql:$nss_dir" -W "$p12_pass"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}Failed to import certificate. Check password.${NC}"
+        rm -rf "$nss_dir"
+        return 1
+    fi
+
+    # List certificates to find the nickname
+    echo ""
+    echo "Available certificates in database:"
+    certutil -L -d "sql:$nss_dir" 2>/dev/null
+    echo ""
+
+    # Get the certificate nickname (first certificate found)
+    # The nickname is everything before the trust attributes (u,u,u or similar)
+    local cert_nick=$(certutil -L -d "sql:$nss_dir" 2>/dev/null | grep "u,u,u" | head -1 | sed 's/[[:space:]]*u,u,u$//' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
+
+    if [ -z "$cert_nick" ]; then
+        echo -e "${RED}No certificate found in database.${NC}"
+        rm -rf "$nss_dir"
+        return 1
+    fi
+
+    echo "Using certificate: $cert_nick"
+    echo "Signing PDF..."
+
+    # Sign the PDF using pdfsig
+    pdfsig -nssdir "sql:$nss_dir" -nick "$cert_nick" -add-signature "$input_pdf" "$output_pdf"
+    local sign_result=$?
+
+    # Clean up
+    rm -rf "$nss_dir"
+
+    if [ $sign_result -eq 0 ] && [ -f "$output_pdf" ]; then
+        echo ""
+        echo -e "${GREEN}PDF signed successfully!${NC}"
+        echo "Output: $output_pdf"
+        return 0
+    else
+        echo -e "${RED}Signing failed.${NC}"
+        return 1
+    fi
 }
 
 # Detect PKCS#11 library for smart card
