@@ -1,0 +1,184 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in, top=1.5in, headheight=85pt]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{booktabs}
+
+% ============================================================================
+% DOCUMENT VARIABLES
+% ============================================================================
+\newcommand{\UniqueID}{ECS-2026-001}
+\newcommand{\DocumentDate}{January 14, 2026}
+\newcommand{\AuthorName}{Bruce Dombrowski}
+\newcommand{\AuthorTitle}{Developer}
+\newcommand{\SoftwareName}{PdfSigner}
+\newcommand{\SoftwareVersion}{1.0.5}
+\newcommand{\GitHubURL}{https://github.com/brucedombrowski/PdfSigner}
+
+% ============================================================================
+% DOCUMENT CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    pdfborder={0 0 0}
+}
+
+% Remove paragraph indentation
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% List formatting
+\setlist[enumerate]{leftmargin=0.5in, labelwidth=0.25in, labelsep=0.1in, align=left, itemsep=12pt, topsep=12pt}
+\setlist[enumerate,1]{label=\arabic*.}
+\setlist[itemize]{leftmargin=0.5in, itemsep=3pt, topsep=6pt}
+
+% ============================================================================
+% HEADER AND FOOTER CONFIGURATION
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+
+% Header
+\fancyhead[L]{%
+    \raisebox{-0.5\height}{\includegraphics[height=0.9in]{logo.png}}%
+}
+\fancyhead[R]{%
+    \parbox[b]{3.5in}{\raggedleft\large\textbf{Export Compliance Statement}}%
+}
+\renewcommand{\headrulewidth}{0pt}
+
+% Footer
+\fancyfoot[L]{\small \UniqueID}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\fancyfoot[R]{\small \DocumentDate}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================================
+% CUSTOM COMMANDS
+% ============================================================================
+\newcommand{\dmsection}[1]{\item \textbf{#1}\par}
+
+% ============================================================================
+% BEGIN DOCUMENT
+% ============================================================================
+\begin{document}
+
+% ----------------------------------------------------------------------------
+% UNIQUE ID (top right)
+% ----------------------------------------------------------------------------
+\hfill \UniqueID
+
+\vspace{0.25in}
+
+% ----------------------------------------------------------------------------
+% SIGNATURE BLOCK
+% ----------------------------------------------------------------------------
+\underline{\hspace{2.5in}}\\[2pt]
+\AuthorName\\
+\AuthorTitle
+
+\vspace{0.25in}
+
+% ----------------------------------------------------------------------------
+% HEADER FIELDS
+% ----------------------------------------------------------------------------
+\textbf{DATE:} \DocumentDate
+
+\textbf{SOFTWARE:} \SoftwareName{} v\SoftwareVersion
+
+\textbf{REPOSITORY:} \url{\GitHubURL}
+
+\textbf{SUBJECT:} Export Control Classification and License Exception Determination
+
+\vspace{0.25in}
+
+% ============================================================================
+% MAIN CONTENT
+% ============================================================================
+\begin{enumerate}
+
+% ----------------------------------------------------------------------------
+\dmsection{Purpose}
+
+This Export Compliance Statement certifies the export control classification of \SoftwareName{} version \SoftwareVersion{} and documents compliance with the Export Administration Regulations (EAR).
+
+% ----------------------------------------------------------------------------
+\dmsection{Software Classification}
+
+\SoftwareName{} is classified under:
+
+\begin{itemize}
+    \item \textbf{ECCN:} 5D002 --- Information Security Software
+    \item \textbf{License Exception:} TSU (Technology and Software Unrestricted)
+    \item \textbf{Authority:} 15 CFR \S~740.13(e)
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Basis for TSU Eligibility}
+
+This software qualifies for License Exception TSU because it meets all requirements under 15 CFR \S~740.13(e):
+
+\begin{itemize}
+    \item \textbf{Publicly Available:} Source code is publicly available at \url{\GitHubURL}
+    \item \textbf{No Restrictions:} Released under MIT License with no payment or distribution restrictions
+    \item \textbf{Standard Cryptography:} Uses standard cryptographic libraries (BouncyCastle, .NET) without custom cryptographic implementations
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Cryptographic Functionality}
+
+\SoftwareName{} performs \textbf{digital signing operations only}. It does not perform encryption for data confidentiality.
+
+\vspace{6pt}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Operation} & \textbf{Implementation} \\
+\midrule
+Hash Algorithm & SHA-256 \\
+Signature Algorithms & RSA, ECDSA (via Windows Certificate Store) \\
+Signature Format & CMS (Cryptographic Message Syntax) \\
+\bottomrule
+\end{tabular}
+
+% ----------------------------------------------------------------------------
+\dmsection{BIS Notification}
+
+Per 15 CFR \S~740.13(e)(3), notification of publicly available encryption source code was submitted to:
+
+\begin{itemize}
+    \item Bureau of Industry and Security (BIS): crypt@bis.doc.gov
+    \item ENC Encryption Request Coordinator: enc@nsa.gov
+\end{itemize}
+
+\textbf{Notification Date:} January 14, 2026
+
+% ----------------------------------------------------------------------------
+\dmsection{Export Restrictions}
+
+This software may not be exported or re-exported to:
+
+\begin{itemize}
+    \item Countries under U.S. embargo: Cuba, Iran, North Korea, Syria, and the Crimea, Donetsk, and Luhansk regions of Ukraine
+    \item Denied persons or entities on the BIS Entity List
+    \item End-users involved in weapons of mass destruction proliferation
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Certification}
+
+I certify that the information contained in this statement is accurate and complete to the best of my knowledge, and that \SoftwareName{} version \SoftwareVersion{} is eligible for export under License Exception TSU per 15 CFR \S~740.13(e).
+
+\end{enumerate}
+
+\end{document}

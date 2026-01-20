@@ -1,0 +1,183 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in, top=1.5in, headheight=85pt]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tabularx}
+
+% ============================================================================
+% DOCUMENT VARIABLES - EDIT THESE
+% ============================================================================
+\newcommand{\UniqueID}{DM-2026-001}
+\newcommand{\DocumentDate}{January 19, 2026}
+\newcommand{\AuthorName}{PDF Tools Working Group}
+\newcommand{\AuthorTitle}{Technical Lead}
+\newcommand{\ToField}{Document Processing Stakeholders}
+\newcommand{\SubjectField}{CUI Coversheet Implementation Approach}
+\newcommand{\OPRField}{PdfTools}
+
+% ============================================================================
+% DOCUMENT CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    pdfborder={0 0 0}
+}
+
+% Remove paragraph indentation
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% List formatting - match Word style
+\setlist[enumerate]{leftmargin=0.5in, labelwidth=0.25in, labelsep=0.1in, align=left, itemsep=12pt, topsep=12pt}
+\setlist[enumerate,1]{label=\arabic*.}
+\setlist[itemize]{leftmargin=0.5in, itemsep=3pt, topsep=6pt}
+
+% ============================================================================
+% HEADER AND FOOTER CONFIGURATION
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+
+% Header: Logo on left, "Decision Memorandum" on right
+\fancyhead[L]{%
+    \raisebox{-0.5\height}{\includegraphics[height=0.9in]{logo.png}}%
+}
+\fancyhead[R]{%
+    \parbox[b]{3.5in}{\raggedleft\large\textbf{Decision Memorandum}}%
+}
+\renewcommand{\headrulewidth}{0pt}
+
+% Footer: Unique ID (left), Page X of Y (center), Date (right)
+\fancyfoot[L]{\small \UniqueID}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\fancyfoot[R]{\small \DocumentDate}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================================
+% CUSTOM COMMANDS
+% ============================================================================
+% Bold section headers for numbered sections
+\newcommand{\dmsection}[1]{\item \textbf{#1}\par}
+
+% ============================================================================
+% BEGIN DOCUMENT
+% ============================================================================
+\begin{document}
+
+% ----------------------------------------------------------------------------
+% UNIQUE ID (top right)
+% ----------------------------------------------------------------------------
+\hfill \UniqueID
+
+\vspace{0.25in}
+
+% ----------------------------------------------------------------------------
+% SIGNATURE BLOCK
+% ----------------------------------------------------------------------------
+\underline{\hspace{2.5in}}\\[2pt]
+\AuthorName\\
+\AuthorTitle
+
+\vspace{0.25in}
+
+% ----------------------------------------------------------------------------
+% MEMO HEADER FIELDS
+% ----------------------------------------------------------------------------
+\textbf{DATE:} \DocumentDate
+
+\textbf{TO:} \ToField
+
+\textbf{SUBJECT:} \SubjectField
+
+\textbf{OFFICE OF PRIMARY RESPONSIBILITY:} \OPRField
+
+\vspace{0.25in}
+
+% ============================================================================
+% MAIN CONTENT - NUMBERED SECTIONS
+% ============================================================================
+\begin{enumerate}
+
+% ----------------------------------------------------------------------------
+\dmsection{Purpose}
+
+This memorandum documents the decision to implement the CUI (Controlled Unclassified Information) coversheet capability using a LaTeX template that recreates Standard Form 901 (SF901), rather than programmatically modifying the official GSA PDF.
+
+% ----------------------------------------------------------------------------
+\dmsection{Background}
+
+The PdfTools capability requires the ability to prepend CUI cover pages to PDF documents as part of the document preparation workflow. The official CUI coversheet is Standard Form 901, prescribed by GSA/ISOO under 32 CFR Part 2002 and Executive Order 13556.
+
+SF901 includes a designated area for document-specific information: CUI categories, limited dissemination controls, special instructions, and points of contact. Two implementation approaches were considered:
+
+\begin{itemize}
+    \item \textbf{Approach A:} Programmatically edit the official GSA PDF (SF901-18a.pdf) to insert custom text into the designated area
+    \item \textbf{Approach B:} Recreate SF901 as a LaTeX template with parameterized fields for customization
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Analysis}
+
+\textbf{Approach A: PDF Manipulation}
+\begin{itemize}
+    \item Requires PDF manipulation tools (pdftk, qpdf, or similar)
+    \item Precise text positioning in existing PDF is technically challenging
+    \item Runtime dependency on external tools
+    \item Preserves exact GSA formatting
+    \item Requires downloading SF901 from GSA for each use, or maintaining a local copy
+    \item GSA URL changes with each form revision (e.g., SF901-18a.pdf)
+\end{itemize}
+
+\textbf{Approach B: LaTeX Recreation}
+\begin{itemize}
+    \item Full control over customizable text area via \texttt{\textbackslash newcommand} variables
+    \item Consistent with existing LaTeX document workflows (DecisionDocument, etc.)
+    \item No runtime dependency on PDF manipulation tools for cover page generation
+    \item LaTeX template generation with AI coding agents is trivial
+    \item SF901 has been stable since November 2018, indicating low maintenance burden
+\end{itemize}
+
+\textbf{Tracking Requirement (applies to both approaches):} Both approaches require tracking the official GSA source for form updates. Approach A requires network access or manual downloads for each use; Approach B requires only periodic verification that the template remains current.
+\begin{itemize}
+    \item GSA Form Page: \url{https://www.gsa.gov/reference/forms/controlled-unclassified-information-cui-coversheet-1}
+    \item Current PDF: \url{https://www.gsa.gov/system/files/SF901-18a.pdf}
+    \item Current Revision: SF901 (11-18) --- November 2018
+    \item Authority: 32 CFR Part 2002, Executive Order 13556
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Decision}
+
+\textbf{Approved:} Approach B --- Recreate SF901 as a LaTeX template.
+
+\textbf{Rationale:}
+\begin{itemize}
+    \item Aligns with existing LaTeX-based document infrastructure
+    \item Provides maximum flexibility for customization
+    \item Eliminates runtime tool dependencies for cover page generation
+    \item No additional tracking burden vs.\ Approach A (both require monitoring GSA for updates)
+    \item LaTeX template generation is trivial with AI coding agents
+    \item Form stability (7+ years unchanged) minimizes maintenance burden
+    \item Official PDF retained as reference for periodic verification
+\end{itemize}
+
+\textbf{Implementation:}
+\begin{itemize}
+    \item Create \texttt{sf901\_cover.tex} with parameterized fields
+    \item Retain \texttt{SF901-Example.pdf} for reference comparison
+    \item Document tracking requirement in AGENTS.md
+\end{itemize}
+
+\end{enumerate}
+
+\end{document}
