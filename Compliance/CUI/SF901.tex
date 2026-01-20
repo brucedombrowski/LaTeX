@@ -26,8 +26,9 @@
 %% CUSTOMIZABLE VARIABLES
 %% =============================================================================
 
-% Page margin (white border around purple area)
-\def\pagemargin{0.15in}
+% Page margin (white border around purple area) - change this value as needed
+\newlength{\pagemargin}
+\setlength{\pagemargin}{0.15in}
 
 % CUI Purple color (RGB values matched from official SF901)
 \definecolor{cuipurple}{RGB}{42,29,73}
@@ -48,11 +49,15 @@
 \begin{document}
 
 \begin{tikzpicture}[remember picture, overlay]
+    % Calculate derived dimensions from page margin
+    \pgfmathsetlengthmacro{\rightedge}{8.5in - \pagemargin}
+    \pgfmathsetlengthmacro{\bottomedge}{11in - \pagemargin}
+
     % Purple background
     \fill[cuipurple]
-        ($(current page.north west) + (0.15in, -0.15in)$)
+        ($(current page.north west) + (\pagemargin, -\pagemargin)$)
         rectangle
-        ($(current page.north west) + (8.35in, -10.85in)$);
+        ($(current page.north west) + (\rightedge, -\bottomedge)$);
 
     %% ===== TOP SECTION (on purple) =====
     % CUI text

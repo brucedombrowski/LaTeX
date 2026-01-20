@@ -8,8 +8,9 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
-# Build SF901.tex
+# Build SF901.tex (run twice for TikZ overlay positioning)
 echo "Building SF901.tex..."
+xelatex -interaction=nonstopmode SF901.tex
 xelatex -interaction=nonstopmode SF901.tex
 
 # Build test-margin.tex if it exists
