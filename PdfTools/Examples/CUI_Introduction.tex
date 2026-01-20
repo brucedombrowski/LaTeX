@@ -1,0 +1,168 @@
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in, top=1.5in, headheight=85pt]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{booktabs}
+
+% ============================================================================
+% DOCUMENT VARIABLES - EDIT THESE
+% ============================================================================
+\newcommand{\UniqueID}{DM-2026-004}
+\newcommand{\DocumentDate}{January 20, 2026}
+\newcommand{\AuthorName}{J. Smith}
+\newcommand{\AuthorTitle}{Document Control Manager}
+\newcommand{\ToField}{Project Constellation Document Recipients}
+\newcommand{\SubjectField}{CUI Document Package Transmittal}
+\newcommand{\OPRField}{Example Aerospace Corporation, Records Management}
+
+% ============================================================================
+% DOCUMENT CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=false,
+    pdfborder={0 0 0}
+}
+
+% Remove paragraph indentation
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% List formatting
+\setlist[enumerate]{leftmargin=0.5in, labelwidth=0.25in, labelsep=0.1in, align=left, itemsep=12pt, topsep=12pt}
+\setlist[enumerate,1]{label=\arabic*.}
+\setlist[itemize]{leftmargin=0.5in, itemsep=3pt, topsep=6pt}
+
+% ============================================================================
+% HEADER AND FOOTER CONFIGURATION
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+
+% Header: Organization name on left, "Decision Memorandum" on right
+\fancyhead[L]{%
+    \parbox[b]{3in}{\large\textbf{Example Aerospace Corporation}}%
+}
+\fancyhead[R]{%
+    \parbox[b]{3in}{\raggedleft\large\textbf{Decision Memorandum}}%
+}
+\renewcommand{\headrulewidth}{0pt}
+
+% Footer: Unique ID (left), Page X of Y (center), Date (right)
+\fancyfoot[L]{\small \UniqueID}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\fancyfoot[R]{\small \DocumentDate}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================================
+% CUSTOM COMMANDS
+% ============================================================================
+\newcommand{\dmsection}[1]{\item \textbf{#1}\par}
+
+% ============================================================================
+% BEGIN DOCUMENT
+% ============================================================================
+\begin{document}
+
+% ----------------------------------------------------------------------------
+% UNIQUE ID (top right)
+% ----------------------------------------------------------------------------
+\hfill \UniqueID
+
+\vspace{0.25in}
+
+% ----------------------------------------------------------------------------
+% SIGNATURE BLOCK
+% ----------------------------------------------------------------------------
+\underline{\hspace{2.5in}}\\[2pt]
+\AuthorName\\
+\AuthorTitle
+
+\vspace{0.25in}
+
+% ----------------------------------------------------------------------------
+% MEMO HEADER FIELDS
+% ----------------------------------------------------------------------------
+\textbf{DATE:} \DocumentDate
+
+\textbf{TO:} \ToField
+
+\textbf{SUBJECT:} \SubjectField
+
+\textbf{OFFICE OF PRIMARY RESPONSIBILITY:} \OPRField
+
+\vspace{0.25in}
+
+% ============================================================================
+% MAIN CONTENT - NUMBERED SECTIONS
+% ============================================================================
+\begin{enumerate}
+
+% ----------------------------------------------------------------------------
+\dmsection{Purpose}
+
+This memorandum transmits Controlled Unclassified Information (CUI) cover sheets for documents associated with Project Constellation. Each cover sheet identifies the specific CUI category, dissemination controls, and handling requirements for the attached materials.
+
+% ----------------------------------------------------------------------------
+\dmsection{Background}
+
+Project Constellation requires multiple document types with varying CUI classifications. To ensure proper handling and compliance with 32 CFR Part 2002, standardized SF901-format cover sheets have been prepared for each document category.
+
+% ----------------------------------------------------------------------------
+\dmsection{Document Contents}
+
+The following CUI cover sheets are included in this package:
+
+\vspace{0.1in}
+
+\begin{tabular}{@{}p{1.5in}p{3.5in}@{}}
+\toprule
+\textbf{CUI Category} & \textbf{Document Type} \\
+\midrule
+CUI//SP-PROCURE & Source Selection Evaluation Report \\
+CUI//BASIC & Internal Policy Document \\
+CUI//SP-PRVCY & Personnel Security Investigation Report \\
+CUI//SP-CTI & Payload Software Interface Control Document \\
+\bottomrule
+\end{tabular}
+
+% ----------------------------------------------------------------------------
+\dmsection{Handling Instructions}
+
+All recipients must adhere to the following requirements:
+
+\begin{itemize}
+    \item Review each cover sheet for specific dissemination controls before handling attached documents
+    \item Store documents in accordance with 32 CFR Part 2002 and agency policy
+    \item Contact the designated Point of Contact (POC) on each cover sheet with handling questions
+    \item Destroy documents using agency-approved methods when no longer required
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+\dmsection{Distribution}
+
+This package is authorized for distribution to U.S. Government agencies and contractors with appropriate need-to-know and security clearances as specified on each individual cover sheet.
+
+\end{enumerate}
+
+\vspace{0.5in}
+
+\begin{center}
+\textit{--- FOR DEMONSTRATION PURPOSES ONLY ---}
+
+\vspace{0.1in}
+
+{\small This is a fictitious example document created to demonstrate\\
+the PDF merge functionality of the PdfTools utility.\\
+No actual CUI is contained in this package.}
+\end{center}
+
+\end{document}
