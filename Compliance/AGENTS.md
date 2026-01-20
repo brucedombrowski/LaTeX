@@ -71,6 +71,7 @@ These templates are reusable for any document requiring:
 |----|------|-------|------|--------|
 | DM-2026-001 | dm_sf901_decision | SF901 LaTeX Recreation Decision | 2026-01-19 | Approved |
 | DM-2026-002 | DM-2026-002_sf901_font_decision | CUI Header Font Selection (Cinzel vs Trajan) | 2026-01-19 | Approved |
+| DM-2026-003 | DM-2026-003_sf901_tikz_layout | SF901 Layout Implementation (TikZ vs Alternatives) | 2026-01-19 | Approved |
 
 ---
 
@@ -138,7 +139,8 @@ Compliance/
 ├── Security/                     # Security compliance - future
 └── Decisions/                    # Decision memorandums (PDF format)
     ├── dm_sf901_decision.*       # SF901 recreation decision (DM-2026-001)
-    └── DM-2026-002_sf901_font_decision.*  # Font selection decision
+    ├── DM-2026-002_sf901_font_decision.*  # Font selection decision
+    └── DM-2026-003_sf901_tikz_layout.*    # TikZ layout decision
 ```
 
 ## Research Needed

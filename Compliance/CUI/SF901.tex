@@ -65,23 +65,23 @@
 
     %% ===== TOP SECTION (on purple) =====
     % CUI text (Cinzel font - similar to Trajan used in original)
-    \node[anchor=north, text=white, font=\cuifont\fontsize{72}{72}\selectfont]
+    \node[anchor=north, text=white, font=\cuifont\fontsize{72}{72}\selectfont\bfseries]
         at ($(current page.north west) + (4.25in, -0.5in)$) {CUI};
 
     % ATTENTION heading
     \node[anchor=north, text=white, font=\fontsize{22}{22}\selectfont]
-        at ($(current page.north west) + (4.25in, -1.4in)$) {ATTENTION};
+        at ($(current page.north west) + (4.25in, -1.55in)$) {ATTENTION};
 
     %% ===== TOP WHITE BOX (categories area - large box for content) =====
     \fill[white]
-        ($(current page.north west) + (0.5in, -1.77in)$)
+        ($(current page.north west) + (1.5in, -1.95in)$)
         rectangle
-        ($(current page.north west) + (8.0in, -6.40in)$);
+        ($(current page.north west) + (7.0in, -6.40in)$);
 
     % Categories text (at top of white box)
     \node[anchor=north, text=black, font=\fontsize{10}{13}\selectfont\itshape,
           text width=5in, align=center]
-        at ($(current page.north west) + (4.25in, -1.87in)$) {\cuicategories};
+        at ($(current page.north west) + (4.25in, -2.05in)$) {\cuicategories};
 
     %% ===== MIDDLE ATTENTION HEADING (on purple between the two white boxes) =====
     \node[anchor=north, text=white, font=\fontsize{22}{22}\selectfont]
@@ -89,9 +89,9 @@
 
     %% ===== BOTTOM WHITE BOX =====
     \fill[white]
-        ($(current page.north west) + (0.5in, -6.92in)$)
+        ($(current page.north west) + (1.5in, -6.92in)$)
         rectangle
-        ($(current page.north west) + (8.0in, -9.25in)$);
+        ($(current page.north west) + (7.0in, -9.25in)$);
 
     % First paragraph
     \node[anchor=north, text=black, font=\fontsize{10}{13}\selectfont,
@@ -122,14 +122,15 @@
 
     % Form citation
     \node[anchor=south east, text=black, font=\fontsize{7}{9}\selectfont, align=right]
-        at ($(current page.north west) + (7.9in, -9.20in)$) {%
-            Standard Form 901 (11-18)\\
+        at ($(current page.north west) + (6.90in, -9.20in)$) {%
+            Adapted from: Standard Form 901 (11-18)\\
             Prescribed by GSA/ISOO | 32 CFR 2002%
         };
 
     %% ===== BOTTOM CUI BANNER (on purple) =====
-    \node[anchor=south, text=white, font=\cuifont\fontsize{72}{72}\selectfont]
-        at ($(current page.north west) + (4.25in, -10.80in)$) {CUI};
+    % Centered in bottom purple area (between bottom white box at 9.25in and purple edge at ~10.75in)
+    \node[anchor=center, text=white, font=\cuifont\fontsize{72}{72}\selectfont\bfseries]
+        at ($(current page.north west) + (4.25in, -10.0in)$) {CUI};
 
 \end{tikzpicture}
 
