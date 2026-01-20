@@ -1,0 +1,157 @@
+%% Decision Memorandum: CUI Header Font Selection
+%% Document ID: DM-2026-002
+%% Date: January 19, 2026
+
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{fontspec}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+
+\setmainfont{Times New Roman}
+
+% Formatting
+\titleformat{\section}{\normalfont\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalfont\bfseries}{\thesubsection}{0.5em}{}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5em}
+
+\begin{document}
+
+\begin{center}
+    {\Large\bfseries DECISION MEMORANDUM}\\[0.5em]
+    {\large CUI Header Font Selection}\\[1em]
+\end{center}
+
+\begin{tabular}{@{}ll}
+    \textbf{Decision ID:} & DM-2026-002 \\
+    \textbf{Date:} & January 19, 2026 \\
+    \textbf{Status:} & Approved \\
+    \textbf{Author:} & Bruce Dombrowski \\
+    \textbf{Affected Documents:} & SF901.tex (CUI Cover Sheet Template) \\
+\end{tabular}
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+\section*{Context}
+
+The official SF901 CUI Cover Sheet template (Standard Form 901, 11-18) uses the \textbf{Trajan Bold} font for the large ``CUI'' header text displayed at the top and bottom of the cover sheet. This font was identified by extracting font metadata from the official PDF template obtained from the National Archives.
+
+\section*{Problem Statement}
+
+Trajan is a commercial Adobe font that:
+\begin{itemize}[nosep]
+    \item Requires purchase (\$35--70) or an Adobe Creative Cloud subscription
+    \item Is not freely redistributable
+    \item Would add licensing complexity to the LaTeX template
+    \item May not be available on all systems where the template is used
+\end{itemize}
+
+A suitable open-source alternative is required to maintain visual fidelity with the official template while ensuring the template can be freely distributed and used without licensing restrictions.
+
+\section*{Decision}
+
+\textbf{Use Cinzel as a substitute for Trajan Bold in the SF901 CUI Cover Sheet template.}
+
+\section*{Rationale}
+
+Cinzel is selected as the replacement font for the following reasons:
+
+\subsection*{Visual Similarity}
+Cinzel is a free font directly inspired by Roman inscriptional lettering---the same design tradition as Trajan. Both fonts feature:
+\begin{itemize}[nosep]
+    \item Classical Roman capital letterforms
+    \item Elegant, refined stroke weights
+    \item All-caps display styling optimized for titles and headers
+    \item Serifs derived from stone-carved Roman inscriptions
+\end{itemize}
+
+\subsection*{Licensing}
+Cinzel is available under the SIL Open Font License (OFL), which permits:
+\begin{itemize}[nosep]
+    \item Free use in any project, commercial or non-commercial
+    \item Redistribution with the template
+    \item Modification if needed
+    \item No licensing fees or subscription requirements
+\end{itemize}
+
+\subsection*{Availability}
+Cinzel is available from Google Fonts, ensuring easy installation across all major operating systems (Windows, macOS, Linux).
+
+\section*{Alternatives Considered}
+
+\begin{center}
+\begin{tabular}{>{\raggedright}p{2.5cm} >{\raggedright}p{4.5cm} >{\raggedright\arraybackslash}p{5cm}}
+    \toprule
+    \textbf{Option} & \textbf{Advantages} & \textbf{Disadvantages} \\
+    \midrule
+    Trajan Bold (original) & Exact match to official template & Commercial license required; cost; not redistributable \\
+    \addlinespace
+    Times New Roman Bold & Pre-installed on most systems & Visually quite different; too heavy; wrong character style \\
+    \addlinespace
+    Times New Roman Regular & Pre-installed; lighter weight & Different letterform style; not a display font \\
+    \addlinespace
+    Cinzel & Free; visually similar; easy to install; proper display font & Not an exact match (acceptable trade-off) \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Implementation}
+
+The implementation requires:
+\begin{enumerate}[nosep]
+    \item Install Cinzel font on the target system
+    \item Define \texttt{\textbackslash cuifont} in SF901.tex using the fontspec package
+    \item Apply \texttt{\textbackslash cuifont} to CUI header text nodes
+\end{enumerate}
+
+\subsection*{Font Installation (macOS)}
+\begin{verbatim}
+# Download from Google Fonts helper
+curl -L -o /tmp/cinzel.zip \
+  "https://gwfh.mranftl.com/api/fonts/cinzel?download=zip&subsets=latin&variants=regular"
+unzip -o /tmp/cinzel.zip -d ~/Library/Fonts/
+\end{verbatim}
+
+\subsection*{Code Changes to SF901.tex}
+\begin{verbatim}
+% In preamble:
+\newfontfamily{\cuifont}{Cinzel}
+
+% In CUI header nodes:
+\node[..., font=\cuifont\fontsize{72}{72}\selectfont] {...} {CUI};
+\end{verbatim}
+
+\section*{References}
+
+\begin{itemize}[nosep]
+    \item Official SF901 Template: \url{https://www.archives.gov/cui/registry/forms}
+    \item Cinzel Font: \url{https://fonts.google.com/specimen/Cinzel}
+    \item Trajan Font: Originally designed by Carol Twombly for Adobe, 1989
+\end{itemize}
+
+\section*{Impact Assessment}
+
+\begin{itemize}[nosep]
+    \item \textbf{Visual:} Template remains visually consistent with official SF901
+    \item \textbf{Legal:} No licensing costs or restrictions on distribution
+    \item \textbf{Technical:} Requires Cinzel font installation (documented in template)
+    \item \textbf{Risk:} Low---Cinzel is widely available and well-maintained
+\end{itemize}
+
+\vspace{2em}
+\hrule
+\vspace{1em}
+
+\begin{tabular}{@{}ll}
+    \textbf{Approved:} & \underline{\hspace{3in}} \\[1em]
+    \textbf{Date:} & \underline{\hspace{3in}} \\
+\end{tabular}
+
+\end{document}

@@ -28,10 +28,14 @@
 
 % Page margin (white border around purple area) - change this value as needed
 \newlength{\pagemargin}
-\setlength{\pagemargin}{0.15in}
+\setlength{\pagemargin}{0.25in}
 
 % CUI Purple color (RGB values matched from official SF901)
 \definecolor{cuipurple}{RGB}{42,29,73}
+
+% CUI Header font (Cinzel - free alternative to Trajan used in official template)
+% See decision document: ../Decisions/DM-2026-002_sf901_font_decision.pdf
+\newfontfamily{\cuifont}{Cinzel}
 
 % CUI categories text - customize this for your specific use
 \newcommand{\cuicategories}{%
@@ -60,8 +64,8 @@
         ($(current page.north west) + (\rightedge, -\bottomedge)$);
 
     %% ===== TOP SECTION (on purple) =====
-    % CUI text
-    \node[anchor=north, text=white, font=\fontsize{72}{72}\selectfont\bfseries]
+    % CUI text (Cinzel font - similar to Trajan used in original)
+    \node[anchor=north, text=white, font=\cuifont\fontsize{72}{72}\selectfont]
         at ($(current page.north west) + (4.25in, -0.5in)$) {CUI};
 
     % ATTENTION heading
@@ -124,7 +128,7 @@
         };
 
     %% ===== BOTTOM CUI BANNER (on purple) =====
-    \node[anchor=south, text=white, font=\fontsize{72}{72}\selectfont\bfseries]
+    \node[anchor=south, text=white, font=\cuifont\fontsize{72}{72}\selectfont]
         at ($(current page.north west) + (4.25in, -10.80in)$) {CUI};
 
 \end{tikzpicture}
