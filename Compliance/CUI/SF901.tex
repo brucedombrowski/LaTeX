@@ -1,0 +1,127 @@
+%% SF901.tex - Standard Form 901 CUI Cover Sheet
+%% LaTeX Template based on GSA/ISOO 32 CFR 2002
+%% Standard Form 901 (11-18)
+%%
+%% Adapted from Standard Form 901
+%% Adaptation Date: January 19, 2026
+%% Original Source: https://www.archives.gov/cui/registry/forms
+%%
+%% Usage: Compile with xelatex (requires fontspec for Times New Roman)
+%% Customize the \cuicategories command for specific categories/instructions
+
+\documentclass[letterpaper]{article}
+
+\usepackage[
+    paperwidth=8.5in,
+    paperheight=11in,
+    margin=0in
+]{geometry}
+
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{fontspec}
+
+%% =============================================================================
+%% CUSTOMIZABLE VARIABLES
+%% =============================================================================
+
+% Page margin (white border around purple area)
+\def\pagemargin{0.15in}
+
+% CUI Purple color (RGB values matched from official SF901)
+\definecolor{cuipurple}{RGB}{42,29,73}
+
+% CUI categories text - customize this for your specific use
+\newcommand{\cuicategories}{%
+    Use this space to indicate categories, limited dissemination controls,\\
+    special instructions, points of contact, etc., if needed.%
+}
+
+%% =============================================================================
+%% END CUSTOMIZABLE VARIABLES
+%% =============================================================================
+
+\pagestyle{empty}
+\setmainfont{Times New Roman}
+
+\begin{document}
+
+\begin{tikzpicture}[remember picture, overlay]
+    % Purple background
+    \fill[cuipurple]
+        ($(current page.north west) + (0.15in, -0.15in)$)
+        rectangle
+        ($(current page.north west) + (8.35in, -10.85in)$);
+
+    %% ===== TOP SECTION (on purple) =====
+    % CUI text
+    \node[anchor=north, text=white, font=\fontsize{72}{72}\selectfont\bfseries]
+        at ($(current page.north west) + (4.25in, -0.5in)$) {CUI};
+
+    % ATTENTION heading
+    \node[anchor=north, text=white, font=\fontsize{22}{22}\selectfont]
+        at ($(current page.north west) + (4.25in, -1.4in)$) {ATTENTION};
+
+    %% ===== TOP WHITE BOX (categories area - large box for content) =====
+    \fill[white]
+        ($(current page.north west) + (0.5in, -1.77in)$)
+        rectangle
+        ($(current page.north west) + (8.0in, -6.40in)$);
+
+    % Categories text (at top of white box)
+    \node[anchor=north, text=black, font=\fontsize{10}{13}\selectfont\itshape,
+          text width=5in, align=center]
+        at ($(current page.north west) + (4.25in, -1.87in)$) {\cuicategories};
+
+    %% ===== MIDDLE ATTENTION HEADING (on purple between the two white boxes) =====
+    \node[anchor=north, text=white, font=\fontsize{22}{22}\selectfont]
+        at ($(current page.north west) + (4.25in, -6.55in)$) {ATTENTION};
+
+    %% ===== BOTTOM WHITE BOX =====
+    \fill[white]
+        ($(current page.north west) + (0.5in, -6.92in)$)
+        rectangle
+        ($(current page.north west) + (8.0in, -9.25in)$);
+
+    % First paragraph
+    \node[anchor=north, text=black, font=\fontsize{10}{13}\selectfont,
+          text width=4.8in, align=center]
+        at ($(current page.north west) + (4.25in, -7.04in)$) {%
+            All individuals handling this information are required to protect\\
+            it from unauthorized disclosure.%
+        };
+
+    % Second paragraph
+    \node[anchor=north, text=black, font=\fontsize{9}{12}\selectfont,
+          text width=5.3in, align=center]
+        at ($(current page.north west) + (4.25in, -7.48in)$) {%
+            Handling, storage, reproduction, and disposition of the attached document(s) must\\
+            be in accordance with 32 CFR Part 2002 and applicable agency policy.%
+        };
+
+    % Third paragraph
+    \node[anchor=north, text=black, font=\fontsize{9}{12}\selectfont,
+          text width=5.5in, align=center]
+        at ($(current page.north west) + (4.25in, -7.90in)$) {%
+            Access to and dissemination of Controlled Unclassified Information shall be\\
+            allowed as necessary and permissible to any individual(s), organization(s), or\\
+            grouping(s) of users, provided such access or dissemination is consistent with or in\\
+            furtherance of a Lawful Government Purpose and in a manner consistent with\\
+            applicable law, regulations, and Government-wide policies.%
+        };
+
+    % Form citation
+    \node[anchor=south east, text=black, font=\fontsize{7}{9}\selectfont, align=right]
+        at ($(current page.north west) + (7.9in, -9.20in)$) {%
+            Standard Form 901 (11-18)\\
+            Prescribed by GSA/ISOO | 32 CFR 2002%
+        };
+
+    %% ===== BOTTOM CUI BANNER (on purple) =====
+    \node[anchor=south, text=white, font=\fontsize{72}{72}\selectfont\bfseries]
+        at ($(current page.north west) + (4.25in, -10.80in)$) {CUI};
+
+\end{tikzpicture}
+
+\end{document}
