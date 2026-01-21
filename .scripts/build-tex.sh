@@ -12,11 +12,8 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+# Source common utilities
+source "$SCRIPT_DIR/lib/common.sh"
 
 echo "=========================================="
 echo "LaTeX Toolkit Build Script"
@@ -134,9 +131,9 @@ fi
 
 # Clean up auxiliary files
 echo ""
-echo -e "${YELLOW}Cleaning up auxiliary files...${NC}"
-rm -f *.aux *.log *.out *.toc *.fdb_latexmk *.fls *.nav *.snm *.vrb
-echo -e "${GREEN}Auxiliary files cleaned.${NC}"
+print_warning "Cleaning up auxiliary files..."
+cleanup_aux_files "."
+print_success "Auxiliary files cleaned."
 
 echo ""
 echo "=========================================="

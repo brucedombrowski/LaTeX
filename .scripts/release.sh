@@ -13,12 +13,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 DIST_DIR="$REPO_ROOT/.dist"
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# Source common utilities
+source "$SCRIPT_DIR/lib/common.sh"
 
 echo "=========================================="
 echo "LaTeX Toolkit Release Build"
@@ -108,14 +104,8 @@ build_tex() {
 
     cd "$dirname"
 
-    # Check if file uses fontspec (requires xelatex)
-    # Also check if it inputs SF901-template which uses fontspec
-    if grep -q '\\usepackage{fontspec}' "$tex_file" 2>/dev/null || \
-       grep -q 'SF901-template' "$tex_file" 2>/dev/null; then
-        COMPILER="xelatex"
-    else
-        COMPILER="pdflatex"
-    fi
+    # Determine compiler using common utility
+    local COMPILER=$(determine_compiler "$tex_file")
 
     if $COMPILER -interaction=nonstopmode "${basename}.tex" > /dev/null 2>&1; then
         $COMPILER -interaction=nonstopmode "${basename}.tex" > /dev/null 2>&1
@@ -123,18 +113,18 @@ build_tex() {
         # Copy PDF to dist
         if [ -f "${basename}.pdf" ]; then
             cp "${basename}.pdf" "$output_dir/"
-            echo -e "${GREEN}  ✓ ${basename}.pdf ($COMPILER)${NC}"
+            print_success "  ✓ ${basename}.pdf ($COMPILER)"
             ((BUILT++))
         fi
 
         # Clean auxiliary files
-        rm -f *.aux *.log *.out *.toc *.fdb_latexmk *.fls *.nav *.snm *.vrb
+        cleanup_aux_files "."
     else
-        echo -e "${RED}  ✗ Failed to build ${basename}.tex ($COMPILER)${NC}"
+        print_error "  ✗ Failed to build ${basename}.tex ($COMPILER)"
         ((FAILED++))
         FAILED_FILES="$FAILED_FILES\n  - ${tex_file#$REPO_ROOT/}"
         # Clean auxiliary files even on failure
-        rm -f *.aux *.log *.out *.toc *.fdb_latexmk *.fls *.nav *.snm *.vrb
+        cleanup_aux_files "."
     fi
 
     cd "$REPO_ROOT"
@@ -151,37 +141,31 @@ build_tex_inplace() {
 
     cd "$dirname"
 
-    # Check if file uses fontspec (requires xelatex)
-    # Also check if it inputs SF901-template which uses fontspec
-    if grep -q '\\usepackage{fontspec}' "$tex_file" 2>/dev/null || \
-       grep -q 'SF901-template' "$tex_file" 2>/dev/null; then
-        COMPILER="xelatex"
-    else
-        COMPILER="pdflatex"
-    fi
+    # Determine compiler using common utility
+    local COMPILER=$(determine_compiler "$tex_file")
 
     if $COMPILER -interaction=nonstopmode "${basename}.tex" > /dev/null 2>&1; then
         $COMPILER -interaction=nonstopmode "${basename}.tex" > /dev/null 2>&1
 
         if [ -f "${basename}.pdf" ]; then
-            echo -e "${GREEN}  ✓ ${basename}.pdf ($COMPILER)${NC}"
+            print_success "  ✓ ${basename}.pdf ($COMPILER)"
             ((BUILT++))
 
             # Generate PNG if pdftoppm is available
             if command -v pdftoppm &> /dev/null; then
                 pdftoppm -png -r 150 -singlefile "${basename}.pdf" "${basename}"
-                echo -e "${GREEN}  ✓ ${basename}.png${NC}"
+                print_success "  ✓ ${basename}.png"
             fi
         fi
 
         # Clean auxiliary files
-        rm -f *.aux *.log *.out *.toc *.fdb_latexmk *.fls *.nav *.snm *.vrb
+        cleanup_aux_files "."
     else
-        echo -e "${RED}  ✗ Failed to build ${basename}.tex ($COMPILER)${NC}"
+        print_error "  ✗ Failed to build ${basename}.tex ($COMPILER)"
         ((FAILED++))
         FAILED_FILES="$FAILED_FILES\n  - ${tex_file#$REPO_ROOT/}"
         # Clean auxiliary files even on failure
-        rm -f *.aux *.log *.out *.toc *.fdb_latexmk *.fls *.nav *.snm *.vrb
+        cleanup_aux_files "."
     fi
 
     cd "$REPO_ROOT"

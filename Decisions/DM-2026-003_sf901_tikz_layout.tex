@@ -1,20 +1,12 @@
-\documentclass[11pt,letterpaper]{article}
+% ============================================================================
+% DM-2026-003: SF901 Layout Implementation (TikZ vs Alternatives)
+% ============================================================================
+% Thin wrapper for Decision Memorandum - see _template.tex for shared preamble
+% ============================================================================
 
-% ============================================================================
-% PACKAGES
-% ============================================================================
-\usepackage[margin=1in, top=1.5in, headheight=85pt]{geometry}
-\usepackage{graphicx}
-\usepackage{fancyhdr}
-\usepackage{lastpage}
-\usepackage{enumitem}
-\usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{tabularx}
-
-% ============================================================================
-% DOCUMENT VARIABLES - EDIT THESE
-% ============================================================================
+% ----------------------------------------------------------------------------
+% DOCUMENT VARIABLES
+% ----------------------------------------------------------------------------
 \newcommand{\UniqueID}{DM-2026-003}
 \newcommand{\DocumentDate}{January 19, 2026}
 \newcommand{\AuthorName}{PDF Tools Working Group}
@@ -23,97 +15,16 @@
 \newcommand{\SubjectField}{SF901 Layout Implementation (TikZ vs Alternatives)}
 \newcommand{\OPRField}{PdfTools}
 
-% ============================================================================
-% DOCUMENT CONFIGURATION
-% ============================================================================
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    urlcolor=blue,
-    pdfborder={0 0 0}
-}
-
-% Remove paragraph indentation
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt}
-
-% List formatting - match Word style
-\setlist[enumerate]{leftmargin=0.5in, labelwidth=0.25in, labelsep=0.1in, align=left, itemsep=12pt, topsep=12pt}
-\setlist[enumerate,1]{label=\arabic*.}
-\setlist[itemize]{leftmargin=0.5in, itemsep=3pt, topsep=6pt}
-
-% ============================================================================
-% HEADER AND FOOTER CONFIGURATION
-% ============================================================================
-\pagestyle{fancy}
-\fancyhf{}
-
-% Header: Logo on left, "Decision Memorandum" on right
-\fancyhead[L]{%
-    \raisebox{-0.5\height}{\includegraphics[height=0.9in]{logo.png}}%
-}
-\fancyhead[R]{%
-    \parbox[b]{3.5in}{\raggedleft\large\textbf{Decision Memorandum}}%
-}
-\renewcommand{\headrulewidth}{0pt}
-
-% Footer: Unique ID (left), Page X of Y (center), Date (right)
-\fancyfoot[L]{\small \UniqueID}
-\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
-\fancyfoot[R]{\small \DocumentDate}
-\renewcommand{\footrulewidth}{0.4pt}
-
-% ============================================================================
-% CUSTOM COMMANDS
-% ============================================================================
-% Bold section headers for numbered sections
-\newcommand{\dmsection}[1]{\item \textbf{#1}\par}
-
-% ============================================================================
-% BEGIN DOCUMENT
-% ============================================================================
-\begin{document}
-
 % ----------------------------------------------------------------------------
-% UNIQUE ID (top right)
+% DOCUMENT CONTENT
 % ----------------------------------------------------------------------------
-\hfill \UniqueID
-
-\vspace{0.25in}
-
-% ----------------------------------------------------------------------------
-% SIGNATURE BLOCK
-% ----------------------------------------------------------------------------
-\underline{\hspace{2.5in}}\\[2pt]
-\AuthorName\\
-\AuthorTitle
-
-\vspace{0.25in}
-
-% ----------------------------------------------------------------------------
-% MEMO HEADER FIELDS
-% ----------------------------------------------------------------------------
-\textbf{DATE:} \DocumentDate
-
-\textbf{TO:} \ToField
-
-\textbf{SUBJECT:} \SubjectField
-
-\textbf{OFFICE OF PRIMARY RESPONSIBILITY:} \OPRField
-
-\vspace{0.25in}
-
-% ============================================================================
-% MAIN CONTENT - NUMBERED SECTIONS
-% ============================================================================
+\newcommand{\dmContent}{%
 \begin{enumerate}
 
-% ----------------------------------------------------------------------------
 \dmsection{Purpose}
 
 This memorandum documents the decision to use TikZ with absolute positioning for the SF901 CUI Cover Sheet template layout, rather than alternative LaTeX layout approaches.
 
-% ----------------------------------------------------------------------------
 \dmsection{Background}
 
 The SF901 template requires precise reproduction of a government form with:
@@ -126,7 +37,6 @@ The SF901 template requires precise reproduction of a government form with:
 
 Several implementation approaches were evaluated for achieving this layout in LaTeX.
 
-% ----------------------------------------------------------------------------
 \dmsection{Analysis}
 
 \textbf{Approach A: TikZ with Absolute Positioning}
@@ -166,7 +76,6 @@ Several implementation approaches were evaluated for achieving this layout in La
     \item Runtime dependency on external tools
 \end{itemize}
 
-% ----------------------------------------------------------------------------
 \dmsection{Decision}
 
 \textbf{Approved:} Approach A --- TikZ with absolute positioning.
@@ -190,7 +99,6 @@ Several implementation approaches were evaluated for achieving this layout in La
     \item Acceptable because form layout is fixed and rarely changes
 \end{itemize}
 
-% ----------------------------------------------------------------------------
 \dmsection{Implementation Notes}
 
 The SF901.tex template uses:
@@ -210,7 +118,6 @@ The SF901.tex template uses:
     \item Run \texttt{build.sh} to generate PNG comparison images
 \end{itemize}
 
-% ----------------------------------------------------------------------------
 \dmsection{References}
 
 \begin{itemize}
@@ -221,5 +128,9 @@ The SF901.tex template uses:
 \end{itemize}
 
 \end{enumerate}
+}
 
-\end{document}
+% ----------------------------------------------------------------------------
+% INCLUDE SHARED TEMPLATE
+% ----------------------------------------------------------------------------
+\input{_template.tex}

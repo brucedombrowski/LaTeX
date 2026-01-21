@@ -1,20 +1,12 @@
-\documentclass[11pt,letterpaper]{article}
+% ============================================================================
+% DM-2026-002: CUI Header Font Selection (Cinzel vs Trajan)
+% ============================================================================
+% Thin wrapper for Decision Memorandum - see _template.tex for shared preamble
+% ============================================================================
 
-% ============================================================================
-% PACKAGES
-% ============================================================================
-\usepackage[margin=1in, top=1.5in, headheight=85pt]{geometry}
-\usepackage{graphicx}
-\usepackage{fancyhdr}
-\usepackage{lastpage}
-\usepackage{enumitem}
-\usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{tabularx}
-
-% ============================================================================
-% DOCUMENT VARIABLES - EDIT THESE
-% ============================================================================
+% ----------------------------------------------------------------------------
+% DOCUMENT VARIABLES
+% ----------------------------------------------------------------------------
 \newcommand{\UniqueID}{DM-2026-002}
 \newcommand{\DocumentDate}{January 19, 2026}
 \newcommand{\AuthorName}{PDF Tools Working Group}
@@ -23,108 +15,27 @@
 \newcommand{\SubjectField}{CUI Header Font Selection (Cinzel vs Trajan)}
 \newcommand{\OPRField}{PdfTools}
 
-% ============================================================================
-% DOCUMENT CONFIGURATION
-% ============================================================================
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    urlcolor=blue,
-    pdfborder={0 0 0}
-}
-
-% Remove paragraph indentation
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt}
-
-% List formatting - match Word style
-\setlist[enumerate]{leftmargin=0.5in, labelwidth=0.25in, labelsep=0.1in, align=left, itemsep=12pt, topsep=12pt}
-\setlist[enumerate,1]{label=\arabic*.}
-\setlist[itemize]{leftmargin=0.5in, itemsep=3pt, topsep=6pt}
-
-% ============================================================================
-% HEADER AND FOOTER CONFIGURATION
-% ============================================================================
-\pagestyle{fancy}
-\fancyhf{}
-
-% Header: Logo on left, "Decision Memorandum" on right
-\fancyhead[L]{%
-    \raisebox{-0.5\height}{\includegraphics[height=0.9in]{logo.png}}%
-}
-\fancyhead[R]{%
-    \parbox[b]{3.5in}{\raggedleft\large\textbf{Decision Memorandum}}%
-}
-\renewcommand{\headrulewidth}{0pt}
-
-% Footer: Unique ID (left), Page X of Y (center), Date (right)
-\fancyfoot[L]{\small \UniqueID}
-\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
-\fancyfoot[R]{\small \DocumentDate}
-\renewcommand{\footrulewidth}{0.4pt}
-
-% ============================================================================
-% CUSTOM COMMANDS
-% ============================================================================
-% Bold section headers for numbered sections
-\newcommand{\dmsection}[1]{\item \textbf{#1}\par}
-
-% ============================================================================
-% BEGIN DOCUMENT
-% ============================================================================
-\begin{document}
-
 % ----------------------------------------------------------------------------
-% UNIQUE ID (top right)
+% DOCUMENT CONTENT
 % ----------------------------------------------------------------------------
-\hfill \UniqueID
-
-\vspace{0.25in}
-
-% ----------------------------------------------------------------------------
-% SIGNATURE BLOCK
-% ----------------------------------------------------------------------------
-\underline{\hspace{2.5in}}\\[2pt]
-\AuthorName\\
-\AuthorTitle
-
-\vspace{0.25in}
-
-% ----------------------------------------------------------------------------
-% MEMO HEADER FIELDS
-% ----------------------------------------------------------------------------
-\textbf{DATE:} \DocumentDate
-
-\textbf{TO:} \ToField
-
-\textbf{SUBJECT:} \SubjectField
-
-\textbf{OFFICE OF PRIMARY RESPONSIBILITY:} \OPRField
-
-\vspace{0.25in}
-
-% ============================================================================
-% MAIN CONTENT - NUMBERED SECTIONS
-% ============================================================================
+\newcommand{\dmContent}{%
 \begin{enumerate}
 
-% ----------------------------------------------------------------------------
 \dmsection{Purpose}
 
 This memorandum documents the decision to use Cinzel as the display font for ``CUI'' header text in the SF901 LaTeX template, rather than the Trajan Bold font used in the official GSA template.
 
-% ----------------------------------------------------------------------------
 \dmsection{Background}
 
 The official SF901 CUI Cover Sheet template (Standard Form 901, 11-18) uses the \textbf{Trajan Bold} font for the large ``CUI'' header text displayed at the top and bottom of the cover sheet. This font was identified by extracting font metadata from the official PDF template obtained from the National Archives:
 
-\begin{verbatim}
-$ pdffonts SF901-Official-Template.pdf
-name                          type
-ZMPPSD+Trajan-Bold            Type 1C
-ZMPPSD+TimesNewRomanPSMT      CID TrueType
-ZMPPSD+MinionPro-Regular      Type 1C
-\end{verbatim}
+{\small\ttfamily
+\noindent\$ pdffonts SF901-Official-Template.pdf\\
+name \hspace{2.5cm} type\\
+ZMPPSD+Trajan-Bold \hspace{0.7cm} Type 1C\\
+ZMPPSD+TimesNewRomanPSMT \hspace{0.2cm} CID TrueType\\
+ZMPPSD+MinionPro-Regular \hspace{0.3cm} Type 1C
+}
 
 Two implementation approaches were considered:
 
@@ -133,7 +44,6 @@ Two implementation approaches were considered:
     \item \textbf{Approach B:} Use Cinzel (free open-source alternative)
 \end{itemize}
 
-% ----------------------------------------------------------------------------
 \dmsection{Analysis}
 
 \textbf{Approach A: Trajan Bold (Original Font)}
@@ -161,7 +71,6 @@ Two implementation approaches were considered:
     \item \textbf{Times New Roman Regular:} Pre-installed with lighter weight, but different letterform style and not a display font
 \end{itemize}
 
-% ----------------------------------------------------------------------------
 \dmsection{Decision}
 
 \textbf{Approved:} Approach B --- Use Cinzel as the CUI header font.
@@ -184,14 +93,14 @@ Two implementation approaches were considered:
 \end{itemize}
 
 \textbf{Font Installation (macOS):}
-\begin{verbatim}
-curl -L -o /tmp/cinzel.zip \
-  "https://gwfh.mranftl.com/api/fonts/cinzel?download=zip\
-&subsets=latin&variants=regular"
-unzip -o /tmp/cinzel.zip -d ~/Library/Fonts/
-\end{verbatim}
 
-% ----------------------------------------------------------------------------
+{\small\ttfamily
+\noindent curl -L -o /tmp/cinzel.zip \textbackslash\\
+\hspace*{0.5cm}"https://gwfh.mranftl.com/api/fonts/cinzel?download=zip\textbackslash\\
+\hspace*{0.5cm}\&subsets=latin\&variants=regular"\\
+unzip -o /tmp/cinzel.zip -d \textasciitilde/Library/Fonts/
+}
+
 \dmsection{References}
 
 \begin{itemize}
@@ -202,5 +111,9 @@ unzip -o /tmp/cinzel.zip -d ~/Library/Fonts/
 \end{itemize}
 
 \end{enumerate}
+}
 
-\end{document}
+% ----------------------------------------------------------------------------
+% INCLUDE SHARED TEMPLATE
+% ----------------------------------------------------------------------------
+\input{_template.tex}

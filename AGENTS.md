@@ -72,7 +72,7 @@ This toolkit follows the [SpeakUp project](https://github.com/brucedombrowski/Sp
 | [Documentation-Generation/](Documentation-Generation/) | Document templates (decisions, slides, agendas, attestations) | [Documentation-Generation/AGENTS.md](Documentation-Generation/AGENTS.md) |
 | [Decisions/](Decisions/) | Formal Decision Memorandums archive | — |
 | [Attestations/](Attestations/) | Generated software attestation PDFs | — |
-| [Assessments/](Assessments/) | Technical assessments and analyses | — |
+| [Analysis/](Analysis/) | Technical assessments, DRY analysis, mitigation plans | — |
 | [Compliance-Marking/](Compliance-Marking/) | CUI cover pages, export markings, security compliance | [Compliance-Marking/AGENTS.md](Compliance-Marking/AGENTS.md) |
 
 ## Documentation-Generation
@@ -260,6 +260,99 @@ Attestations follow the same DRY pattern as SF901 cover sheets:
 - `Attestations/software-attestation-latest.pdf` - Symlink to most recent
 - `dist/attestations/` - Same files for release distribution
 
+## DRY (Don't Repeat Yourself) Patterns
+
+This repository uses template wrapper patterns to minimize code duplication and ensure consistency across documents.
+
+### Template Wrapper Pattern
+
+The template wrapper pattern separates shared structure from document-specific content:
+
+```
+Template (shared)                Wrapper (document-specific)
+┌─────────────────────────┐     ┌─────────────────────────┐
+│ \documentclass{...}     │     │ \newcommand{\var1}{...} │
+│ \usepackage{...}        │     │ \newcommand{\var2}{...} │
+│ Header/footer config    │ <── │ \newcommand{\content}   │
+│ Common styling          │     │   {...}                 │
+│ \begin{document}        │     │ \input{_template.tex}   │
+│ \content                │     └─────────────────────────┘
+│ \end{document}          │
+└─────────────────────────┘
+```
+
+### Pattern Implementations
+
+| Component | Template | Wrapper Example |
+|-----------|----------|-----------------|
+| SF901 Cover Sheets | `SF901-template.tex` | `Examples/SF901_BASIC.tex` |
+| Decision Memoranda | `Decisions/_template.tex` | `DM-2026-001_sf901_decision.tex` |
+| Meeting Agendas | `templates/meeting_agenda_base.tex` | `examples/project_kickoff.tex` |
+| Attestations | `templates/attestation-template.tex` | `examples/software_attestation.tex` |
+
+### Creating New Documents Using Templates
+
+**Decision Memorandum:**
+```latex
+% DM-2026-004_example.tex
+\newcommand{\UniqueID}{DM-2026-004}
+\newcommand{\DocumentDate}{January 21, 2026}
+\newcommand{\AuthorName}{Your Name}
+% ... other variables ...
+\newcommand{\dmContent}{%
+\begin{enumerate}
+\dmsection{Purpose}
+Your purpose text here.
+% ... more sections ...
+\end{enumerate}
+}
+\input{_template.tex}
+```
+
+**Meeting Agenda:**
+```latex
+% new_meeting.tex
+\newcommand{\MeetingTitle}{Technical Review}
+\newcommand{\MeetingSubtitle}{Phase 2 Checkpoint}
+\newcommand{\MeetingDate}{January 21, 2026}
+% ... other variables ...
+\newcommand{\MeetingAgendaItems}{%
+    0:00 & Welcome & Facilitator \\
+    0:05 & Status updates & All \\
+    % ... more items ...
+}
+% ... other content commands ...
+\input{../templates/meeting_agenda_base.tex}
+```
+
+### Shell Script Common Utilities
+
+Build scripts share common utilities via `.scripts/lib/common.sh`:
+
+```bash
+# Source common utilities
+source "$SCRIPT_DIR/lib/common.sh"
+
+# Use shared functions
+COMPILER=$(determine_compiler "$tex_file")  # Returns "pdflatex" or "xelatex"
+cleanup_aux_files "."                        # Removes .aux, .log, etc.
+print_success "Build complete"               # Green output
+print_error "Build failed"                   # Red output
+print_warning "Optional step skipped"        # Yellow output
+require_command pdflatex "Install TeX Live"  # Check command exists
+```
+
+### Benefits
+
+1. **Consistency:** All documents of the same type share formatting
+2. **Maintainability:** Fix bugs or update styles in one place
+3. **Simplicity:** New documents are small, focused on content
+4. **Reduced Errors:** Less code = fewer opportunities for mistakes
+
+### Assessment Reference
+
+See `Analysis/DRY-Assessment-2026-01-21.md` for the complete DRY compliance analysis and `Analysis/DRY-Mitigation-Plan.md` for implementation details.
+
 ## Repository-Wide Conventions
 
 ### LaTeX Style
@@ -403,6 +496,8 @@ LaTeX/
 ├── .gitignore                # Git ignore rules
 │
 ├── .scripts/                 # Centralized build and utility scripts
+│   ├── lib/
+│   │   └── common.sh         # Shared utilities (colors, compiler detection)
 │   ├── build-tex.sh          # Build any single .tex file
 │   ├── release.sh            # Build all documents to .dist/
 │   ├── generate-attestation.sh # Generate software attestation
@@ -436,7 +531,7 @@ LaTeX/
 │
 ├── Attestations/             # Generated attestation PDFs
 │
-├── Assessments/              # Technical assessments and analyses
+├── Analysis/                 # Technical assessments, DRY analysis, mitigation plans
 │
 └── Compliance-Marking/       # Compliance templates
     ├── AGENTS.md
