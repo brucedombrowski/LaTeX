@@ -264,6 +264,19 @@ else
     echo -e "${YELLOW}  Skipping CUI Cover Packet - not all example PDFs available${NC}"
 fi
 
+# Generate Software Attestation
+echo ""
+echo -e "${YELLOW}Generating Software Attestation...${NC}"
+if [ -f "$SCRIPT_DIR/generate-attestation.sh" ]; then
+    if "$SCRIPT_DIR/generate-attestation.sh"; then
+        ((BUILT++))
+    else
+        echo -e "${YELLOW}  Attestation generation skipped or failed${NC}"
+    fi
+else
+    echo -e "${YELLOW}  generate-attestation.sh not found${NC}"
+fi
+
 # Clean up auxiliary files across the entire repo
 echo ""
 echo -e "${YELLOW}Cleaning auxiliary files across repo...${NC}"

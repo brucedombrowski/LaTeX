@@ -26,6 +26,7 @@ This toolkit follows the [SpeakUp project](https://github.com/brucedombrowski/Sp
 | **Export Markings** | Compliance-Marking/Export/ | Planned |
 | **PDF Merging** | scripts/merge-pdf.* | Production |
 | **Digital Signatures** | Documentation-Generation/DecisionDocument/ | Production |
+| **Software Attestations** | Documentation-Generation/Attestations/ | Production |
 
 ### Key Features
 
@@ -33,6 +34,7 @@ This toolkit follows the [SpeakUp project](https://github.com/brucedombrowski/Sp
 - Decision Memorandums (single-page) and Program Decision Documents (multi-page)
 - Beamer presentation slide decks
 - Structured meeting agendas with timed items
+- Software attestations documenting versions, checksums, and download URLs
 
 **Compliance & Security:**
 - SF901 CUI cover sheets (32 CFR Part 2002 compliant)
@@ -65,8 +67,9 @@ This toolkit follows the [SpeakUp project](https://github.com/brucedombrowski/Sp
 |-----------|-------------|-----------|
 | [scripts/](scripts/) | Build tools, release scripts, PDF merge utilities | — |
 | [assets/](assets/) | Shared images and logos | — |
-| [Documentation-Generation/](Documentation-Generation/) | Document templates (decisions, slides, agendas) | [Documentation-Generation/AGENTS.md](Documentation-Generation/AGENTS.md) |
+| [Documentation-Generation/](Documentation-Generation/) | Document templates (decisions, slides, agendas, attestations) | [Documentation-Generation/AGENTS.md](Documentation-Generation/AGENTS.md) |
 | [Decisions/](Decisions/) | Formal Decision Memorandums archive | — |
+| [Attestations/](Attestations/) | Generated software attestation PDFs | — |
 | [Compliance-Marking/](Compliance-Marking/) | CUI cover pages, export markings, security compliance | [Compliance-Marking/AGENTS.md](Compliance-Marking/AGENTS.md) |
 
 ## Documentation-Generation
@@ -113,12 +116,18 @@ Documentation-Generation/
 │   │   └── standard_brief.tex
 │   └── examples/
 │
-└── MeetingAgenda/            # Meeting agenda documents
+├── MeetingAgenda/            # Meeting agenda documents
+│   ├── templates/
+│   │   └── meeting_agenda.tex
+│   └── examples/
+│       ├── project_kickoff.tex
+│       └── requirements_review.tex
+│
+└── Attestations/             # Software attestation documents
     ├── templates/
-    │   └── meeting_agenda.tex
+    │   └── attestation-template.tex  # Shared template (like SF901-template)
     └── examples/
-        ├── project_kickoff.tex
-        └── requirements_review.tex
+        └── software_attestation.tex  # PdfSigner version attestation
 ```
 
 ### DecisionMemorandum - Brief Decisions
@@ -218,6 +227,36 @@ January 21, 2026 | 10:00 AM | Conference Room A
 \end{document}
 ```
 
+### Attestations - Software Version Documentation
+
+**Purpose:** Document software versions, SHA256 checksums, and download URLs for external binaries used by the toolkit. Provides traceability and verification capability for security-conscious environments.
+
+**Structure:**
+- `Documentation-Generation/Attestations/templates/` - Shared attestation template
+- `Documentation-Generation/Attestations/examples/` - Attestation wrappers (like `software_attestation.tex`)
+- `Attestations/` - Generated attestation PDFs (root level, like `Decisions/`)
+- `dist/attestations/` - Attestations included in release builds
+
+**Generation:**
+```bash
+# Generate attestation manually
+./scripts/generate-attestation.sh
+
+# Attestations are also generated automatically during release builds
+./scripts/release.sh
+```
+
+**DRY Pattern:**
+Attestations follow the same DRY pattern as SF901 cover sheets:
+1. `attestation-template.tex` - Shared template with header/footer, colors, document structure
+2. Thin wrappers (e.g., `software_attestation.tex`) define variables and `\input` the template
+3. Generation scripts perform sed substitution on placeholders
+
+**Output:**
+- `Attestations/software-attestation-YYYYMMDD.pdf` - Dated attestation
+- `Attestations/software-attestation-latest.pdf` - Symlink to most recent
+- `dist/attestations/` - Same files for release distribution
+
 ## Repository-Wide Conventions
 
 ### LaTeX Style
@@ -252,6 +291,7 @@ Centralized build tools in `scripts/`:
 |--------|---------|
 | `scripts/build-tex.sh` | Build any single .tex file |
 | `scripts/release.sh` | Build all documents to `dist/` |
+| `scripts/generate-attestation.sh` | Generate software attestation PDF |
 | `scripts/merge-pdf.sh` | Merge multiple PDFs (interactive) |
 | `scripts/merge-pdf.ps1` | Merge multiple PDFs (Windows PowerShell) |
 | `scripts/sign-pdf.sh` | Sign PDFs with digital certificates |
@@ -362,6 +402,7 @@ LaTeX/
 ├── scripts/                  # Centralized build and utility scripts
 │   ├── build-tex.sh          # Build any single .tex file
 │   ├── release.sh            # Build all documents to dist/
+│   ├── generate-attestation.sh # Generate software attestation
 │   ├── merge-pdf.sh          # PDF merge utility (macOS/Linux)
 │   ├── merge-pdf.ps1         # PDF merge utility (Windows)
 │   ├── sign-pdf.sh           # PDF signing (macOS/Linux)
@@ -378,15 +419,19 @@ LaTeX/
 ├── dist/                     # Build output (tracked for examples)
 │   ├── decisions/
 │   ├── meetings/
-│   └── compliance/
+│   ├── compliance/
+│   └── attestations/
 │
 ├── Documentation-Generation/ # All document generation
 │   ├── DecisionMemorandum/   # Single-page decision memos
 │   ├── DecisionDocument/     # Multi-page decisions (with signing tools)
 │   ├── SlideDecks/           # Beamer presentations
-│   └── MeetingAgenda/        # Meeting agendas
+│   ├── MeetingAgenda/        # Meeting agendas
+│   └── Attestations/         # Attestation templates and examples
 │
 ├── Decisions/                # Formal Decision Memorandums (cross-cutting)
+│
+├── Attestations/             # Generated attestation PDFs
 │
 └── Compliance-Marking/       # Compliance templates
     ├── AGENTS.md

@@ -1,0 +1,74 @@
+%% software_attestation.tex - Software Version Attestation
+%% Documents software versions, checksums, and download URLs used in the toolkit
+%%
+%% Usage: Compile with pdflatex
+%%        Variables are replaced by generate-attestation.sh script
+%%
+%% This is a thin wrapper that defines variables and inputs the shared template.
+
+\documentclass[11pt]{article}
+
+%% =============================================================================
+%% DOCUMENT VARIABLES - These are replaced by generate-attestation.sh
+%% =============================================================================
+\newcommand{\attDocTitle}{Software Attestation}
+\newcommand{\attDocId}{ATT-PLACEHOLDER-ID}
+\newcommand{\attDate}{PLACEHOLDER-DATE}
+\newcommand{\attAuthor}{LaTeX Toolkit Release Process}
+
+%% Toolkit version info (populated by script)
+\newcommand{\attToolkitVersion}{PLACEHOLDER-VERSION}
+\newcommand{\attToolkitCommit}{PLACEHOLDER-COMMIT}
+
+%% =============================================================================
+%% PURPOSE
+%% =============================================================================
+\newcommand{\attPurpose}{%
+This document attests to the software versions, checksums, and download URLs
+for external binaries used by the LaTeX Toolkit at the time of release.
+This provides traceability and verification capability for security-conscious
+environments.
+}
+
+%% =============================================================================
+%% MAIN CONTENT - Software inventory and checksums
+%% =============================================================================
+\newcommand{\attContent}{%
+\section*{Software Inventory}
+
+The following external software is used by this toolkit:
+
+\subsection*{PdfSigner.exe}
+
+\begin{description}[leftmargin=2cm,style=nextline]
+    \item[Version] PDFSIGNER-VERSION
+    \item[SHA256] \texttt{PDFSIGNER-CHECKSUM}
+    \item[URL] \url{PDFSIGNER-URL}
+\end{description}
+
+\section*{Checksum Verification}
+
+To verify the integrity of downloaded software:
+
+\begin{verbatim}
+# macOS/Linux
+shasum -a 256 PdfSigner.exe
+
+# Windows PowerShell
+Get-FileHash -Algorithm SHA256 PdfSigner.exe
+\end{verbatim}
+
+Compare the output against the checksums documented above.
+
+\section*{Source Repositories}
+
+\begin{description}[leftmargin=3cm,style=nextline]
+    \item[LaTeX Toolkit] \url{https://github.com/brucedombrowski/LaTeX}
+    \item[PdfSigner] \url{https://github.com/brucedombrowski/PDFSigner}
+\end{description}
+}
+
+%% =============================================================================
+%% Load the shared template
+%% =============================================================================
+\input{attestation-template.tex}
