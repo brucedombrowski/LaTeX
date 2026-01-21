@@ -127,12 +127,13 @@ for tex_file in "$REPO_ROOT/Compliance-Marking/CUI"/*.tex; do
     [ -e "$tex_file" ] && build_tex "$tex_file" "$DIST_DIR/compliance"
 done
 
-# Clean up auxiliary files in Decisions folder
+# Clean up auxiliary files across the entire repo
 echo ""
-echo -e "${YELLOW}Cleaning auxiliary files in Decisions/...${NC}"
-rm -f "$REPO_ROOT/Decisions"/*.aux "$REPO_ROOT/Decisions"/*.log "$REPO_ROOT/Decisions"/*.out \
-      "$REPO_ROOT/Decisions"/*.toc "$REPO_ROOT/Decisions"/*.fdb_latexmk "$REPO_ROOT/Decisions"/*.fls 2>/dev/null
-echo -e "${GREEN}Decisions/ cleaned.${NC}"
+echo -e "${YELLOW}Cleaning auxiliary files across repo...${NC}"
+find "$REPO_ROOT" -type f \( -name "*.aux" -o -name "*.log" -o -name "*.out" -o -name "*.toc" \
+    -o -name "*.fdb_latexmk" -o -name "*.fls" -o -name "*.nav" -o -name "*.snm" -o -name "*.vrb" \
+    -o -name "*.synctex.gz" -o -name "*.bbl" -o -name "*.blg" \) -delete 2>/dev/null
+echo -e "${GREEN}Auxiliary files cleaned.${NC}"
 
 # Summary
 echo ""
