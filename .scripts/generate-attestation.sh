@@ -21,6 +21,7 @@ BIN_DIR="$REPO_ROOT/.bin"
 
 # Source common utilities
 source "$SCRIPT_DIR/lib/common.sh"
+source "$SCRIPT_DIR/lib/external-deps.sh"
 
 echo "=========================================="
 echo "Generate Software Attestation"
@@ -28,7 +29,7 @@ echo "=========================================="
 
 # Check if pdflatex is installed
 if ! command -v pdflatex &> /dev/null; then
-    echo -e "${YELLOW}Warning: pdflatex not found. Skipping attestation generation.${NC}"
+    print_warning "pdflatex not found. Skipping attestation generation."
     exit 2
 fi
 
@@ -49,35 +50,19 @@ TOOLKIT_COMMIT=$(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo 
 ATT_ID="ATT-${DATE_STAMP}-001"
 
 echo ""
-echo -e "${YELLOW}Collecting software information...${NC}"
+print_warning "Collecting software information..."
 
-# PdfSigner information
-PDFSIGNER_VERSION="unknown"
-PDFSIGNER_CHECKSUM="not-available"
-PDFSIGNER_URL="https://github.com/brucedombrowski/PDFSigner/releases/latest"
+# Get dependency info using external-deps library
+# This sets PDFSIGNER_VERSION, PDFSIGNER_URL, PDFSIGNER_CHECKSUM
+check_external_deps 2>/dev/null || true
 
-# Try to get PdfSigner version from GitHub API
-if command -v curl &> /dev/null; then
-    PDFSIGNER_API="https://api.github.com/repos/brucedombrowski/PDFSigner/releases/latest"
-    PDFSIGNER_INFO=$(curl -s --max-time 10 "$PDFSIGNER_API" 2>/dev/null || echo "")
+# Ensure variables have defaults if check failed
+PDFSIGNER_VERSION="${PDFSIGNER_VERSION:-unknown}"
+PDFSIGNER_URL="${PDFSIGNER_URL:-https://github.com/brucedombrowski/PDFSigner/releases/latest}"
+PDFSIGNER_CHECKSUM="${PDFSIGNER_CHECKSUM:-not-available}"
 
-    if [ -n "$PDFSIGNER_INFO" ]; then
-        PDFSIGNER_VERSION=$(echo "$PDFSIGNER_INFO" | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4 || echo "unknown")
-        # Get download URL for the zip release (release is a .zip, not standalone .exe)
-        PDFSIGNER_URL=$(echo "$PDFSIGNER_INFO" | grep -o '"browser_download_url": *"[^"]*\.zip"' | head -1 | cut -d'"' -f4 || echo "$PDFSIGNER_URL")
-    fi
-fi
-
-# Calculate checksum if PdfSigner.exe exists locally
-if [ -f "$BIN_DIR/PdfSigner.exe" ]; then
-    PDFSIGNER_CHECKSUM=$(shasum -a 256 "$BIN_DIR/PdfSigner.exe" 2>/dev/null | cut -d' ' -f1 || echo "calculation-failed")
-    echo -e "${GREEN}  PdfSigner.exe found - checksum calculated${NC}"
-else
-    echo -e "${YELLOW}  PdfSigner.exe not found in bin/ - checksum not available${NC}"
-fi
-
-echo -e "${GREEN}  PdfSigner version: $PDFSIGNER_VERSION${NC}"
-echo -e "${GREEN}  PdfSigner URL: $PDFSIGNER_URL${NC}"
+print_success "  PdfSigner version: $PDFSIGNER_VERSION"
+print_success "  PdfSigner URL: $PDFSIGNER_URL"
 
 # Escape special LaTeX characters
 escape_latex() {

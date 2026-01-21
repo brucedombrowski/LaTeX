@@ -1,0 +1,31 @@
+{
+  "_comment": "External dependencies configuration for LaTeX Toolkit",
+  "version": "1.0",
+  "description": "Defines external binaries fetched from GitHub releases",
+
+  "dependencies": {
+    "PdfSigner": {
+      "description": "PDF digital signing tool for Windows",
+      "source": "github_release",
+      "github_repo": "brucedombrowski/PDFSigner",
+      "release_url": "https://github.com/brucedombrowski/PDFSigner/releases/latest",
+      "asset_pattern": ".zip",
+      "extract_files": ["PdfSigner.exe"],
+      "install_path": ".bin/PdfSigner.exe",
+      "checksum_file": "PdfSigner.exe",
+      "platforms": ["windows"],
+      "optional": true,
+      "attestation": {
+        "include": true,
+        "name": "PdfSigner.exe",
+        "purpose": "PDF digital signing with PIV/CAC smart card support"
+      }
+    }
+  },
+
+  "settings": {
+    "auto_download": false,
+    "check_updates": true,
+    "cache_timeout_seconds": 300
+  }
+}

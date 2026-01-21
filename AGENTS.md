@@ -393,7 +393,8 @@ Centralized build tools in `.scripts/`:
 | `.scripts/sign-pdf.sh` | Sign PDFs with digital certificates |
 | `.scripts/sign-pdf.ps1` | Sign PDFs (Windows PowerShell) |
 | `.scripts/sign-pdf.bat` | Sign PDFs (Windows batch) |
-| `.bin/PdfSigner.exe` | PDF signing tool for Windows |
+| `.scripts/lib/common.sh` | Shared utilities (colors, compiler detection) |
+| `.scripts/lib/external-deps.sh` | External dependency management |
 
 **Usage:**
 
@@ -412,6 +413,26 @@ Centralized build tools in `.scripts/`:
 
 # Merge PDFs (interactive - run from folder containing PDFs)
 ./.scripts/merge-pdf.sh
+
+# Download missing external dependencies
+source .scripts/lib/common.sh && source .scripts/lib/external-deps.sh
+download_dependency "PdfSigner"
+```
+
+### External Dependencies
+
+External binaries are configured in `.config/external-deps.json` and downloaded from GitHub releases:
+
+| Dependency | Source | Install Path |
+|------------|--------|--------------|
+| PdfSigner.exe | [brucedombrowski/PDFSigner](https://github.com/brucedombrowski/PDFSigner/releases) | `.bin/PdfSigner.exe` |
+
+**Automatic checks:** `release.sh` checks for missing/outdated dependencies and reports status.
+
+**Manual download:**
+```bash
+source .scripts/lib/common.sh && source .scripts/lib/external-deps.sh
+download_dependency "PdfSigner"
 ```
 
 **Output:**
@@ -495,9 +516,13 @@ LaTeX/
 ├── README.md                 # User documentation
 ├── .gitignore                # Git ignore rules
 │
+├── .config/                  # Configuration files
+│   └── external-deps.json    # External dependency definitions (GitHub sources)
+│
 ├── .scripts/                 # Centralized build and utility scripts
 │   ├── lib/
-│   │   └── common.sh         # Shared utilities (colors, compiler detection)
+│   │   ├── common.sh         # Shared utilities (colors, compiler detection)
+│   │   └── external-deps.sh  # External dependency management
 │   ├── build-tex.sh          # Build any single .tex file
 │   ├── release.sh            # Build all documents to .dist/
 │   ├── generate-attestation.sh # Generate software attestation
