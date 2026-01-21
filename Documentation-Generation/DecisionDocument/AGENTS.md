@@ -1,19 +1,26 @@
 # AGENTS.md
 
-Instructions for AI agents working with this repository.
+Instructions for AI agents working with this component.
 
 ## Project Overview
 
-This repository contains LaTeX templates for formal program decision documentation, adapted from NASA's Memorandum of Agreement format.
+This component (`Documentation-Generation/DecisionDocument/`) provides LaTeX templates for formal program decision documentation, adapted from NASA's Memorandum of Agreement format.
+
+**Parent repository:** See [../../AGENTS.md](../../AGENTS.md) for repository-wide instructions.
+
+**Related components:**
+- `../../Decisions/` - Where generated Decision Memorandums are stored
+- `../../assets/` - Shared logos (symlinked here as `logo.png`, `logo.svg`)
+- `../../Compliance-Marking/AGENTS.md` - Decision Memorandum Index and requirements
 
 ## Target Environment
 
-**Airgapped Windows 11** with security hardening. Users are expected to run on:
+**Airgapped Windows 11** with security hardening:
 - CIS Windows 11 Enterprise baseline
 - DISA STIG Windows 11 baseline
 - Microsoft Security Baseline
 
-See README.md for baseline references and VM download links.
+Also supports macOS/Linux for development.
 
 ## Templates
 
@@ -175,8 +182,8 @@ Use ANSI/NIST standard date format placeholders:
 DecisionDocument/
 ├── decision_memo.tex             # Brief Decision Memorandum template
 ├── decision_document.tex         # Comprehensive decision template
-├── logo.png                      # Header logo (orbit-styled "Logo")
-├── logo.svg                      # Logo source file (editable vector)
+├── logo.png -> ../../assets/logo.png  # Symlink to shared logo
+├── logo.svg -> ../../assets/logo.svg  # Symlink to shared logo source
 ├── build.bat                     # Build script (Windows batch - double-click)
 ├── build.ps1                     # Build script (Windows PowerShell)
 ├── build.sh                      # Build script (macOS/Linux)

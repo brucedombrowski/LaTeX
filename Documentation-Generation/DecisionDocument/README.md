@@ -60,7 +60,7 @@ Output: `<filename>_signed.pdf`
 DecisionDocument/
 ├── decision_memo.tex       # Brief memo template
 ├── decision_document.tex   # Comprehensive template
-├── logo.png                # Header logo
+├── logo.png                # Symlink to ../../assets/logo.png
 ├── build.bat               # Build script (Windows)
 ├── sign.bat                # Sign script (Windows)
 ├── PdfSigner.exe           # PDF signing tool

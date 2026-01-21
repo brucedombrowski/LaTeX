@@ -41,7 +41,7 @@ These templates are reusable for any document requiring:
 **When asked to "Create a Decision Memorandum", follow these requirements exactly.**
 
 1. **Format:** LaTeX-generated PDF documents (dogfooding our own templates)
-2. **Location:** `Decisions/` directory
+2. **Location:** `../Decisions/` directory (root level)
 3. **Unique ID Format:** `DM-YYYY-NNN` where:
    - `YYYY` = 4-digit year
    - `NNN` = 3-digit sequential number within that year
@@ -97,7 +97,7 @@ These templates are reusable for any document requiring:
 
 **Reference file:** `CUI/SF901-Example.pdf` - official GSA form kept for comparison
 
-**Decision Memo:** `Decisions/dm_sf901_decision.pdf` (DM-2026-001)
+**Decision Memo:** `../Decisions/dm_sf901_decision.pdf` (DM-2026-001)
 
 ### SF901 Template Fields
 
@@ -121,14 +121,14 @@ The LaTeX template will support these customizable fields:
 
 | Component | Location | Purpose |
 |-----------|----------|---------|
-| PdfSigner.exe | `../DecisionDocument/PdfSigner.exe` | Digital signature capability |
-| sign.bat | `../DecisionDocument/sign.bat` | Windows signing workflow |
-| Decision templates | `../DecisionDocument/` | Decision memo templates |
+| PdfSigner.exe | `../Documentation-Generation/DecisionDocument/PdfSigner.exe` | Digital signature capability |
+| sign.bat | `../Documentation-Generation/DecisionDocument/sign.bat` | Windows signing workflow |
+| Decision templates | `../Documentation-Generation/DecisionDocument/` | Decision memo templates |
 
 ## File Structure
 
 ```
-Compliance/
+Compliance-Marking/
 ├── AGENTS.md                     # This file - requirements and analysis
 ├── CUI/                          # Controlled Unclassified Information
 │   ├── SF901-Official-Template.pdf  # Official GSA SF901 for reference
@@ -136,11 +136,9 @@ Compliance/
 │   ├── SF901.pdf                 # Generated cover sheet
 │   └── build.sh                  # Build script (runs xelatex twice)
 ├── Export/                       # Export control (ITAR/EAR) - future
-├── Security/                     # Security compliance - future
-└── Decisions/                    # Decision memorandums (PDF format)
-    ├── dm_sf901_decision.*       # SF901 recreation decision (DM-2026-001)
-    ├── DM-2026-002_sf901_font_decision.*  # Font selection decision
-    └── DM-2026-003_sf901_tikz_layout.*    # TikZ layout decision
+└── Security/                     # Security compliance - future
+
+# Decision Memorandums are at repo root: ../Decisions/
 ```
 
 ## Research Needed

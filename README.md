@@ -6,14 +6,18 @@ LaTeX templates and tools for document generation.
 
 | Component | Description |
 |-----------|-------------|
-| [DecisionDocument/](DecisionDocument/) | Formal program decision documentation templates |
-| [Compliance/](Compliance/) | CUI cover pages, export markings, security compliance |
+| [Documentation-Generation/](Documentation-Generation/) | Document generation (decisions, slides, agendas) |
+| [Decisions/](Decisions/) | Formal Decision Memorandums |
+| [Compliance-Marking/](Compliance-Marking/) | CUI cover pages, export markings, security compliance |
 | [PdfTools/](PdfTools/) | PDF manipulation tools (merge, split) |
 
 ## Quick Links
 
-- **Decision Memos:** [DecisionDocument/README.md](DecisionDocument/README.md)
-- **CUI Cover Pages:** [Compliance/CUI/](Compliance/CUI/)
+- **Decision Memos:** [Documentation-Generation/DecisionDocument/README.md](Documentation-Generation/DecisionDocument/README.md)
+- **Decision Index:** [Decisions/](Decisions/)
+- **Slide Decks:** [Documentation-Generation/SlideDecks/](Documentation-Generation/SlideDecks/)
+- **Meeting Agendas:** [Documentation-Generation/MeetingAgenda/](Documentation-Generation/MeetingAgenda/)
+- **CUI Cover Pages:** [Compliance-Marking/CUI/](Compliance-Marking/CUI/)
 - **PDF Merge Tool:** [PdfTools/README.md](PdfTools/README.md)
 
 ## Target Environment
