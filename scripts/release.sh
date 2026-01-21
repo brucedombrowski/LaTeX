@@ -69,21 +69,72 @@ build_tex() {
 
     cd "$dirname"
 
-    if pdflatex -interaction=nonstopmode "${basename}.tex" > /dev/null 2>&1; then
-        pdflatex -interaction=nonstopmode "${basename}.tex" > /dev/null 2>&1
-        pdflatex -interaction=nonstopmode "${basename}.tex" > /dev/null 2>&1
+    # Check if file uses fontspec (requires xelatex)
+    if grep -q '\\usepackage{fontspec}' "$tex_file" 2>/dev/null; then
+        COMPILER="xelatex"
+    else
+        COMPILER="pdflatex"
+    fi
+
+    if $COMPILER -interaction=nonstopmode "${basename}.tex" > /dev/null 2>&1; then
+        $COMPILER -interaction=nonstopmode "${basename}.tex" > /dev/null 2>&1
 
         # Copy PDF to dist
         if [ -f "${basename}.pdf" ]; then
             cp "${basename}.pdf" "$output_dir/"
-            echo -e "${GREEN}  ✓ ${basename}.pdf${NC}"
+            echo -e "${GREEN}  ✓ ${basename}.pdf ($COMPILER)${NC}"
             ((BUILT++))
         fi
 
         # Clean auxiliary files
         rm -f *.aux *.log *.out *.toc *.fdb_latexmk *.fls *.nav *.snm *.vrb
     else
-        echo -e "${RED}  ✗ Failed to build ${basename}.tex${NC}"
+        echo -e "${RED}  ✗ Failed to build ${basename}.tex ($COMPILER)${NC}"
+        ((FAILED++))
+        FAILED_FILES="$FAILED_FILES\n  - ${tex_file#$REPO_ROOT/}"
+        # Clean auxiliary files even on failure
+        rm -f *.aux *.log *.out *.toc *.fdb_latexmk *.fls *.nav *.snm *.vrb
+    fi
+
+    cd "$REPO_ROOT"
+}
+
+# Build function for in-place builds (keeps PDF in source dir, generates PNG)
+build_tex_inplace() {
+    local tex_file="$1"
+    local basename=$(basename "$tex_file" .tex)
+    local dirname=$(dirname "$tex_file")
+
+    echo ""
+    echo -e "${BLUE}Building: ${tex_file#$REPO_ROOT/}${NC}"
+
+    cd "$dirname"
+
+    # Check if file uses fontspec (requires xelatex)
+    if grep -q '\\usepackage{fontspec}' "$tex_file" 2>/dev/null; then
+        COMPILER="xelatex"
+    else
+        COMPILER="pdflatex"
+    fi
+
+    if $COMPILER -interaction=nonstopmode "${basename}.tex" > /dev/null 2>&1; then
+        $COMPILER -interaction=nonstopmode "${basename}.tex" > /dev/null 2>&1
+
+        if [ -f "${basename}.pdf" ]; then
+            echo -e "${GREEN}  ✓ ${basename}.pdf ($COMPILER)${NC}"
+            ((BUILT++))
+
+            # Generate PNG preview if pdftoppm is available
+            if command -v pdftoppm &> /dev/null; then
+                pdftoppm -png -r 150 -singlefile "${basename}.pdf" "${basename}-preview"
+                echo -e "${GREEN}  ✓ ${basename}-preview.png${NC}"
+            fi
+        fi
+
+        # Clean auxiliary files
+        rm -f *.aux *.log *.out *.toc *.fdb_latexmk *.fls *.nav *.snm *.vrb
+    else
+        echo -e "${RED}  ✗ Failed to build ${basename}.tex ($COMPILER)${NC}"
         ((FAILED++))
         FAILED_FILES="$FAILED_FILES\n  - ${tex_file#$REPO_ROOT/}"
         # Clean auxiliary files even on failure
@@ -122,9 +173,9 @@ done
 echo ""
 echo -e "${YELLOW}Building Compliance Documents...${NC}"
 
-# CUI Cover Sheets
+# CUI Cover Sheets (build in-place with PNG preview)
 for tex_file in "$REPO_ROOT/Compliance-Marking/CUI"/*.tex; do
-    [ -e "$tex_file" ] && build_tex "$tex_file" "$DIST_DIR/compliance"
+    [ -e "$tex_file" ] && build_tex_inplace "$tex_file"
 done
 
 # Clean up auxiliary files across the entire repo
