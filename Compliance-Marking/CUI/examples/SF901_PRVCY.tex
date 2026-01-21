@@ -6,29 +6,6 @@
 
 \documentclass[letterpaper]{article}
 
-\usepackage[
-    paperwidth=8.5in,
-    paperheight=11in,
-    margin=0in
-]{geometry}
-
-\usepackage{xcolor}
-\usepackage{tikz}
-\usetikzlibrary{calc}
-\usepackage{fontspec}
-
-%% =============================================================================
-%% CUSTOMIZABLE VARIABLES
-%% =============================================================================
-
-\newlength{\pagemargin}
-\setlength{\pagemargin}{0.25in}
-
-\definecolor{cuipurple}{RGB}{42,29,73}
-
-\newfontfamily{\cuifont}{Cinzel}
-
-% CUI categories for Privacy Information
 \newcommand{\cuicategories}{%
     \textbf{CUI//SP-PRVCY}\\[12pt]
     Privacy Act Information\\[6pt]
@@ -46,86 +23,4 @@
     Email: privacy@example.gov%
 }
 
-%% =============================================================================
-%% END CUSTOMIZABLE VARIABLES
-%% =============================================================================
-
-\pagestyle{empty}
-\setmainfont{Times New Roman}
-
-\begin{document}
-
-\begin{tikzpicture}[remember picture, overlay]
-    \pgfmathsetlengthmacro{\rightedge}{8.5in - \pagemargin}
-    \pgfmathsetlengthmacro{\bottomedge}{11in - \pagemargin}
-
-    % Purple background
-    \fill[cuipurple]
-        ($(current page.north west) + (\pagemargin, -\pagemargin)$)
-        rectangle
-        ($(current page.north west) + (\rightedge, -\bottomedge)$);
-
-    %% ===== TOP SECTION (on purple) =====
-    \node[anchor=north, text=white, font=\cuifont\fontsize{72}{72}\selectfont\bfseries]
-        at ($(current page.north west) + (4.25in, -0.5in)$) {CUI};
-
-    \node[anchor=north, text=white, font=\fontsize{22}{22}\selectfont]
-        at ($(current page.north west) + (4.25in, -1.55in)$) {ATTENTION};
-
-    %% ===== TOP WHITE BOX (categories area) =====
-    \fill[white]
-        ($(current page.north west) + (1.5in, -1.95in)$)
-        rectangle
-        ($(current page.north west) + (7.0in, -6.40in)$);
-
-    \node[anchor=north, text=black, font=\fontsize{10}{13}\selectfont,
-          text width=5in, align=center]
-        at ($(current page.north west) + (4.25in, -2.05in)$) {\cuicategories};
-
-    %% ===== MIDDLE ATTENTION HEADING =====
-    \node[anchor=north, text=white, font=\fontsize{22}{22}\selectfont]
-        at ($(current page.north west) + (4.25in, -6.55in)$) {ATTENTION};
-
-    %% ===== BOTTOM WHITE BOX =====
-    \fill[white]
-        ($(current page.north west) + (1.5in, -6.92in)$)
-        rectangle
-        ($(current page.north west) + (7.0in, -9.25in)$);
-
-    \node[anchor=north, text=black, font=\fontsize{10}{13}\selectfont,
-          text width=4.8in, align=center]
-        at ($(current page.north west) + (4.25in, -7.04in)$) {%
-            All individuals handling this information are required to protect\\
-            it from unauthorized disclosure.%
-        };
-
-    \node[anchor=north, text=black, font=\fontsize{9}{12}\selectfont,
-          text width=5.3in, align=center]
-        at ($(current page.north west) + (4.25in, -7.48in)$) {%
-            Handling, storage, reproduction, and disposition of the attached document(s) must\\
-            be in accordance with 32 CFR Part 2002 and applicable agency policy.%
-        };
-
-    \node[anchor=north, text=black, font=\fontsize{9}{12}\selectfont,
-          text width=5.5in, align=center]
-        at ($(current page.north west) + (4.25in, -7.90in)$) {%
-            Access to and dissemination of Controlled Unclassified Information shall be\\
-            allowed as necessary and permissible to any individual(s), organization(s), or\\
-            grouping(s) of users, provided such access or dissemination is consistent with or in\\
-            furtherance of a Lawful Government Purpose and in a manner consistent with\\
-            applicable law, regulations, and Government-wide policies.%
-        };
-
-    \node[anchor=south east, text=black, font=\fontsize{7}{9}\selectfont, align=right]
-        at ($(current page.north west) + (6.90in, -9.20in)$) {%
-            Adapted from: Standard Form 901 (11-18)\\
-            Prescribed by GSA/ISOO | 32 CFR 2002%
-        };
-
-    %% ===== BOTTOM CUI BANNER =====
-    \node[anchor=center, text=white, font=\cuifont\fontsize{72}{72}\selectfont\bfseries]
-        at ($(current page.north west) + (4.25in, -10.0in)$) {CUI};
-
-\end{tikzpicture}
-
-\end{document}
+\input{../SF901-template.tex}

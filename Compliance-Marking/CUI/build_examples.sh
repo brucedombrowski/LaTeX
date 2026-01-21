@@ -55,7 +55,9 @@ for texfile in "${TEX_FILES[@]}"; do
     echo -e "${YELLOW}Compiling $texfile...${NC}"
 
     # Check if file uses fontspec (requires xelatex) or can use pdflatex
-    if grep -q '\\usepackage{fontspec}' "$texfile" 2>/dev/null; then
+    # Also check if it inputs SF901-template which uses fontspec
+    if grep -q '\\usepackage{fontspec}' "$texfile" 2>/dev/null || \
+       grep -q 'SF901-template' "$texfile" 2>/dev/null; then
         COMPILER="xelatex"
     else
         COMPILER="pdflatex"
