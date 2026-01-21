@@ -126,6 +126,12 @@ Documentation-Generation/
 │       ├── project_kickoff.tex
 │       └── requirements_review.tex
 │
+├── TechnicalReport/          # Technical reports and assessments
+│   ├── templates/
+│   │   └── technical_report_base.tex
+│   └── examples/
+│       └── DRY_Assessment_Report.tex
+│
 └── Attestations/             # Software attestation documents
     ├── templates/
     │   └── attestation-template.tex  # Shared template (like SF901-template)
@@ -229,6 +235,33 @@ January 21, 2026 | 10:00 AM | Conference Room A
 
 \end{document}
 ```
+
+### TechnicalReport - Technical Reports and Assessments
+
+**Purpose:** Formal technical reports for assessments, analysis results, and project documentation.
+
+**Structure:**
+- `templates/technical_report_base.tex` - Base template with title page, TOC, headers/footers
+- `examples/` - Report implementations using the template
+
+**Required Variables:**
+```latex
+\newcommand{\ReportTitle}{Report Title}
+\newcommand{\ReportSubtitle}{Subtitle}
+\newcommand{\ReportID}{ASSESS-2026-001}
+\newcommand{\ReportDate}{January 21, 2026}
+\newcommand{\ReportVersion}{1.0}
+\newcommand{\ReportAuthor}{Author Name}
+\newcommand{\HeaderLeft}{Header Text}
+\newcommand{\FooterLeft}{Footer Text}
+```
+
+**Content Commands:**
+- `\ReportContent` - Main body of the report (required)
+- `\TitlePageExtras` - Additional title page content (optional)
+- `\ReportAppendix` - Appendix content (optional)
+
+**Example:** See `examples/DRY_Assessment_Report.tex` for a complete implementation.
 
 ### Attestations - Software Version Documentation
 
