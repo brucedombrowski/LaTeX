@@ -13,15 +13,15 @@ Simple PDF manipulation tools for LaTeX users. Merge multiple PDFs with an easy 
 ### Merge PDFs
 
 1. Create a new folder anywhere on your computer
-2. Copy `build.ps1` into that folder
+2. Copy `merge-pdf.ps1` into that folder
 3. Copy the PDFs you want to merge into the same folder
-4. Right-click `build.ps1` and select "Run with PowerShell"
+4. Right-click `merge-pdf.ps1` and select "Run with PowerShell"
 5. Follow the prompts to select merge order
 6. Output: `merged.pdf`
 
 ```
 MyFolder/
-├── build.ps1         # The script
+├── merge-pdf.ps1     # The script
 ├── report.pdf        # Your first PDF
 ├── appendix.pdf      # Your second PDF
 └── merged.pdf        # Output (created by script)
@@ -31,10 +31,10 @@ MyFolder/
 
 ```bash
 # Make executable (one time)
-chmod +x build.sh
+chmod +x merge-pdf.sh
 
 # Run
-./build.sh
+./merge-pdf.sh
 ```
 
 ## Usage
@@ -134,11 +134,11 @@ sudo tlmgr install pdfpages
 
 ```
 PdfTools/
-├── build.ps1     # Windows PowerShell script
-├── build.sh      # macOS/Linux script
-├── README.md     # This file
-├── AGENTS.md     # AI agent instructions
-└── Examples/     # Sample CUI cover sheets for testing
+├── merge-pdf.ps1     # Windows PowerShell script
+├── merge-pdf.sh      # macOS/Linux script
+├── README.md         # This file
+├── AGENTS.md         # AI agent instructions
+└── Examples/         # Sample CUI cover sheets for testing
     ├── build_tex_to_pdf.sh   # Compiles examples, generates PNGs
     ├── CUI_Introduction.tex  # Title page for document package
     ├── SF901_BASIC.tex       # CUI//BASIC example
@@ -149,7 +149,7 @@ PdfTools/
 
 ## Examples
 
-The `Examples/` folder contains sample SF901 CUI cover sheets for testing the merge functionality:
+The `Examples/` folder contains sample SF901 CUI cover sheets for testing the merge functionality. These are derived from the canonical template at [Compliance-Marking/CUI/SF901.tex](../Compliance-Marking/CUI/SF901.tex):
 
 | File | CUI Category | Example Document |
 |------|--------------|------------------|
@@ -164,7 +164,7 @@ To test:
 cd Examples
 ./build_tex_to_pdf.sh   # Compile all .tex files and generate PNGs
 cd ..
-./build.sh              # Merge the PDFs interactively
+./merge-pdf.sh          # Merge the PDFs interactively
 ```
 
 ## Future Features

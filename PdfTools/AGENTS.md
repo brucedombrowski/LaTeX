@@ -25,7 +25,7 @@ Users are expected to have LaTeX already installed (MiKTeX on Windows, TeX Live 
 ## User Workflow (Windows)
 
 The primary use case is a Windows user who:
-1. Downloads a single script (`build.ps1`)
+1. Downloads a single script (`merge-pdf.ps1`)
 2. Creates a folder with the script and their PDFs
 3. Runs the script
 4. Interactively selects PDF order
@@ -33,7 +33,7 @@ The primary use case is a Windows user who:
 
 ```
 UserFolder/
-├── build.ps1        # Downloaded script
+├── merge-pdf.ps1    # Downloaded script
 ├── document1.pdf    # User's first PDF
 ├── document2.pdf    # User's second PDF
 └── merged.pdf       # Output (generated)
@@ -105,8 +105,8 @@ Uses a dynamically generated `.tex` file with the `pdfpages` package:
 
 ```
 PdfTools/
-├── build.sh          # Unix/Linux merge script
-├── build.ps1         # Windows PowerShell merge script
+├── merge-pdf.sh      # Unix/Linux merge script
+├── merge-pdf.ps1     # Windows PowerShell merge script
 ├── release.sh        # Cleans generated files for git commits
 ├── README.md         # User documentation
 ├── AGENTS.md         # This file
