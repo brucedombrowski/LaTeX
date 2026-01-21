@@ -34,5 +34,4 @@ merge_temp.*
 *.swp
 *.swo
 
-# Build output
-dist/
+# Temporary build artifacts (dist/ is tracked for example outputs)
