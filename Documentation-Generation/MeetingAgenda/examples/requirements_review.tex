@@ -1,0 +1,186 @@
+% ============================================================================
+% SYSTEMS REQUIREMENTS REVIEW (SRR) MEETING AGENDA
+% ============================================================================
+% Example: LaTeX Toolkit requirements review
+% Phase: Requirements Analysis
+% ============================================================================
+
+\documentclass[11pt]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in]{geometry}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{hyperref}
+
+% ============================================================================
+% DOCUMENT VARIABLES - EDIT THESE
+% ============================================================================
+\newcommand{\MeetingTitle}{LaTeX Toolkit Requirements Review}
+\newcommand{\MeetingDate}{January 19, 2026}
+\newcommand{\MeetingTime}{2:00 PM EST}
+\newcommand{\MeetingDuration}{60 minutes}
+\newcommand{\MeetingLocation}{Virtual / Claude Code IDE}
+\newcommand{\MeetingDialIn}{N/A - AI-assisted development session}
+\newcommand{\MeetingOrganizer}{B. Dombrowski}
+\newcommand{\MeetingFacilitator}{B. Dombrowski}
+\newcommand{\MeetingNoteTaker}{Claude (AI Agent)}
+
+% ============================================================================
+% COLORS AND STYLING
+% ============================================================================
+\definecolor{headerblue}{RGB}{0, 51, 102}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=headerblue,
+    urlcolor=headerblue
+}
+
+% ============================================================================
+% HEADER AND FOOTER
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{gray}{\MeetingTitle}}
+\fancyhead[R]{\small\textcolor{gray}{\MeetingDate}}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================================
+% DOCUMENT
+% ============================================================================
+\begin{document}
+
+% ----------------------------------------------------------------------------
+% TITLE BLOCK
+% ----------------------------------------------------------------------------
+\begin{center}
+    {\Large\textbf{\MeetingTitle}}\\[0.5em]
+    {\normalsize\textcolor{gray}{Systems Engineering Phase: Requirements Analysis}}
+\end{center}
+
+\vspace{1em}
+
+% ----------------------------------------------------------------------------
+% MEETING DETAILS
+% ----------------------------------------------------------------------------
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+    \textbf{Date:} & \MeetingDate \\
+    \textbf{Time:} & \MeetingTime{} (\MeetingDuration) \\
+    \textbf{Location:} & \MeetingLocation \\
+    \textbf{Dial-in:} & \MeetingDialIn \\
+    \textbf{Organizer:} & \MeetingOrganizer \\
+    \textbf{Facilitator:} & \MeetingFacilitator \\
+    \textbf{Note Taker:} & \MeetingNoteTaker \\
+\end{tabularx}
+
+\vspace{1em}
+
+% ----------------------------------------------------------------------------
+% ATTENDEES
+% ----------------------------------------------------------------------------
+\noindent\textbf{Attendees:}
+
+\begin{itemize}
+    \item B. Dombrowski, Project Lead / Systems Engineer
+    \item Claude, AI Development Agent
+\end{itemize}
+
+\vspace{0.5em}
+
+% ----------------------------------------------------------------------------
+% MEETING OBJECTIVE
+% ----------------------------------------------------------------------------
+\noindent\textbf{Objective:}
+
+Review and baseline requirements for the Compliance-Marking component (CUI cover sheets). Validate the decision to recreate SF901 in LaTeX rather than programmatically editing the GSA PDF.
+
+\vspace{1em}
+
+% ----------------------------------------------------------------------------
+% AGENDA
+% ----------------------------------------------------------------------------
+\noindent\textbf{Agenda:}
+
+\vspace{0.5em}
+
+\begin{tabularx}{\textwidth}{@{}p{1.2cm}Xr@{}}
+    \toprule
+    \textbf{Time} & \textbf{Topic} & \textbf{Lead} \\
+    \midrule
+    0:00 & Review: DecisionDocument component status & Claude \\
+    0:05 & New requirement: CUI cover pages (SF901) & B. Dombrowski \\
+    0:15 & Regulatory context: 32 CFR Part 2002 & B. Dombrowski \\
+    0:25 & Technical options analysis & Claude \\
+    0:35 & Decision: LaTeX recreation vs PDF manipulation & B. Dombrowski \\
+    0:45 & Implementation approach and template fields & Claude \\
+    0:55 & Action items and next steps & B. Dombrowski \\
+    \bottomrule
+\end{tabularx}
+
+\vspace{1em}
+
+% ----------------------------------------------------------------------------
+% REQUIREMENTS UNDER REVIEW
+% ----------------------------------------------------------------------------
+\noindent\textbf{Requirements Under Review:}
+
+\begin{enumerate}
+    \item \textbf{REQ-CUI-001}: System shall generate SF901 CUI cover sheets
+    \item \textbf{REQ-CUI-002}: Cover sheets shall comply with 32 CFR Part 2002
+    \item \textbf{REQ-CUI-003}: Template shall support customizable CUI categories
+    \item \textbf{REQ-CUI-004}: Template shall support dissemination control markings
+    \item \textbf{REQ-CUI-005}: System shall work on airgapped Windows systems
+\end{enumerate}
+
+\vspace{1em}
+
+% ----------------------------------------------------------------------------
+% ACTION ITEMS
+% ----------------------------------------------------------------------------
+\noindent\textbf{Action Items:}
+
+\vspace{0.5em}
+
+\begin{tabularx}{\textwidth}{@{}Xlr@{}}
+    \toprule
+    \textbf{Action} & \textbf{Owner} & \textbf{Due Date} \\
+    \midrule
+    Create Decision Memorandum DM-2026-001 (SF901 approach) & Claude & Jan 19 \\
+    Download official SF901 PDF for reference & Claude & Jan 19 \\
+    Create SF901.tex template & Claude & Jan 19 \\
+    Create Compliance/CUI/ folder structure & Claude & Jan 19 \\
+    \bottomrule
+\end{tabularx}
+
+\vspace{1em}
+
+% ----------------------------------------------------------------------------
+% NOTES
+% ----------------------------------------------------------------------------
+\noindent\textbf{Notes:}
+
+\begin{itemize}
+    \item SF901 form has been stable since November 2018 (low maintenance burden)
+    \item LaTeX approach provides full control over customizable fields
+    \item No runtime dependency on external PDF tools
+    \item Decision documented in DM-2026-001
+\end{itemize}
+
+\vspace{1em}
+
+% ----------------------------------------------------------------------------
+% NEXT MEETING
+% ----------------------------------------------------------------------------
+\noindent\textbf{Next Meeting:}
+
+Design Review - After SF901 template implementation
+
+\end{document}

@@ -33,3 +33,6 @@ merge_temp.*
 *~
 *.swp
 *.swo
+
+# Build output
+dist/

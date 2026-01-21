@@ -1,0 +1,180 @@
+% ============================================================================
+% MEETING AGENDA TEMPLATE
+% ============================================================================
+% A generic, reusable template for formal meeting agendas.
+% Edit the DOCUMENT VARIABLES section below to customize.
+% ============================================================================
+
+\documentclass[11pt]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in]{geometry}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{hyperref}
+
+% ============================================================================
+% DOCUMENT VARIABLES - EDIT THESE
+% ============================================================================
+\newcommand{\MeetingTitle}{Meeting Title}
+\newcommand{\MeetingDate}{MMMM DD, YYYY}
+\newcommand{\MeetingTime}{HH:MM AM/PM}
+\newcommand{\MeetingDuration}{60 minutes}
+\newcommand{\MeetingLocation}{Location / Conference Room}
+\newcommand{\MeetingDialIn}{Optional dial-in or video link}
+\newcommand{\MeetingOrganizer}{Organizer Name}
+\newcommand{\MeetingFacilitator}{Facilitator Name}
+\newcommand{\MeetingNoteTaker}{Note Taker Name}
+
+% ============================================================================
+% COLORS AND STYLING
+% ============================================================================
+\definecolor{headerblue}{RGB}{0, 51, 102}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=headerblue,
+    urlcolor=headerblue
+}
+
+% ============================================================================
+% HEADER AND FOOTER
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{gray}{\MeetingTitle}}
+\fancyhead[R]{\small\textcolor{gray}{\MeetingDate}}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================================
+% DOCUMENT
+% ============================================================================
+\begin{document}
+
+% ----------------------------------------------------------------------------
+% TITLE BLOCK
+% ----------------------------------------------------------------------------
+\begin{center}
+    {\Large\textbf{\MeetingTitle}}\\[0.5em]
+    {\normalsize\textcolor{gray}{Meeting Agenda}}
+\end{center}
+
+\vspace{1em}
+
+% ----------------------------------------------------------------------------
+% MEETING DETAILS
+% ----------------------------------------------------------------------------
+\begin{tabularx}{\textwidth}{@{}lX@{}}
+    \textbf{Date:} & \MeetingDate \\
+    \textbf{Time:} & \MeetingTime{} (\MeetingDuration) \\
+    \textbf{Location:} & \MeetingLocation \\
+    \textbf{Dial-in:} & \MeetingDialIn \\
+    \textbf{Organizer:} & \MeetingOrganizer \\
+    \textbf{Facilitator:} & \MeetingFacilitator \\
+    \textbf{Note Taker:} & \MeetingNoteTaker \\
+\end{tabularx}
+
+\vspace{1em}
+
+% ----------------------------------------------------------------------------
+% ATTENDEES
+% ----------------------------------------------------------------------------
+\noindent\textbf{Attendees:}
+
+\begin{itemize}
+    \item Name 1, Title/Role
+    \item Name 2, Title/Role
+    \item Name 3, Title/Role
+\end{itemize}
+
+\vspace{0.5em}
+
+% ----------------------------------------------------------------------------
+% MEETING OBJECTIVE
+% ----------------------------------------------------------------------------
+\noindent\textbf{Objective:}
+
+Brief statement of what this meeting aims to accomplish.
+
+\vspace{1em}
+
+% ----------------------------------------------------------------------------
+% AGENDA
+% ----------------------------------------------------------------------------
+\noindent\textbf{Agenda:}
+
+\vspace{0.5em}
+
+\begin{tabularx}{\textwidth}{@{}p{1.2cm}Xr@{}}
+    \toprule
+    \textbf{Time} & \textbf{Topic} & \textbf{Lead} \\
+    \midrule
+    0:00 & Welcome and introductions & Facilitator \\
+    0:05 & Review agenda and objectives & Facilitator \\
+    0:10 & Topic 1: Description here & Lead Name \\
+    0:20 & Topic 2: Description here & Lead Name \\
+    0:35 & Topic 3: Description here & Lead Name \\
+    0:50 & Open discussion / Q\&A & All \\
+    0:55 & Action items and next steps & Facilitator \\
+    \bottomrule
+\end{tabularx}
+
+\vspace{1em}
+
+% ----------------------------------------------------------------------------
+% PRE-READ MATERIALS (OPTIONAL)
+% ----------------------------------------------------------------------------
+\noindent\textbf{Pre-Read Materials:}
+
+\begin{itemize}
+    \item Document 1 - Brief description
+    \item Document 2 - Brief description
+\end{itemize}
+
+\vspace{1em}
+
+% ----------------------------------------------------------------------------
+% ACTION ITEMS (TO BE FILLED DURING MEETING)
+% ----------------------------------------------------------------------------
+\noindent\textbf{Action Items:}
+
+\vspace{0.5em}
+
+\begin{tabularx}{\textwidth}{@{}Xlr@{}}
+    \toprule
+    \textbf{Action} & \textbf{Owner} & \textbf{Due Date} \\
+    \midrule
+    \textit{(To be captured during meeting)} & & \\
+    & & \\
+    & & \\
+    \bottomrule
+\end{tabularx}
+
+\vspace{1em}
+
+% ----------------------------------------------------------------------------
+% NOTES (TO BE FILLED DURING MEETING)
+% ----------------------------------------------------------------------------
+\noindent\textbf{Notes:}
+
+\vspace{0.5em}
+
+\textit{(To be captured during meeting)}
+
+\vspace{3em}
+
+% ----------------------------------------------------------------------------
+% NEXT MEETING
+% ----------------------------------------------------------------------------
+\noindent\textbf{Next Meeting:}
+
+Date, Time, Location (if recurring or follow-up scheduled)
+
+\end{document}

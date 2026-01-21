@@ -1,6 +1,8 @@
-# Program Decision Document Templates
+# Program Decision Document
 
-LaTeX templates for formal program decision documentation.
+LaTeX template for comprehensive, multi-page program decision documentation.
+
+**For single-page Decision Memorandums, see:** [../DecisionMemorandum/](../DecisionMemorandum/)
 
 ## Target Environment
 
@@ -28,13 +30,11 @@ Before using on an airgapped system, download and transfer via approved media:
 
 ### Build a PDF
 
-1. Edit the template with any text editor (Notepad, VS Code, etc.):
-   - `decision_memo.tex` - Brief decision memorandum
-   - `decision_document.tex` - Comprehensive decision document
+1. Edit `decision_document.tex` with any text editor (Notepad, VS Code, etc.)
 
 2. Double-click `build.bat` to compile the PDF
 
-3. Output: `decision_memo.pdf` or `decision_document.pdf`
+3. Output: `decision_document.pdf`
 
 ### Sign a PDF
 
@@ -47,18 +47,16 @@ Output: `<filename>_signed.pdf`
 
 ---
 
-## Templates
+## Template
 
 | Template | Description |
 |----------|-------------|
-| `decision_memo.tex` | Brief single-page decision memorandum |
 | `decision_document.tex` | Comprehensive multi-page decision document |
 
 ## Files
 
 ```
 DecisionDocument/
-├── decision_memo.tex       # Brief memo template
 ├── decision_document.tex   # Comprehensive template
 ├── logo.png                # Symlink to ../../assets/logo.png
 ├── build.bat               # Build script (Windows)
@@ -72,19 +70,6 @@ DecisionDocument/
 ```
 
 ## Template Customization
-
-### Decision Memorandum
-
-Edit the variables at the top of `decision_memo.tex`:
-
-```latex
-\newcommand{\UniqueID}{DM-YYYY-NNN}
-\newcommand{\DocumentDate}{MMMM DD, YYYY}
-\newcommand{\AuthorName}{Author Name}
-\newcommand{\AuthorTitle}{Title}
-\newcommand{\ToField}{Distribution}
-\newcommand{\SubjectField}{Subject Line Here}
-```
 
 ### Decision Document
 
@@ -101,12 +86,8 @@ Edit the variables at the top of `decision_document.tex`:
 ## Build Options
 
 ```batch
-:: Build both templates (default)
+:: Build the template
 build.bat
-
-:: Build specific template
-build.bat decision_memo
-build.bat decision_document
 ```
 
 ## Signing Details

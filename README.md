@@ -13,7 +13,8 @@ LaTeX templates and tools for document generation.
 
 ## Quick Links
 
-- **Decision Memos:** [Documentation-Generation/DecisionDocument/README.md](Documentation-Generation/DecisionDocument/README.md)
+- **Decision Memos:** [Documentation-Generation/DecisionMemorandum/](Documentation-Generation/DecisionMemorandum/)
+- **Decision Documents:** [Documentation-Generation/DecisionDocument/README.md](Documentation-Generation/DecisionDocument/README.md)
 - **Decision Index:** [Decisions/](Decisions/)
 - **Slide Decks:** [Documentation-Generation/SlideDecks/](Documentation-Generation/SlideDecks/)
 - **Meeting Agendas:** [Documentation-Generation/MeetingAgenda/](Documentation-Generation/MeetingAgenda/)

@@ -18,9 +18,10 @@ This toolkit follows the [SpeakUp project](https://github.com/brucedombrowski/Sp
 
 | Capability | Component | Status |
 |------------|-----------|--------|
+| **Decision Memorandums** | Documentation-Generation/DecisionMemorandum/ | Production |
 | **Decision Documents** | Documentation-Generation/DecisionDocument/ | Production |
 | **Slide Decks** | Documentation-Generation/SlideDecks/ | Planned |
-| **Meeting Agendas** | Documentation-Generation/MeetingAgenda/ | Planned |
+| **Meeting Agendas** | Documentation-Generation/MeetingAgenda/ | Production |
 | **CUI Cover Sheets** | Compliance-Marking/CUI/ | Production |
 | **Export Markings** | Compliance-Marking/Export/ | Planned |
 | **PDF Merging** | PdfTools/ | Production |
@@ -62,6 +63,7 @@ This toolkit follows the [SpeakUp project](https://github.com/brucedombrowski/Sp
 
 | Component | Description | AGENTS.md |
 |-----------|-------------|-----------|
+| [scripts/](scripts/) | Centralized build tools (build.sh, release.sh) | — |
 | [assets/](assets/) | Shared images and logos | — |
 | [Documentation-Generation/](Documentation-Generation/) | Document templates (decisions, slides, agendas) | See below |
 | [Decisions/](Decisions/) | Formal Decision Memorandums archive | — |
@@ -88,39 +90,48 @@ Distributable Output (PDF)
 
 ```
 Documentation-Generation/
-├── DecisionDocument/         # Formal program decisions
-│   ├── AGENTS.md             # Component-specific instructions
-│   ├── README.md             # User documentation
-│   ├── decision_memo.tex     # Brief single-page memo
-│   ├── decision_document.tex # Comprehensive multi-page document
-│   ├── build.sh / build.ps1 / build.bat
+├── DecisionMemorandum/       # Single-page decision memos
+│   ├── AGENTS.md
+│   ├── decision_memo.tex
+│   └── sign.* -> ../DecisionDocument/sign.*  # Symlinks to signing tools
+│
+├── DecisionDocument/         # Multi-page program decisions
+│   ├── AGENTS.md
+│   ├── README.md
+│   ├── decision_document.tex
 │   ├── sign.sh / sign.ps1 / sign.bat
 │   └── PdfSigner.exe         # Windows signing tool
 │
 ├── SlideDecks/               # Presentation slide decks (Beamer)
-│   ├── build.sh              # Unix/Linux build script
-│   ├── build.ps1             # Windows PowerShell build script
 │   ├── templates/            # Reusable slide templates
 │   │   └── standard_brief.tex
 │   └── examples/             # Example presentations
 │
 └── MeetingAgenda/            # Meeting agenda documents
-    ├── build.sh              # Unix/Linux build script
-    ├── build.ps1             # Windows PowerShell build script
     ├── templates/            # Reusable agenda templates
-    │   └── standard_agenda.tex
-    └── examples/             # Example agendas
+    │   └── meeting_agenda.tex
+    └── examples/             # Example agendas (SE lifecycle)
+        ├── project_kickoff.tex
+        └── requirements_review.tex
 ```
 
-### DecisionDocument - Formal Decisions
+### DecisionMemorandum - Brief Decisions
 
-**Purpose:** Program decision documentation with digital signatures and full traceability
+**Purpose:** Single-page formal records of program decisions
+
+**AGENTS.md:** [Documentation-Generation/DecisionMemorandum/AGENTS.md](Documentation-Generation/DecisionMemorandum/AGENTS.md)
+
+Template: `decision_memo.tex`
+
+### DecisionDocument - Comprehensive Decisions
+
+**Purpose:** Multi-page program decision documentation with full traceability
 
 **AGENTS.md:** [Documentation-Generation/DecisionDocument/AGENTS.md](Documentation-Generation/DecisionDocument/AGENTS.md)
 
-Templates:
-- `decision_memo.tex` - Brief single-page Decision Memorandum
-- `decision_document.tex` - Comprehensive multi-page Program Decision Document
+Template: `decision_document.tex`
+
+**Note:** Signing tools (PdfSigner.exe, sign scripts) live here and are symlinked from other components.
 
 ### SlideDecks - Beamer Presentations
 
@@ -130,7 +141,6 @@ Templates:
 1. **Document class:** Use `beamer` class
 2. **Theme:** Prefer minimal themes (e.g., `default`, `metropolis`)
 3. **Frames:** One concept per frame
-4. **Build scripts:** Follow existing patterns from DecisionDocument/
 
 Example minimal slide deck:
 
@@ -232,16 +242,32 @@ January 21, 2026 | 10:00 AM | Conference Room A
 
 ### Build Scripts
 
-All components follow the same patterns:
-- `build.sh` for Unix/Linux (bash)
-- `build.ps1` for Windows PowerShell
-- `build.bat` for Windows batch (double-click friendly)
+Centralized build tools in `scripts/`:
 
-Scripts should:
-- Check for LaTeX installation
-- Run compiler appropriate number of times (typically 2-3 for references)
-- Clean up auxiliary files (`.aux`, `.log`, `.out`, `.toc`, etc.)
-- Provide clear error messages
+| Script | Purpose |
+|--------|---------|
+| `scripts/build.sh` | Build any single .tex file |
+| `scripts/release.sh` | Build all documents to `dist/` |
+
+**Usage:**
+
+```bash
+# Build a single document
+./scripts/build.sh path/to/document.tex
+
+# Build with Word output (requires pandoc)
+./scripts/build.sh path/to/document.tex --docx
+
+# Build all documents for release
+./scripts/release.sh
+
+# Clean dist/ directory
+./scripts/release.sh --clean
+```
+
+**Output:**
+- Single builds: PDF in same directory as source
+- Release builds: All PDFs in `dist/` (organized by type)
 
 ### Digital Signatures
 
@@ -256,14 +282,16 @@ Use the signing infrastructure in `Documentation-Generation/DecisionDocument/`:
 When building documents as an AI agent:
 
 ```bash
-# Navigate to component directory
-cd Documentation-Generation/DecisionDocument/
+# Build a single document
+./scripts/build.sh Documentation-Generation/DecisionDocument/decision_document.tex
 
-# Build PDF(s)
-./build.sh
+# Build all documents for release
+./scripts/release.sh
 
 # Optionally sign with source traceability
-TEX_HASH=$(shasum -a 256 document.tex | cut -c1-12)
+cd Documentation-Generation/DecisionDocument/
+TEX_HASH=$(shasum -a 256 decision_document.tex | cut -c1-12)
+./sign.sh decision_document.pdf
 # ... (see Documentation-Generation/DecisionDocument/AGENTS.md for full workflow)
 ```
 
@@ -314,27 +342,38 @@ LaTeX/
 ├── AGENTS.md                 # This file - repository-wide instructions
 ├── README.md                 # User documentation
 ├── .gitignore                # Git ignore rules
+│
+├── scripts/                  # Centralized build tools
+│   ├── build.sh              # Build any single .tex file
+│   └── release.sh            # Build all documents to dist/
+│
 ├── assets/                   # Shared images, logos (symlinked from subfolders)
 │   ├── logo.png
 │   └── logo.svg
 │
+├── dist/                     # Build output (git-ignored)
+│   ├── decisions/
+│   ├── meetings/
+│   └── compliance/
+│
 ├── Documentation-Generation/ # All document generation
-│   ├── DecisionDocument/     # Formal decisions (with signing)
+│   ├── DecisionMemorandum/   # Single-page decision memos
+│   ├── DecisionDocument/     # Multi-page decisions (with signing tools)
 │   ├── SlideDecks/           # Beamer presentations
 │   └── MeetingAgenda/        # Meeting agendas
 │
 ├── Decisions/                # Formal Decision Memorandums (cross-cutting)
 │
-├── Compliance-Marking/               # Compliance templates
+├── Compliance-Marking/       # Compliance templates
 │   ├── AGENTS.md
 │   ├── CUI/                  # SF901 cover sheets
 │   ├── Export/               # Export control (future)
 │   └── Security/             # Security compliance (future)
 │
-└── PdfTools/                 # PDF manipulation
+└── PdfTools/                 # PDF manipulation (interactive merge tool)
     ├── AGENTS.md
     ├── README.md
-    ├── build.sh / build.ps1
+    ├── build.sh              # PDF merge script (not LaTeX build)
     └── Examples/
 ```
 
@@ -348,34 +387,54 @@ LaTeX/
 4. Add build scripts following existing patterns
 5. Update this root `AGENTS.md` with component entry
 
+### Creating a New Decision Memorandum
+
+1. Copy template from `Documentation-Generation/DecisionMemorandum/decision_memo.tex`
+2. Edit document variables at top of `.tex` file
+3. Build: `./scripts/build.sh Documentation-Generation/DecisionMemorandum/decision_memo.tex`
+4. Sign with `./sign.sh` for distribution (from DecisionMemorandum/)
+5. Move final PDF to `Decisions/`
+
 ### Creating a New Decision Document
 
-1. Copy template from `Documentation-Generation/DecisionDocument/`
+1. Copy template from `Documentation-Generation/DecisionDocument/decision_document.tex`
 2. Edit document variables at top of `.tex` file
-3. Run `./build.sh` from `Documentation-Generation/DecisionDocument/`
-4. Sign with `./sign.sh` for distribution
+3. Build: `./scripts/build.sh Documentation-Generation/DecisionDocument/decision_document.tex`
+4. Sign with `./sign.sh` for distribution (from DecisionDocument/)
+5. Move final PDF to `Decisions/`
 
 ### Creating a New Slide Deck
 
 1. Copy template from `Documentation-Generation/SlideDecks/templates/`
 2. Edit content in `.tex` file
-3. Run `./build.sh` or `.\build.ps1` from `Documentation-Generation/SlideDecks/`
+3. Build: `./scripts/build.sh path/to/your_slides.tex`
 4. Review generated PDF
 5. Optionally sign for distribution
 
 ### Creating a New Meeting Agenda
 
-1. Copy template from `Documentation-Generation/MeetingAgenda/templates/`
+1. Copy template from `Documentation-Generation/MeetingAgenda/templates/meeting_agenda.tex`
 2. Edit meeting metadata (date, time, location, attendees)
 3. Fill in timed agenda items
-4. Run `./build.sh` or `.\build.ps1` from `Documentation-Generation/MeetingAgenda/`
+4. Build: `./scripts/build.sh path/to/your_agenda.tex`
 5. Review generated PDF
+
+### Building All Documents
+
+```bash
+# Build everything and output to dist/
+./scripts/release.sh
+
+# Clean the dist/ directory
+./scripts/release.sh --clean
+```
 
 ### Testing Changes
 
 After modifying any component:
-1. Run the build script
+1. Build with `./scripts/build.sh path/to/file.tex`
 2. Verify PDF generates without errors
 3. Check formatting and layout
 4. Verify cross-references and page numbers
-5. Test on target platform (Windows if possible)
+5. Run full release build: `./scripts/release.sh`
+6. Test on target platform (Windows if possible)

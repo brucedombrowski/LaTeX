@@ -4,12 +4,13 @@ Instructions for AI agents working with this component.
 
 ## Project Overview
 
-This component (`Documentation-Generation/DecisionDocument/`) provides LaTeX templates for formal program decision documentation, adapted from NASA's Memorandum of Agreement format.
+This component (`Documentation-Generation/DecisionDocument/`) provides the LaTeX template for comprehensive, multi-page Program Decision Documents, adapted from NASA's Memorandum of Agreement format.
 
 **Parent repository:** See [../../AGENTS.md](../../AGENTS.md) for repository-wide instructions.
 
 **Related components:**
-- `../../Decisions/` - Where generated Decision Memorandums are stored
+- `../DecisionMemorandum/` - Single-page Decision Memorandum template
+- `../../Decisions/` - Where generated decision documents are stored
 - `../../assets/` - Shared logos (symlinked here as `logo.png`, `logo.svg`)
 - `../../Compliance-Marking/AGENTS.md` - Decision Memorandum Index and requirements
 
@@ -22,12 +23,11 @@ This component (`Documentation-Generation/DecisionDocument/`) provides LaTeX tem
 
 Also supports macOS/Linux for development.
 
-## Templates
+## Template
 
 | File | Description |
 |------|-------------|
-| `decision_memo.tex` | Brief Decision Memorandum format for single-page decisions |
-| `decision_document.tex` | Comprehensive decision document with full traceability |
+| `decision_document.tex` | Comprehensive multi-page decision document with full traceability |
 
 ## Build Instructions
 
@@ -35,13 +35,13 @@ Use the provided build scripts:
 
 ```bash
 # macOS/Linux
-./build.sh [decision_memo|decision_document|both]
+./build.sh
 
 # Windows (batch - double-click friendly)
-build.bat [decision_memo|decision_document|both]
+build.bat
 
 # Windows (PowerShell)
-.\build.ps1 [decision_memo|decision_document|both]
+.\build.ps1
 ```
 
 The build scripts:
@@ -180,7 +180,6 @@ Use ANSI/NIST standard date format placeholders:
 
 ```
 DecisionDocument/
-├── decision_memo.tex             # Brief Decision Memorandum template
 ├── decision_document.tex         # Comprehensive decision template
 ├── logo.png -> ../../assets/logo.png  # Symlink to shared logo
 ├── logo.svg -> ../../assets/logo.svg  # Symlink to shared logo source
