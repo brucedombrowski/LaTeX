@@ -1,1 +1,1 @@
-../DecisionDocument/sign.bat
+../../scripts/sign-pdf.bat

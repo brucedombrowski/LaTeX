@@ -1,1 +1,1 @@
-../DecisionDocument/sign.sh
+../../scripts/sign-pdf.sh

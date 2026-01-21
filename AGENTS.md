@@ -254,6 +254,10 @@ Centralized build tools in `scripts/`:
 | `scripts/release.sh` | Build all documents to `dist/` |
 | `scripts/merge-pdf.sh` | Merge multiple PDFs (interactive) |
 | `scripts/merge-pdf.ps1` | Merge multiple PDFs (Windows PowerShell) |
+| `scripts/sign-pdf.sh` | Sign PDFs with digital certificates |
+| `scripts/sign-pdf.ps1` | Sign PDFs (Windows PowerShell) |
+| `scripts/sign-pdf.bat` | Sign PDFs (Windows batch) |
+| `bin/PdfSigner.exe` | PDF signing tool for Windows |
 
 **Usage:**
 
@@ -281,11 +285,13 @@ Centralized build tools in `scripts/`:
 
 ### Digital Signatures
 
-Use the signing infrastructure in `Documentation-Generation/DecisionDocument/`:
-- `sign.sh` / `sign.bat` / `sign.ps1`
-- `PdfSigner.exe` for Windows
+Use the signing infrastructure in `scripts/`:
+- `sign-pdf.sh` / `sign-pdf.bat` / `sign-pdf.ps1`
+- `bin/PdfSigner.exe` for Windows (download from [PDFSigner releases](https://github.com/brucedombrowski/PDFSigner/releases))
 - PIV/CAC smart card support
 - Software certificate support
+
+Symlinks exist in DecisionDocument/ and DecisionMemorandum/ for convenience.
 
 ### AI Agent Build Workflow
 
@@ -357,7 +363,13 @@ LaTeX/
 │   ├── build-tex.sh          # Build any single .tex file
 │   ├── release.sh            # Build all documents to dist/
 │   ├── merge-pdf.sh          # PDF merge utility (macOS/Linux)
-│   └── merge-pdf.ps1         # PDF merge utility (Windows)
+│   ├── merge-pdf.ps1         # PDF merge utility (Windows)
+│   ├── sign-pdf.sh           # PDF signing (macOS/Linux)
+│   ├── sign-pdf.ps1          # PDF signing (Windows PowerShell)
+│   └── sign-pdf.bat          # PDF signing (Windows batch)
+│
+├── bin/                      # Executable binaries
+│   └── PdfSigner.exe         # PDF signing tool for Windows
 │
 ├── assets/                   # Shared images, logos (symlinked from subfolders)
 │   ├── logo.png

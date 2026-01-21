@@ -1,1 +1,1 @@
-../DecisionDocument/sign.ps1
+../../scripts/sign-pdf.ps1
