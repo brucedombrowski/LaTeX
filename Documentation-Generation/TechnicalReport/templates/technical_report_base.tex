@@ -1,0 +1,124 @@
+% ============================================================================
+% TECHNICAL REPORT BASE TEMPLATE
+% ============================================================================
+% This is the shared base template for all technical reports.
+% Individual reports should define variables and \input this file.
+%
+% Required Variables:
+%   \ReportTitle        - Main title of the report
+%   \ReportSubtitle     - Subtitle or description
+%   \ReportID           - Document identifier (e.g., ASSESS-2026-001)
+%   \ReportDate         - Report date
+%   \ReportVersion      - Version number
+%   \ReportAuthor       - Author or generating system
+%   \HeaderLeft         - Left header text
+%   \FooterLeft         - Left footer text
+%
+% Optional Variables:
+%   \TitlePageExtras    - Additional content for title page (default: empty)
+%
+% Required Content Commands:
+%   \ReportContent      - Main body of the report
+%
+% Optional Content Commands:
+%   \ReportAppendix     - Appendix content (default: empty)
+% ============================================================================
+
+\documentclass[11pt,letterpaper]{article}
+
+% ============================================================================
+% PACKAGES
+% ============================================================================
+\usepackage[margin=1in, headheight=14pt]{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{lastpage}
+
+% ============================================================================
+% DOCUMENT CONFIGURATION
+% ============================================================================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue
+}
+
+% Colors
+\definecolor{headerblue}{RGB}{0, 51, 102}
+\definecolor{successgreen}{RGB}{34, 139, 34}
+\definecolor{warningyellow}{RGB}{204, 153, 0}
+\definecolor{errorred}{RGB}{178, 34, 34}
+
+% Header/Footer Configuration
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[L]{\small\textbf{\HeaderLeft}}
+\fancyhead[R]{\small \ReportID}
+\fancyfoot[L]{\small \FooterLeft}
+\fancyfoot[C]{\small Page \thepage\ of \pageref{LastPage}}
+\fancyfoot[R]{\small \ReportDate}
+
+% Section Formatting
+\titleformat{\section}{\normalfont\Large\bfseries\color{headerblue}}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{0.5em}{}
+
+% Default optional variables
+\providecommand{\TitlePageExtras}{}
+\providecommand{\ReportAppendix}{}
+
+% ============================================================================
+% BEGIN DOCUMENT
+% ============================================================================
+\begin{document}
+
+% ----------------------------------------------------------------------------
+% TITLE PAGE
+% ----------------------------------------------------------------------------
+\begin{titlepage}
+    \centering
+    \vspace*{1.5in}
+
+    {\LARGE\textbf{\ReportTitle}}\\[0.5cm]
+    {\Large\textit{\ReportSubtitle}}\\[2cm]
+
+    \rule{\textwidth}{1.5pt}\\[0.5cm]
+    {\large\textbf{Report ID: \ReportID}}\\[0.3cm]
+    {\large Version: \ReportVersion}\\[0.5cm]
+    \rule{\textwidth}{1.5pt}\\[2cm]
+
+    \TitlePageExtras
+
+    \vfill
+
+    {\small\textit{\ReportAuthor}}\\
+    {\small\textit{\ReportDate}}
+
+\end{titlepage}
+
+% ----------------------------------------------------------------------------
+% TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+\tableofcontents
+\newpage
+
+% ============================================================================
+% MAIN CONTENT
+% ============================================================================
+\ReportContent
+
+% ============================================================================
+% APPENDIX (if defined)
+% ============================================================================
+\ReportAppendix
+
+\end{document}
