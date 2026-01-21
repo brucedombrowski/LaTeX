@@ -7,8 +7,6 @@ Instructions for AI agents working with this repository.
 LaTeX templates for compliance-related document components:
 
 1. **CUI** - Controlled Unclassified Information (32 CFR Part 2002)
-2. **Export** - Export control markings (ITAR, EAR) - future
-3. **Security** - Security compliance templates - future
 
 ## Use Cases
 
@@ -130,26 +128,22 @@ The LaTeX template will support these customizable fields:
 ```
 Compliance-Marking/
 ├── AGENTS.md                     # This file - requirements and analysis
-├── CUI/                          # Controlled Unclassified Information
-│   ├── SF901-Official-Template.pdf  # Official GSA SF901 for reference
-│   ├── SF901.tex                 # LaTeX template for SF901 (base)
-│   ├── SF901.pdf                 # Generated cover sheet
-│   └── examples/                 # Filled-in examples by CUI category
-│       ├── build_tex_to_pdf.sh   # Compiles examples, generates PNGs
-│       ├── CUI_Introduction.tex  # Title page for document package
-│       ├── SF901_BASIC.tex       # CUI//BASIC example
-│       ├── SF901_CTI.tex         # CUI//SP-CTI example
-│       ├── SF901_PROCURE.tex     # CUI//SP-PROCURE example
-│       └── SF901_PRVCY.tex       # CUI//SP-PRVCY example
-├── Export/                       # Export control (ITAR/EAR) - future
-└── Security/                     # Security compliance - future
+└── CUI/                          # Controlled Unclassified Information
+    ├── SF901-Official-Template.pdf  # Official GSA SF901 for reference
+    ├── SF901.tex                 # LaTeX template for SF901 (base)
+    ├── SF901.pdf                 # Generated cover sheet
+    └── examples/                 # Filled-in examples by CUI category
+        ├── build_tex_to_pdf.sh   # Compiles examples, generates PNGs
+        ├── CUI_Introduction.tex  # Title page for document package
+        ├── SF901_BASIC.tex       # CUI//BASIC example
+        ├── SF901_CTI.tex         # CUI//SP-CTI example
+        ├── SF901_PROCURE.tex     # CUI//SP-PROCURE example
+        └── SF901_PRVCY.tex       # CUI//SP-PRVCY example
 
 # Decision Memorandums are at repo root: ../Decisions/
 ```
 
-## Research Needed
+## Research Completed
 
 - [x] Document CUI cover page requirements (SF901, 32 CFR 2002)
 - [x] Create LaTeX SF901 template (`CUI/SF901.tex`)
-- [ ] Document export marking requirements (ITAR/EAR specifics)
-- [ ] Create export marking templates (`Export/`)
