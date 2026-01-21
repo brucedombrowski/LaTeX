@@ -11,7 +11,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
-DIST_DIR="$REPO_ROOT/dist"
+DIST_DIR="$REPO_ROOT/.dist"
 
 # Colors for output
 RED='\033[0;31m'
@@ -32,7 +32,7 @@ fi
 
 # Check for PdfSigner.exe updates (non-blocking)
 check_pdfsigner_update() {
-    local BIN_DIR="$REPO_ROOT/bin"
+    local BIN_DIR="$REPO_ROOT/.bin"
     local PDFSIGNER_URL="https://api.github.com/repos/brucedombrowski/PDFSigner/releases/latest"
 
     # Skip if no internet or curl not available

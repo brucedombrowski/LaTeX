@@ -1,1 +1,1 @@
-../../scripts/sign-pdf.ps1
+../../.scripts/sign-pdf.ps1

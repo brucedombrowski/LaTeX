@@ -24,7 +24,7 @@ This toolkit follows the [SpeakUp project](https://github.com/brucedombrowski/Sp
 | **Meeting Agendas** | Documentation-Generation/MeetingAgenda/ | Production |
 | **CUI Cover Sheets** | Compliance-Marking/CUI/ | Production |
 | **Export Markings** | Compliance-Marking/Export/ | Planned |
-| **PDF Merging** | scripts/merge-pdf.* | Production |
+| **PDF Merging** | .scripts/merge-pdf.* | Production |
 | **Digital Signatures** | Documentation-Generation/DecisionDocument/ | Production |
 | **Software Attestations** | Documentation-Generation/Attestations/ | Production |
 
@@ -65,11 +65,14 @@ This toolkit follows the [SpeakUp project](https://github.com/brucedombrowski/Sp
 
 | Component | Description | AGENTS.md |
 |-----------|-------------|-----------|
-| [scripts/](scripts/) | Build tools, release scripts, PDF merge utilities | — |
-| [assets/](assets/) | Shared images and logos | — |
+| [.scripts/](.scripts/) | Build tools, release scripts, PDF merge utilities | — |
+| [.assets/](.assets/) | Shared images and logos | — |
+| [.bin/](.bin/) | Executable binaries (PdfSigner.exe) | — |
+| [.dist/](.dist/) | Build output (tracked for examples) | — |
 | [Documentation-Generation/](Documentation-Generation/) | Document templates (decisions, slides, agendas, attestations) | [Documentation-Generation/AGENTS.md](Documentation-Generation/AGENTS.md) |
 | [Decisions/](Decisions/) | Formal Decision Memorandums archive | — |
 | [Attestations/](Attestations/) | Generated software attestation PDFs | — |
+| [Assessments/](Assessments/) | Technical assessments and analyses | — |
 | [Compliance-Marking/](Compliance-Marking/) | CUI cover pages, export markings, security compliance | [Compliance-Marking/AGENTS.md](Compliance-Marking/AGENTS.md) |
 
 ## Documentation-Generation
@@ -243,7 +246,7 @@ January 21, 2026 | 10:00 AM | Conference Room A
 ./scripts/generate-attestation.sh
 
 # Attestations are also generated automatically during release builds
-./scripts/release.sh
+./.scripts/release.sh
 ```
 
 **DRY Pattern:**
@@ -285,49 +288,49 @@ Attestations follow the same DRY pattern as SF901 cover sheets:
 
 ### Build Scripts
 
-Centralized build tools in `scripts/`:
+Centralized build tools in `.scripts/`:
 
 | Script | Purpose |
 |--------|---------|
-| `scripts/build-tex.sh` | Build any single .tex file |
-| `scripts/release.sh` | Build all documents to `dist/` |
-| `scripts/generate-attestation.sh` | Generate software attestation PDF |
-| `scripts/merge-pdf.sh` | Merge multiple PDFs (interactive) |
-| `scripts/merge-pdf.ps1` | Merge multiple PDFs (Windows PowerShell) |
-| `scripts/sign-pdf.sh` | Sign PDFs with digital certificates |
-| `scripts/sign-pdf.ps1` | Sign PDFs (Windows PowerShell) |
-| `scripts/sign-pdf.bat` | Sign PDFs (Windows batch) |
-| `bin/PdfSigner.exe` | PDF signing tool for Windows |
+| `.scripts/build-tex.sh` | Build any single .tex file |
+| `.scripts/release.sh` | Build all documents to `.dist/` |
+| `.scripts/generate-attestation.sh` | Generate software attestation PDF |
+| `.scripts/merge-pdf.sh` | Merge multiple PDFs (interactive) |
+| `.scripts/merge-pdf.ps1` | Merge multiple PDFs (Windows PowerShell) |
+| `.scripts/sign-pdf.sh` | Sign PDFs with digital certificates |
+| `.scripts/sign-pdf.ps1` | Sign PDFs (Windows PowerShell) |
+| `.scripts/sign-pdf.bat` | Sign PDFs (Windows batch) |
+| `.bin/PdfSigner.exe` | PDF signing tool for Windows |
 
 **Usage:**
 
 ```bash
 # Build a single document
-./scripts/build-tex.sh path/to/document.tex
+./.scripts/build-tex.sh path/to/document.tex
 
 # Build with Word output (requires pandoc)
-./scripts/build-tex.sh path/to/document.tex --docx
+./.scripts/build-tex.sh path/to/document.tex --docx
 
 # Build all documents for release
-./scripts/release.sh
+./.scripts/release.sh
 
-# Clean dist/ directory
-./scripts/release.sh --clean
+# Clean .dist/ directory
+./.scripts/release.sh --clean
 
 # Merge PDFs (interactive - run from folder containing PDFs)
-./scripts/merge-pdf.sh
+./.scripts/merge-pdf.sh
 ```
 
 **Output:**
 - Single builds: PDF in same directory as source
-- Release builds: All PDFs in `dist/` (organized by type)
+- Release builds: All PDFs in `.dist/` (organized by type)
 - Merge: Creates `merged.pdf` in current directory
 
 ### Digital Signatures
 
-Use the signing infrastructure in `scripts/`:
+Use the signing infrastructure in `.scripts/`:
 - `sign-pdf.sh` / `sign-pdf.bat` / `sign-pdf.ps1`
-- `bin/PdfSigner.exe` for Windows (download from [PDFSigner releases](https://github.com/brucedombrowski/PDFSigner/releases))
+- `.bin/PdfSigner.exe` for Windows (download from [PDFSigner releases](https://github.com/brucedombrowski/PDFSigner/releases))
 - PIV/CAC smart card support
 - Software certificate support
 
@@ -339,10 +342,10 @@ When building documents as an AI agent:
 
 ```bash
 # Build a single document
-./scripts/build-tex.sh Documentation-Generation/DecisionDocument/decision_document.tex
+./.scripts/build-tex.sh Documentation-Generation/DecisionDocument/decision_document.tex
 
 # Build all documents for release
-./scripts/release.sh
+./.scripts/release.sh
 
 # Optionally sign with source traceability
 cd Documentation-Generation/DecisionDocument/
@@ -399,9 +402,9 @@ LaTeX/
 ├── README.md                 # User documentation
 ├── .gitignore                # Git ignore rules
 │
-├── scripts/                  # Centralized build and utility scripts
+├── .scripts/                 # Centralized build and utility scripts
 │   ├── build-tex.sh          # Build any single .tex file
-│   ├── release.sh            # Build all documents to dist/
+│   ├── release.sh            # Build all documents to .dist/
 │   ├── generate-attestation.sh # Generate software attestation
 │   ├── merge-pdf.sh          # PDF merge utility (macOS/Linux)
 │   ├── merge-pdf.ps1         # PDF merge utility (Windows)
@@ -409,14 +412,14 @@ LaTeX/
 │   ├── sign-pdf.ps1          # PDF signing (Windows PowerShell)
 │   └── sign-pdf.bat          # PDF signing (Windows batch)
 │
-├── bin/                      # Executable binaries
+├── .bin/                     # Executable binaries
 │   └── PdfSigner.exe         # PDF signing tool for Windows
 │
-├── assets/                   # Shared images, logos (symlinked from subfolders)
+├── .assets/                  # Shared images, logos (symlinked from subfolders)
 │   ├── logo.png
 │   └── logo.svg
 │
-├── dist/                     # Build output (tracked for examples)
+├── .dist/                    # Build output (tracked for examples)
 │   ├── decisions/
 │   ├── meetings/
 │   ├── compliance/
@@ -432,6 +435,8 @@ LaTeX/
 ├── Decisions/                # Formal Decision Memorandums (cross-cutting)
 │
 ├── Attestations/             # Generated attestation PDFs
+│
+├── Assessments/              # Technical assessments and analyses
 │
 └── Compliance-Marking/       # Compliance templates
     ├── AGENTS.md
@@ -452,7 +457,7 @@ LaTeX/
 
 1. Copy template from `Documentation-Generation/DecisionMemorandum/templates/decision_memo.tex`
 2. Edit document variables at top of `.tex` file
-3. Build: `./scripts/build-tex.sh path/to/your_memo.tex`
+3. Build: `./.scripts/build-tex.sh path/to/your_memo.tex`
 4. Sign with `./sign.sh` for distribution (from DecisionMemorandum/)
 5. Move final PDF to `Decisions/`
 
@@ -460,7 +465,7 @@ LaTeX/
 
 1. Copy template from `Documentation-Generation/DecisionDocument/templates/decision_document.tex`
 2. Edit document variables at top of `.tex` file
-3. Build: `./scripts/build-tex.sh path/to/your_document.tex`
+3. Build: `./.scripts/build-tex.sh path/to/your_document.tex`
 4. Sign with `./sign.sh` for distribution (from DecisionDocument/)
 5. Move final PDF to `Decisions/`
 
@@ -468,7 +473,7 @@ LaTeX/
 
 1. Copy template from `Documentation-Generation/SlideDecks/templates/`
 2. Edit content in `.tex` file
-3. Build: `./scripts/build-tex.sh path/to/your_slides.tex`
+3. Build: `./.scripts/build-tex.sh path/to/your_slides.tex`
 4. Review generated PDF
 5. Optionally sign for distribution
 
@@ -477,25 +482,25 @@ LaTeX/
 1. Copy template from `Documentation-Generation/MeetingAgenda/templates/meeting_agenda.tex`
 2. Edit meeting metadata (date, time, location, attendees)
 3. Fill in timed agenda items
-4. Build: `./scripts/build-tex.sh path/to/your_agenda.tex`
+4. Build: `./.scripts/build-tex.sh path/to/your_agenda.tex`
 5. Review generated PDF
 
 ### Building All Documents
 
 ```bash
-# Build everything and output to dist/
-./scripts/release.sh
+# Build everything and output to .dist/
+./.scripts/release.sh
 
-# Clean the dist/ directory
-./scripts/release.sh --clean
+# Clean the .dist/ directory
+./.scripts/release.sh --clean
 ```
 
 ### Testing Changes
 
 After modifying any component:
-1. Build with `./scripts/build-tex.sh path/to/file.tex`
+1. Build with `./.scripts/build-tex.sh path/to/file.tex`
 2. Verify PDF generates without errors
 3. Check formatting and layout
 4. Verify cross-references and page numbers
-5. Run full release build: `./scripts/release.sh`
+5. Run full release build: `./.scripts/release.sh`
 6. Test on target platform (Windows if possible)

@@ -17,7 +17,7 @@ REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 TEMPLATE_DIR="$REPO_ROOT/Documentation-Generation/Attestations/templates"
 EXAMPLES_DIR="$REPO_ROOT/Documentation-Generation/Attestations/examples"
 OUTPUT_DIR="$REPO_ROOT/Attestations"
-BIN_DIR="$REPO_ROOT/bin"
+BIN_DIR="$REPO_ROOT/.bin"
 
 # Colors for output
 RED='\033[0;31m'
@@ -136,12 +136,12 @@ if [ -f "software_attestation.pdf" ]; then
     # Also create a "latest" symlink
     ln -sf "software-attestation-${DATE_STAMP}.pdf" "$OUTPUT_DIR/software-attestation-latest.pdf"
 
-    # Copy to dist/attestations/ for release distribution
-    DIST_ATT_DIR="$REPO_ROOT/dist/attestations"
+    # Copy to .dist/attestations/ for release distribution
+    DIST_ATT_DIR="$REPO_ROOT/.dist/attestations"
     mkdir -p "$DIST_ATT_DIR"
     cp software_attestation.pdf "$DIST_ATT_DIR/software-attestation-${DATE_STAMP}.pdf"
     ln -sf "software-attestation-${DATE_STAMP}.pdf" "$DIST_ATT_DIR/software-attestation-latest.pdf"
-    echo -e "${GREEN}  Generated: dist/attestations/software-attestation-${DATE_STAMP}.pdf${NC}"
+    echo -e "${GREEN}  Generated: .dist/attestations/software-attestation-${DATE_STAMP}.pdf${NC}"
 
     echo ""
     echo "=========================================="

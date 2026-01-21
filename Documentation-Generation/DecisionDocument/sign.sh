@@ -1,1 +1,1 @@
-../../scripts/sign-pdf.sh
+../../.scripts/sign-pdf.sh

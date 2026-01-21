@@ -1,1 +1,1 @@
-../../scripts/sign-pdf.bat
+../../.scripts/sign-pdf.bat

@@ -75,7 +75,7 @@ When building and signing PDFs as an AI agent:
 
 ```bash
 # 1. Build the document
-./scripts/build.sh Documentation-Generation/DecisionDocument/templates/decision_document.tex
+./.scripts/build.sh Documentation-Generation/DecisionDocument/templates/decision_document.tex
 
 # 2. Create certificate with source hash for traceability
 cd Documentation-Generation/DecisionDocument
@@ -121,7 +121,7 @@ shasum -a 256 templates/decision_document.tex | cut -c1-12
 DecisionDocument/
 ├── templates/
 │   ├── decision_document.tex
-│   └── logo.* -> ../../../assets/
+│   └── logo.* -> ../../../.assets/
 ├── examples/
 │   ├── decision_document.pdf
 │   └── decision_document_signed.pdf
