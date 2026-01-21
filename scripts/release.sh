@@ -97,13 +97,13 @@ echo ""
 echo -e "${YELLOW}Building Decision Documents...${NC}"
 
 # Decision Memorandum
-if [ -f "$REPO_ROOT/Documentation-Generation/DecisionMemorandum/decision_memo.tex" ]; then
-    build_tex "$REPO_ROOT/Documentation-Generation/DecisionMemorandum/decision_memo.tex" "$DIST_DIR/decisions"
+if [ -f "$REPO_ROOT/Documentation-Generation/DecisionMemorandum/templates/decision_memo.tex" ]; then
+    build_tex "$REPO_ROOT/Documentation-Generation/DecisionMemorandum/templates/decision_memo.tex" "$DIST_DIR/decisions"
 fi
 
 # Decision Document
-if [ -f "$REPO_ROOT/Documentation-Generation/DecisionDocument/decision_document.tex" ]; then
-    build_tex "$REPO_ROOT/Documentation-Generation/DecisionDocument/decision_document.tex" "$DIST_DIR/decisions"
+if [ -f "$REPO_ROOT/Documentation-Generation/DecisionDocument/templates/decision_document.tex" ]; then
+    build_tex "$REPO_ROOT/Documentation-Generation/DecisionDocument/templates/decision_document.tex" "$DIST_DIR/decisions"
 fi
 
 echo ""

@@ -65,7 +65,7 @@ This toolkit follows the [SpeakUp project](https://github.com/brucedombrowski/Sp
 |-----------|-------------|-----------|
 | [scripts/](scripts/) | Centralized build tools (build.sh, release.sh) | — |
 | [assets/](assets/) | Shared images and logos | — |
-| [Documentation-Generation/](Documentation-Generation/) | Document templates (decisions, slides, agendas) | See below |
+| [Documentation-Generation/](Documentation-Generation/) | Document templates (decisions, slides, agendas) | [Documentation-Generation/AGENTS.md](Documentation-Generation/AGENTS.md) |
 | [Decisions/](Decisions/) | Formal Decision Memorandums archive | — |
 | [Compliance-Marking/](Compliance-Marking/) | CUI cover pages, export markings, security compliance | [Compliance-Marking/AGENTS.md](Compliance-Marking/AGENTS.md) |
 | [PdfTools/](PdfTools/) | PDF manipulation tools (merge, split) | [PdfTools/AGENTS.md](PdfTools/AGENTS.md) |
@@ -88,29 +88,36 @@ Distributable Output (PDF)
 
 ### Documentation Structure
 
+All components follow a consistent `templates/` and `examples/` structure:
+
 ```
 Documentation-Generation/
+├── AGENTS.md                 # Documentation-Generation instructions
+│
 ├── DecisionMemorandum/       # Single-page decision memos
-│   ├── AGENTS.md
-│   ├── decision_memo.tex
+│   ├── templates/
+│   │   └── decision_memo.tex
+│   ├── examples/
 │   └── sign.* -> ../DecisionDocument/sign.*  # Symlinks to signing tools
 │
 ├── DecisionDocument/         # Multi-page program decisions
-│   ├── AGENTS.md
+│   ├── AGENTS.md             # Signing-specific instructions
 │   ├── README.md
-│   ├── decision_document.tex
+│   ├── templates/
+│   │   └── decision_document.tex
+│   ├── examples/
 │   ├── sign.sh / sign.ps1 / sign.bat
-│   └── PdfSigner.exe         # Windows signing tool
+│   └── PdfSigner.exe         # From github.com/brucedombrowski/PDFSigner
 │
 ├── SlideDecks/               # Presentation slide decks (Beamer)
-│   ├── templates/            # Reusable slide templates
+│   ├── templates/
 │   │   └── standard_brief.tex
-│   └── examples/             # Example presentations
+│   └── examples/
 │
 └── MeetingAgenda/            # Meeting agenda documents
-    ├── templates/            # Reusable agenda templates
+    ├── templates/
     │   └── meeting_agenda.tex
-    └── examples/             # Example agendas (SE lifecycle)
+    └── examples/
         ├── project_kickoff.tex
         └── requirements_review.tex
 ```
@@ -119,19 +126,17 @@ Documentation-Generation/
 
 **Purpose:** Single-page formal records of program decisions
 
-**AGENTS.md:** [Documentation-Generation/DecisionMemorandum/AGENTS.md](Documentation-Generation/DecisionMemorandum/AGENTS.md)
-
-Template: `decision_memo.tex`
+Template: `templates/decision_memo.tex`
 
 ### DecisionDocument - Comprehensive Decisions
 
 **Purpose:** Multi-page program decision documentation with full traceability
 
-**AGENTS.md:** [Documentation-Generation/DecisionDocument/AGENTS.md](Documentation-Generation/DecisionDocument/AGENTS.md)
+**AGENTS.md:** [Documentation-Generation/DecisionDocument/AGENTS.md](Documentation-Generation/DecisionDocument/AGENTS.md) - signing workflows
 
-Template: `decision_document.tex`
+Template: `templates/decision_document.tex`
 
-**Note:** Signing tools (PdfSigner.exe, sign scripts) live here and are symlinked from other components.
+**Note:** Signing scripts live here; PdfSigner.exe from [PDFSigner repo](https://github.com/brucedombrowski/PDFSigner).
 
 ### SlideDecks - Beamer Presentations
 
@@ -389,17 +394,17 @@ LaTeX/
 
 ### Creating a New Decision Memorandum
 
-1. Copy template from `Documentation-Generation/DecisionMemorandum/decision_memo.tex`
+1. Copy template from `Documentation-Generation/DecisionMemorandum/templates/decision_memo.tex`
 2. Edit document variables at top of `.tex` file
-3. Build: `./scripts/build.sh Documentation-Generation/DecisionMemorandum/decision_memo.tex`
+3. Build: `./scripts/build.sh path/to/your_memo.tex`
 4. Sign with `./sign.sh` for distribution (from DecisionMemorandum/)
 5. Move final PDF to `Decisions/`
 
 ### Creating a New Decision Document
 
-1. Copy template from `Documentation-Generation/DecisionDocument/decision_document.tex`
+1. Copy template from `Documentation-Generation/DecisionDocument/templates/decision_document.tex`
 2. Edit document variables at top of `.tex` file
-3. Build: `./scripts/build.sh Documentation-Generation/DecisionDocument/decision_document.tex`
+3. Build: `./scripts/build.sh path/to/your_document.tex`
 4. Sign with `./sign.sh` for distribution (from DecisionDocument/)
 5. Move final PDF to `Decisions/`
 
