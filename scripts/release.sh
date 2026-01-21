@@ -213,8 +213,6 @@ if [ -f "$CUI_EXAMPLES_DIR/CUI_Introduction.pdf" ] && \
 EOF
     if pdflatex -interaction=nonstopmode merge_temp.tex > /dev/null 2>&1; then
         cp merge_temp.pdf "$DIST_DIR/compliance/CUI_Cover_Packet_Example.pdf"
-        # Also update the copy in PdfTools
-        cp merge_temp.pdf "$REPO_ROOT/PdfTools/CUI_Cover_Packet_Example.pdf"
         echo -e "${GREEN}  ✓ CUI_Cover_Packet_Example.pdf${NC}"
         ((BUILT++))
     else
