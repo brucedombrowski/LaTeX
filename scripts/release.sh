@@ -124,10 +124,10 @@ build_tex_inplace() {
             echo -e "${GREEN}  ✓ ${basename}.pdf ($COMPILER)${NC}"
             ((BUILT++))
 
-            # Generate PNG preview if pdftoppm is available
+            # Generate PNG if pdftoppm is available
             if command -v pdftoppm &> /dev/null; then
-                pdftoppm -png -r 150 -singlefile "${basename}.pdf" "${basename}-preview"
-                echo -e "${GREEN}  ✓ ${basename}-preview.png${NC}"
+                pdftoppm -png -r 150 -singlefile "${basename}.pdf" "${basename}"
+                echo -e "${GREEN}  ✓ ${basename}.png${NC}"
             fi
         fi
 
