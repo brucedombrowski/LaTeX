@@ -70,7 +70,9 @@ build_tex() {
     cd "$dirname"
 
     # Check if file uses fontspec (requires xelatex)
-    if grep -q '\\usepackage{fontspec}' "$tex_file" 2>/dev/null; then
+    # Also check if it inputs SF901-template which uses fontspec
+    if grep -q '\\usepackage{fontspec}' "$tex_file" 2>/dev/null || \
+       grep -q 'SF901-template' "$tex_file" 2>/dev/null; then
         COMPILER="xelatex"
     else
         COMPILER="pdflatex"
@@ -111,7 +113,9 @@ build_tex_inplace() {
     cd "$dirname"
 
     # Check if file uses fontspec (requires xelatex)
-    if grep -q '\\usepackage{fontspec}' "$tex_file" 2>/dev/null; then
+    # Also check if it inputs SF901-template which uses fontspec
+    if grep -q '\\usepackage{fontspec}' "$tex_file" 2>/dev/null || \
+       grep -q 'SF901-template' "$tex_file" 2>/dev/null; then
         COMPILER="xelatex"
     else
         COMPILER="pdflatex"
@@ -174,9 +178,54 @@ echo ""
 echo -e "${YELLOW}Building Compliance Documents...${NC}"
 
 # CUI Cover Sheets (build in-place with PNG preview)
+# Skip template files (they are meant to be \input, not compiled directly)
 for tex_file in "$REPO_ROOT/Compliance-Marking/CUI"/*.tex; do
+    [ -e "$tex_file" ] || continue
+    [[ "$tex_file" == *"-template.tex" ]] && continue
+    build_tex_inplace "$tex_file"
+done
+
+# CUI Examples (build in-place with PNG preview)
+for tex_file in "$REPO_ROOT/Compliance-Marking/CUI/Examples"/*.tex; do
     [ -e "$tex_file" ] && build_tex_inplace "$tex_file"
 done
+
+# Create CUI Cover Packet Example (merged PDF) for dist
+echo ""
+echo -e "${BLUE}Creating CUI Cover Packet Example...${NC}"
+CUI_EXAMPLES_DIR="$REPO_ROOT/Compliance-Marking/CUI/Examples"
+if [ -f "$CUI_EXAMPLES_DIR/CUI_Introduction.pdf" ] && \
+   [ -f "$CUI_EXAMPLES_DIR/SF901_BASIC.pdf" ] && \
+   [ -f "$CUI_EXAMPLES_DIR/SF901_CTI.pdf" ] && \
+   [ -f "$CUI_EXAMPLES_DIR/SF901_PROCURE.pdf" ] && \
+   [ -f "$CUI_EXAMPLES_DIR/SF901_PRVCY.pdf" ]; then
+    cd "$CUI_EXAMPLES_DIR"
+    cat > merge_temp.tex << 'EOF'
+\documentclass{article}
+\usepackage{pdfpages}
+\begin{document}
+\includepdf[pages=-]{CUI_Introduction.pdf}
+\includepdf[pages=-]{SF901_PROCURE.pdf}
+\includepdf[pages=-]{SF901_BASIC.pdf}
+\includepdf[pages=-]{SF901_PRVCY.pdf}
+\includepdf[pages=-]{SF901_CTI.pdf}
+\end{document}
+EOF
+    if pdflatex -interaction=nonstopmode merge_temp.tex > /dev/null 2>&1; then
+        cp merge_temp.pdf "$DIST_DIR/compliance/CUI_Cover_Packet_Example.pdf"
+        # Also update the copy in PdfTools
+        cp merge_temp.pdf "$REPO_ROOT/PdfTools/CUI_Cover_Packet_Example.pdf"
+        echo -e "${GREEN}  ✓ CUI_Cover_Packet_Example.pdf${NC}"
+        ((BUILT++))
+    else
+        echo -e "${RED}  ✗ Failed to create CUI_Cover_Packet_Example.pdf${NC}"
+        ((FAILED++))
+    fi
+    rm -f merge_temp.*
+    cd "$REPO_ROOT"
+else
+    echo -e "${YELLOW}  Skipping CUI Cover Packet - not all example PDFs available${NC}"
+fi
 
 # Clean up auxiliary files across the entire repo
 echo ""
