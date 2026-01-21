@@ -30,6 +30,45 @@ if ! command -v pdflatex &> /dev/null; then
     exit 1
 fi
 
+# Check for PdfSigner.exe updates (non-blocking)
+check_pdfsigner_update() {
+    local BIN_DIR="$REPO_ROOT/bin"
+    local PDFSIGNER_URL="https://api.github.com/repos/brucedombrowski/PDFSigner/releases/latest"
+
+    # Skip if no internet or curl not available
+    if ! command -v curl &> /dev/null; then
+        return
+    fi
+
+    echo -e "${YELLOW}Checking for PdfSigner.exe updates...${NC}"
+
+    # Get latest release info (timeout after 5 seconds)
+    local LATEST_INFO=$(curl -s --max-time 5 "$PDFSIGNER_URL" 2>/dev/null)
+    if [ -z "$LATEST_INFO" ]; then
+        echo -e "${YELLOW}  Could not reach GitHub (offline or timeout)${NC}"
+        return
+    fi
+
+    # Extract latest version tag
+    local LATEST_VERSION=$(echo "$LATEST_INFO" | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4)
+    if [ -z "$LATEST_VERSION" ]; then
+        return
+    fi
+
+    # Check if PdfSigner.exe exists locally
+    if [ ! -f "$BIN_DIR/PdfSigner.exe" ]; then
+        echo -e "${YELLOW}  PdfSigner.exe not found in bin/${NC}"
+        echo -e "${YELLOW}  Download latest ($LATEST_VERSION) from:${NC}"
+        echo -e "${BLUE}  https://github.com/brucedombrowski/PDFSigner/releases/latest${NC}"
+    else
+        echo -e "${GREEN}  Latest release: $LATEST_VERSION${NC}"
+        echo -e "${GREEN}  PdfSigner.exe found in bin/${NC}"
+    fi
+}
+
+# Run update check (don't fail if it errors)
+check_pdfsigner_update || true
+
 # Parse arguments
 CLEAN_ONLY=0
 for arg in "$@"; do
