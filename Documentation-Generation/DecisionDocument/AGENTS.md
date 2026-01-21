@@ -43,7 +43,9 @@ sign.bat list
 - Only shows valid signing certs (Email Protection or Document Signing EKU)
 - PIV/CAC certificates prioritized
 
-### macOS/Linux
+### macOS/Linux (Developer Testing)
+
+The `sign.sh` script is for developer testing. A cross-platform GUI version will be released from [PDFSigner repo](https://github.com/brucedombrowski/PDFSigner).
 
 ```bash
 # Interactive mode
