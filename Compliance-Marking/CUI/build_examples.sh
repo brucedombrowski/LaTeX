@@ -1,9 +1,12 @@
 #!/bin/bash
 
 # Build script for SF901 example cover sheets
-# Compiles all .tex files in this directory using xelatex
+# Compiles all .tex files in Examples/ directory
 
 set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+EXAMPLES_DIR="$SCRIPT_DIR/Examples"
 
 # Colors for output
 RED='\033[0;31m'
@@ -16,6 +19,8 @@ echo -e "${CYAN}==========================================${NC}"
 echo -e "${CYAN}SF901 Examples Build Script${NC}"
 echo -e "${CYAN}==========================================${NC}"
 echo ""
+
+cd "$EXAMPLES_DIR"
 
 # Clean up old PDFs and PNGs first
 echo -e "${YELLOW}Cleaning old PDFs and PNGs...${NC}"
