@@ -136,36 +136,29 @@ sudo tlmgr install pdfpages
 PdfTools/
 ├── merge-pdf.ps1     # Windows PowerShell script
 ├── merge-pdf.sh      # macOS/Linux script
+├── release.sh        # Cleans generated files for git commits
 ├── README.md         # This file
-├── AGENTS.md         # AI agent instructions
-└── Examples/         # Sample CUI cover sheets for testing
-    ├── build_tex_to_pdf.sh   # Compiles examples, generates PNGs
-    ├── CUI_Introduction.tex  # Title page for document package
-    ├── SF901_BASIC.tex       # CUI//BASIC example
-    ├── SF901_CTI.tex         # CUI//SP-CTI example
-    ├── SF901_PROCURE.tex     # CUI//SP-PROCURE example
-    └── SF901_PRVCY.tex       # CUI//SP-PRVCY example
+└── AGENTS.md         # AI agent instructions
 ```
 
-## Examples
+## Testing with Sample PDFs
 
-The `Examples/` folder contains sample SF901 CUI cover sheets for testing the merge functionality. These are derived from the canonical template at [Compliance-Marking/CUI/SF901.tex](../Compliance-Marking/CUI/SF901.tex):
+To test the merge functionality with sample CUI cover sheets:
 
-| File | CUI Category | Example Document |
-|------|--------------|------------------|
-| CUI_Introduction | — | Title page for Example Aerospace Corp |
-| SF901_BASIC | CUI//BASIC | Internal Policy Document |
-| SF901_CTI | CUI//SP-CTI | Payload Software Interface Control Document |
-| SF901_PROCURE | CUI//SP-PROCURE | Source Selection Evaluation Report |
-| SF901_PRVCY | CUI//SP-PRVCY | Personnel Security Investigation Report |
-
-To test:
 ```bash
-cd Examples
-./build_tex_to_pdf.sh   # Compile all .tex files and generate PNGs
-cd ..
-./merge-pdf.sh          # Merge the PDFs interactively
+# Build sample PDFs from Compliance-Marking
+cd ../Compliance-Marking/CUI/examples
+./build_tex_to_pdf.sh
+
+# Copy some PDFs to test folder
+mkdir ~/test-merge && cd ~/test-merge
+cp /path/to/LaTeX/Compliance-Marking/CUI/examples/*.pdf .
+
+# Run merge
+/path/to/LaTeX/PdfTools/merge-pdf.sh
 ```
+
+Sample CUI templates are located in [Compliance-Marking/CUI/examples/](../Compliance-Marking/CUI/examples/).
 
 ## Future Features
 

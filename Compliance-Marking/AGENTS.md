@@ -132,9 +132,15 @@ Compliance-Marking/
 ├── AGENTS.md                     # This file - requirements and analysis
 ├── CUI/                          # Controlled Unclassified Information
 │   ├── SF901-Official-Template.pdf  # Official GSA SF901 for reference
-│   ├── SF901.tex                 # LaTeX recreation of SF901
+│   ├── SF901.tex                 # LaTeX template for SF901 (base)
 │   ├── SF901.pdf                 # Generated cover sheet
-│   └── build.sh                  # Build script (runs xelatex twice)
+│   └── examples/                 # Filled-in examples by CUI category
+│       ├── build_tex_to_pdf.sh   # Compiles examples, generates PNGs
+│       ├── CUI_Introduction.tex  # Title page for document package
+│       ├── SF901_BASIC.tex       # CUI//BASIC example
+│       ├── SF901_CTI.tex         # CUI//SP-CTI example
+│       ├── SF901_PROCURE.tex     # CUI//SP-PROCURE example
+│       └── SF901_PRVCY.tex       # CUI//SP-PRVCY example
 ├── Export/                       # Export control (ITAR/EAR) - future
 └── Security/                     # Security compliance - future
 

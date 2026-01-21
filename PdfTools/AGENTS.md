@@ -109,15 +109,10 @@ PdfTools/
 ├── merge-pdf.ps1     # Windows PowerShell merge script
 ├── release.sh        # Cleans generated files for git commits
 ├── README.md         # User documentation
-├── AGENTS.md         # This file
-└── Examples/         # Sample CUI cover sheets
-    ├── build_tex_to_pdf.sh   # Compiles .tex files, generates PNGs
-    ├── CUI_Introduction.tex  # Title page for document package
-    ├── SF901_BASIC.tex       # CUI//BASIC example
-    ├── SF901_CTI.tex         # CUI//SP-CTI example
-    ├── SF901_PROCURE.tex     # CUI//SP-PROCURE example
-    └── SF901_PRVCY.tex       # CUI//SP-PRVCY example
+└── AGENTS.md         # This file
 ```
+
+For sample PDFs to test with, see [Compliance-Marking/CUI/examples/](../Compliance-Marking/CUI/examples/).
 
 ## Testing
 
