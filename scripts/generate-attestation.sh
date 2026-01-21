@@ -67,8 +67,8 @@ if command -v curl &> /dev/null; then
 
     if [ -n "$PDFSIGNER_INFO" ]; then
         PDFSIGNER_VERSION=$(echo "$PDFSIGNER_INFO" | grep -o '"tag_name": *"[^"]*"' | head -1 | cut -d'"' -f4 || echo "unknown")
-        # Get download URL for the exe
-        PDFSIGNER_URL=$(echo "$PDFSIGNER_INFO" | grep -o '"browser_download_url": *"[^"]*PdfSigner\.exe"' | head -1 | cut -d'"' -f4 || echo "$PDFSIGNER_URL")
+        # Get download URL for the zip release (release is a .zip, not standalone .exe)
+        PDFSIGNER_URL=$(echo "$PDFSIGNER_INFO" | grep -o '"browser_download_url": *"[^"]*\.zip"' | head -1 | cut -d'"' -f4 || echo "$PDFSIGNER_URL")
     fi
 fi
 
@@ -81,6 +81,7 @@ else
 fi
 
 echo -e "${GREEN}  PdfSigner version: $PDFSIGNER_VERSION${NC}"
+echo -e "${GREEN}  PdfSigner URL: $PDFSIGNER_URL${NC}"
 
 # Escape special LaTeX characters
 escape_latex() {
