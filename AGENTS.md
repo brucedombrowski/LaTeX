@@ -24,7 +24,7 @@ This toolkit follows the [SpeakUp project](https://github.com/brucedombrowski/Sp
 | **Meeting Agendas** | Documentation-Generation/MeetingAgenda/ | Production |
 | **CUI Cover Sheets** | Compliance-Marking/CUI/ | Production |
 | **Export Markings** | Compliance-Marking/Export/ | Planned |
-| **PDF Merging** | PdfTools/ | Production |
+| **PDF Merging** | scripts/merge-pdf.* | Production |
 | **Digital Signatures** | Documentation-Generation/DecisionDocument/ | Production |
 
 ### Key Features
@@ -63,12 +63,11 @@ This toolkit follows the [SpeakUp project](https://github.com/brucedombrowski/Sp
 
 | Component | Description | AGENTS.md |
 |-----------|-------------|-----------|
-| [scripts/](scripts/) | Centralized build tools (build.sh, release.sh) | — |
+| [scripts/](scripts/) | Build tools, release scripts, PDF merge utilities | — |
 | [assets/](assets/) | Shared images and logos | — |
 | [Documentation-Generation/](Documentation-Generation/) | Document templates (decisions, slides, agendas) | [Documentation-Generation/AGENTS.md](Documentation-Generation/AGENTS.md) |
 | [Decisions/](Decisions/) | Formal Decision Memorandums archive | — |
 | [Compliance-Marking/](Compliance-Marking/) | CUI cover pages, export markings, security compliance | [Compliance-Marking/AGENTS.md](Compliance-Marking/AGENTS.md) |
-| [PdfTools/](PdfTools/) | PDF manipulation tools (merge, split) | [PdfTools/AGENTS.md](PdfTools/AGENTS.md) |
 
 ## Documentation-Generation
 
@@ -251,28 +250,34 @@ Centralized build tools in `scripts/`:
 
 | Script | Purpose |
 |--------|---------|
-| `scripts/build.sh` | Build any single .tex file |
+| `scripts/build-tex.sh` | Build any single .tex file |
 | `scripts/release.sh` | Build all documents to `dist/` |
+| `scripts/merge-pdf.sh` | Merge multiple PDFs (interactive) |
+| `scripts/merge-pdf.ps1` | Merge multiple PDFs (Windows PowerShell) |
 
 **Usage:**
 
 ```bash
 # Build a single document
-./scripts/build.sh path/to/document.tex
+./scripts/build-tex.sh path/to/document.tex
 
 # Build with Word output (requires pandoc)
-./scripts/build.sh path/to/document.tex --docx
+./scripts/build-tex.sh path/to/document.tex --docx
 
 # Build all documents for release
 ./scripts/release.sh
 
 # Clean dist/ directory
 ./scripts/release.sh --clean
+
+# Merge PDFs (interactive - run from folder containing PDFs)
+./scripts/merge-pdf.sh
 ```
 
 **Output:**
 - Single builds: PDF in same directory as source
 - Release builds: All PDFs in `dist/` (organized by type)
+- Merge: Creates `merged.pdf` in current directory
 
 ### Digital Signatures
 
@@ -288,7 +293,7 @@ When building documents as an AI agent:
 
 ```bash
 # Build a single document
-./scripts/build.sh Documentation-Generation/DecisionDocument/decision_document.tex
+./scripts/build-tex.sh Documentation-Generation/DecisionDocument/decision_document.tex
 
 # Build all documents for release
 ./scripts/release.sh
@@ -348,15 +353,17 @@ LaTeX/
 ├── README.md                 # User documentation
 ├── .gitignore                # Git ignore rules
 │
-├── scripts/                  # Centralized build tools
-│   ├── build.sh              # Build any single .tex file
-│   └── release.sh            # Build all documents to dist/
+├── scripts/                  # Centralized build and utility scripts
+│   ├── build-tex.sh          # Build any single .tex file
+│   ├── release.sh            # Build all documents to dist/
+│   ├── merge-pdf.sh          # PDF merge utility (macOS/Linux)
+│   └── merge-pdf.ps1         # PDF merge utility (Windows)
 │
 ├── assets/                   # Shared images, logos (symlinked from subfolders)
 │   ├── logo.png
 │   └── logo.svg
 │
-├── dist/                     # Build output (git-ignored)
+├── dist/                     # Build output (tracked for examples)
 │   ├── decisions/
 │   ├── meetings/
 │   └── compliance/
@@ -369,17 +376,9 @@ LaTeX/
 │
 ├── Decisions/                # Formal Decision Memorandums (cross-cutting)
 │
-├── Compliance-Marking/       # Compliance templates
-│   ├── AGENTS.md
-│   ├── CUI/                  # SF901 cover sheets
-│   ├── Export/               # Export control (future)
-│   └── Security/             # Security compliance (future)
-│
-└── PdfTools/                 # PDF manipulation (interactive merge tool)
+└── Compliance-Marking/       # Compliance templates
     ├── AGENTS.md
-    ├── README.md
-    ├── build.sh              # PDF merge script (not LaTeX build)
-    └── Examples/
+    └── CUI/                  # SF901 cover sheets
 ```
 
 ## Common Tasks
@@ -396,7 +395,7 @@ LaTeX/
 
 1. Copy template from `Documentation-Generation/DecisionMemorandum/templates/decision_memo.tex`
 2. Edit document variables at top of `.tex` file
-3. Build: `./scripts/build.sh path/to/your_memo.tex`
+3. Build: `./scripts/build-tex.sh path/to/your_memo.tex`
 4. Sign with `./sign.sh` for distribution (from DecisionMemorandum/)
 5. Move final PDF to `Decisions/`
 
@@ -404,7 +403,7 @@ LaTeX/
 
 1. Copy template from `Documentation-Generation/DecisionDocument/templates/decision_document.tex`
 2. Edit document variables at top of `.tex` file
-3. Build: `./scripts/build.sh path/to/your_document.tex`
+3. Build: `./scripts/build-tex.sh path/to/your_document.tex`
 4. Sign with `./sign.sh` for distribution (from DecisionDocument/)
 5. Move final PDF to `Decisions/`
 
@@ -412,7 +411,7 @@ LaTeX/
 
 1. Copy template from `Documentation-Generation/SlideDecks/templates/`
 2. Edit content in `.tex` file
-3. Build: `./scripts/build.sh path/to/your_slides.tex`
+3. Build: `./scripts/build-tex.sh path/to/your_slides.tex`
 4. Review generated PDF
 5. Optionally sign for distribution
 
@@ -421,7 +420,7 @@ LaTeX/
 1. Copy template from `Documentation-Generation/MeetingAgenda/templates/meeting_agenda.tex`
 2. Edit meeting metadata (date, time, location, attendees)
 3. Fill in timed agenda items
-4. Build: `./scripts/build.sh path/to/your_agenda.tex`
+4. Build: `./scripts/build-tex.sh path/to/your_agenda.tex`
 5. Review generated PDF
 
 ### Building All Documents
@@ -437,7 +436,7 @@ LaTeX/
 ### Testing Changes
 
 After modifying any component:
-1. Build with `./scripts/build.sh path/to/file.tex`
+1. Build with `./scripts/build-tex.sh path/to/file.tex`
 2. Verify PDF generates without errors
 3. Check formatting and layout
 4. Verify cross-references and page numbers
