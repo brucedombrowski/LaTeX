@@ -34,4 +34,8 @@ merge_temp.*
 *.swp
 *.swo
 
+# Binaries in bin/ folder (download from releases, not tracked)
+bin/*.exe
+bin/*.dll
+
 # Temporary build artifacts (dist/ is tracked for example outputs)
