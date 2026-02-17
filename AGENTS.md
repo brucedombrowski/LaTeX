@@ -23,6 +23,7 @@ This toolkit follows the [SpeakUp project](https://github.com/brucedombrowski/Sp
 | **Slide Decks** | Documentation-Generation/SlideDecks/ | Planned |
 | **Meeting Agendas** | Documentation-Generation/MeetingAgenda/ | Production |
 | **CUI Cover Sheets** | Compliance-Marking/CUI/ | Production |
+| **Requirements/V&V** | Compliance-Marking/Requirements/ | Production |
 | **Export Markings** | Compliance-Marking/Export/ | Planned |
 | **PDF Merging** | .scripts/merge-pdf.* | Production |
 | **Digital Signatures** | Documentation-Generation/DecisionDocument/ | Production |
@@ -593,7 +594,9 @@ LaTeX/
 │
 └── Compliance-Marking/       # Compliance templates
     ├── AGENTS.md
-    └── CUI/                  # SF901 cover sheets
+    ├── CUI/                  # SF901 cover sheets
+    ├── Requirements/         # Formal REQ docs (JSON → PDF)
+    └── Verifications/        # VER document index (docs live in impl repos)
 ```
 
 ## Common Tasks

@@ -1,0 +1,108 @@
+% ============================================================================
+% DM-2026-006: NASA CUI Directive Requirements Absorption
+% ============================================================================
+% Thin wrapper for Decision Memorandum - see _template.tex for shared preamble
+% ============================================================================
+
+% ----------------------------------------------------------------------------
+% DOCUMENT VARIABLES
+% ----------------------------------------------------------------------------
+\newcommand{\UniqueID}{DM-2026-006}
+\newcommand{\DocumentDate}{February 17, 2026}
+\newcommand{\AuthorName}{Bruce Dombrowski}
+\newcommand{\AuthorTitle}{Systems Engineer}
+\newcommand{\ToField}{V\&V Framework Stakeholders}
+\newcommand{\SubjectField}{NASA CUI Directive Requirements Absorption}
+\newcommand{\OPRField}{Compliance-Marking}
+
+% ----------------------------------------------------------------------------
+% DOCUMENT CONTENT
+% ----------------------------------------------------------------------------
+\newcommand{\dmContent}{%
+\begin{enumerate}
+
+\dmsection{Purpose}
+
+This memorandum documents the decision to absorb NASA's CUI directive hierarchy into formal requirements artifacts. Two documents are captured: the current active NPR 2810.7 ``Controlled Unclassified Information'' and the expired interim NID 2810.135. Together they demonstrate the systems-engineering framework's ability to absorb external governing-authority requirements and produce formal Verification \& Validation (V\&V) artifacts.
+
+\dmsection{Background}
+
+NASA's Controlled Unclassified Information (CUI) program standardizes how sensitive information is marked, handled, and shared across the agency. The program is governed by a directive hierarchy:
+
+\begin{itemize}
+    \item \textbf{Federal Level:} Executive Order 13556 (establishing the CUI program) and 32 CFR Part 2002 (implementation regulation)
+    \item \textbf{NASA Policy:} NPD 2810.1F ``NASA Information Security Policy'' (effective Jan 21, 2022; expires Jan 21, 2027) --- establishes overarching information security policy and mandates the CUI program per EO 13556
+    \item \textbf{NASA Procedure (Current):} NPR 2810.7 ``Controlled Unclassified Information'' Change 1 (effective Oct 22, 2021; expires Oct 22, 2026) --- 23 subsections covering all CUI management procedures. This is the \textbf{current active governing document} for production use.
+    \item \textbf{NASA Interim (Expired):} NID 2810.135 ``Controlled Unclassified Information'' (effective Feb 2, 2021; expired Feb 2, 2022) --- interim directive whose requirements were carried forward into NPR 2810.7
+\end{itemize}
+
+NID 2810.135 is publicly available at: \url{https://nodis3.gsfc.nasa.gov/OPD_docs/NID_2810_135_.pdf}
+
+NPR 2810.7 is available at: \url{https://nodis3.gsfc.nasa.gov/displayDir.cfm?t=NPR&c=2810&s=7}
+
+\dmsection{Analysis}
+
+\textbf{Why use expired NID 2810.135 rather than active NPR 2810.7?}
+
+\begin{itemize}
+    \item \textbf{Safe test data:} The expired status means no compliance obligations arise from citing it. It cannot be mistaken for an active requirement source.
+    \item \textbf{Framework demonstration:} The goal is to prove the REQ/VER toolchain can absorb a complex, multi-chapter directive with diverse requirement types (technical, organizational, informational). NID 2810.135 serves this purpose.
+    \item \textbf{Full lifecycle visibility:} Using an expired directive shows the complete lifecycle: active $\rightarrow$ superseded $\rightarrow$ archived. The successor relationship (NID 2810.135 $\rightarrow$ NPR 2810.7) is documented in the artifact metadata.
+    \item \textbf{Requirements equivalence:} All normative requirements in NID 2810.135 were carried forward into NPR 2810.7. The test data is representative of real CUI requirements without creating ambiguity about which standard is authoritative.
+    \item \textbf{Publicly shareable:} NID 2810.135 is a public document. Artifacts derived from it can be freely shared, discussed, and used as examples.
+\end{itemize}
+
+\dmsection{Decision}
+
+\textbf{Approved:} Absorb both NASA CUI directives as formal requirements artifacts.
+
+\textbf{Artifacts to be produced:}
+\begin{itemize}
+    \item \textbf{REQ-2026-002:} JSON requirements extraction from NID 2810.135 (expired interim directive) --- serves as framework test data demonstrating full lifecycle
+    \item \textbf{REQ-2026-003:} JSON requirements extraction from NPR 2810.7 (current active procedural requirement) --- the authoritative CUI standard for production compliance
+    \item \textbf{VER-2026-002:} LaTeX verification document verifying ORBIT-RIFD-Status against applicable technical requirements from both REQ documents
+    \item \textbf{build-requirements-pdf.py:} Parameterized build script generating PDF from JSON (adapted from SendCUIEmail REQ-2026-001 toolchain)
+\end{itemize}
+
+\textbf{Scope:} REQ extraction from both directives, plus VER against ORBIT-RIFD-Status as a real-world verification target. ORBIT-RIFD-Status is ideal because it handles CUI data daily (ISS program CEFs/PIAs), implements CUI markings on outputs, uses DPAPI database encryption, and requires CAC/PIV authentication.
+
+\textbf{Rationale for both documents:}
+\begin{itemize}
+    \item \textbf{NPR 2810.7} is the current governing authority --- production projects reference REQ-2026-003
+    \item \textbf{NID 2810.135} (expired) demonstrates the expired-directive lifecycle and serves as safe, shareable test data
+    \item Requirements are substantively equivalent; the interim directive's requirements were carried forward into NPR 2810.7
+\end{itemize}
+
+\dmsection{Implementation Notes}
+
+\begin{itemize}
+    \item Both REQ JSONs include a \texttt{source\_document} metadata block recording: document ID, status, successor/predecessor references, and provenance URLs
+    \item REQ-2026-002 (NID) includes an expired-status warning and test-data disclaimer
+    \item REQ-2026-003 (NPR) is marked as the current active governing document
+    \item Each requirement carries an \texttt{applicability} field: \texttt{technical} (verifiable against software), \texttt{organizational} (requires process/policy), or \texttt{informational} (reference material)
+    \item The build script is backward-compatible with REQ-2026-001 (graceful fallback when new fields are absent)
+    \item VER-2026-002 lives in the ORBIT-CEF-Status repository (co-located with the implementation it verifies)
+\end{itemize}
+
+\dmsection{References}
+
+\begin{itemize}
+    \item NID 2810.135: \url{https://nodis3.gsfc.nasa.gov/OPD_docs/NID_2810_135_.pdf}
+    \item NPR 2810.7: \url{https://nodis3.gsfc.nasa.gov/displayDir.cfm?t=NPR&c=2810&s=7}
+    \item NPD 2810.1F: \url{https://nodis3.gsfc.nasa.gov/displayDir.cfm?t=NPD&c=2810&s=1E}
+    \item NASA CUI Program: \url{https://www.nasa.gov/controlled-unclassified-information-cui-and-why-it-matters/}
+    \item EO 13556: \url{https://www.archives.gov/cui/registry/policy-guidance}
+    \item 32 CFR Part 2002: \url{https://www.ecfr.gov/current/title-32/subtitle-B/chapter-XX/part-2002}
+    \item NARA CUI Registry: \url{https://www.archives.gov/cui}
+    \item REQ-2026-001 (SendCUIEmail precedent): Cryptographic Compliance Requirements
+    \item VER-2026-001 (SendCUIEmail precedent): Cryptographic Compliance Verification
+    \item Related Decision: DM-2026-001 (SF901 LaTeX Recreation)
+\end{itemize}
+
+\end{enumerate}
+}
+
+% ----------------------------------------------------------------------------
+% INCLUDE SHARED TEMPLATE
+% ----------------------------------------------------------------------------
+\input{_template.tex}
