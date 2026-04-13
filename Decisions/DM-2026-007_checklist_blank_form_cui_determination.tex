@@ -1,0 +1,95 @@
+% ============================================================================
+% DM-2026-007: Doc 8604 Rev D Blank Checklist CUI Determination
+% ============================================================================
+\newcommand{\UniqueID}{DM-2026-007}
+\newcommand{\DocumentDate}{April 13, 2026}
+\newcommand{\AuthorName}{Bruce Dombrowski}
+\newcommand{\AuthorTitle}{Systems Engineer, Payload Software Integration}
+\newcommand{\ToField}{PSI Team, PIM, NASA JSC CUI Program Manager}
+\newcommand{\SubjectField}{CUI Determination: Doc 8604 Rev D Blank Checklist Form}
+\newcommand{\OPRField}{Payload Software Integration (PSI)}
+
+\newcommand{\dmContent}{%
+\begin{enumerate}
+
+\dmsection{Purpose}
+
+This memorandum documents the formal determination that the \textbf{blank} Doc 8604 Rev D ``C\&DH / GDS / IT Security Coordination Meeting Checklist'' PDF form is \textbf{not Controlled Unclassified Information (CUI)} and may be distributed without CUI markings or handling restrictions. This determination applies only to the blank, unfilled form as shipped from the source repository.
+
+\dmsection{Background}
+
+Doc 8604 Rev D is a LaTeX-generated AcroForm PDF checklist used during the ISS Payload C\&DH / GDS / IT Security Coordination Meeting. It contains 485 fillable form fields across 14 sections covering Legacy C\&DH, Onboard Ethernet, KuIP Services, NTP, Anti-Virus, SSC Change Management, NAS Services, JSL, Visiting Vehicles, HOSC GDS, and HRDL.
+
+When a Payload Developer (PD) fills the form with payload-specific data (MAC addresses, IP addresses, KuIP identifiers, IT security configurations), the \textbf{filled} copy becomes CUI under the Export Controlled category (CUI//SP-EXPT//FEDCON). This distinction --- blank vs.\ filled --- drives different handling requirements.
+
+A formal compliance assessment was conducted against authoritative sources (see Section~6) and is documented in \texttt{docs/compliance/} of the project repository.
+
+\dmsection{Applicable Standard}
+
+\textbf{32 CFR Part 2002.4} defines Controlled Unclassified Information as:
+
+\begin{quote}
+\textit{``information the Government creates or possesses, or that an entity creates or possesses for or on behalf of the Government, that a law, regulation, or Government-wide policy requires or permits an agency to handle using safeguarding or dissemination controls.''}
+\end{quote}
+
+Source: 32 CFR 2002.4, via Cornell LII (\url{https://www.law.cornell.edu/cfr/text/32/part-2002}), verified April 10, 2026.
+
+\dmsection{Analysis}
+
+The blank Doc 8604 Rev D PDF contains the following categories of content:
+
+\begin{itemize}
+    \item \textbf{Section headings} (e.g., ``Section 5: Ku Band IP Services'') --- publicly citable SSP document structure
+    \item \textbf{SSP document numbers and paragraph references} (SSP 57000 I.3.5, SSP 52050 3.3.7, etc.) --- publicly available document identifiers
+    \item \textbf{Empty AcroForm fields} (text fields, checkboxes) --- structure, not data
+    \item \textbf{KuIP protocol names} (ICMP, SSH, FTPS, RDP, etc.) --- IETF-standard protocol names, publicly known
+    \item \textbf{``How to use'' instructions and CUI Designation checkboxes} --- procedural guidance
+    \item \textbf{Applicable Requirements callouts} (per-section SSP paragraph citations) --- references to the requirement, not the requirement text itself
+    \item \textbf{DocuSign-style signature and initial placeholder boxes} --- empty visual elements
+\end{itemize}
+
+Each category was tested against the CUI Registry definitions for:
+
+\begin{itemize}
+    \item \textbf{SP-EXPT (Export Controlled):} No export-controlled technical data is present in the blank form. The form captures payload-specific technical data only when filled.
+    \item \textbf{ISVI (Information Systems Vulnerability Information):} The blank form describes the \textit{structure} of ISS C\&DH interfaces but does not reveal specific vulnerabilities, configurations, IP addresses, or attack surfaces. SSP document numbers are publicly citable.
+    \item \textbf{SP-CTI (Controlled Technical Information):} No technical data with military or space application beyond publicly available SSP paragraph numbers.
+    \item \textbf{SP-PROPIN / PRVCY:} No proprietary business information or personally identifiable information.
+\end{itemize}
+
+\textbf{Conclusion:} No content in the blank PDF triggers any CUI Registry category. The blank form does not meet the 32 CFR 2002.4 definition of CUI.
+
+\dmsection{Decision}
+
+\textbf{The blank Doc 8604 Rev D checklist form is NOT CUI.}
+
+\begin{itemize}
+    \item The blank PDF may be distributed without CUI markings
+    \item The blank PDF may be committed to private repositories accessible to authorized users
+    \item The blank PDF may be emailed without encryption (though encryption is still recommended as good practice)
+    \item The blank PDF carries the notice ``THIS FORM CONTAINS CUI WHEN FILLED IN'' per the NARA-recognized pattern for forms that become CUI upon completion
+\end{itemize}
+
+\textbf{Once any payload-specific data is entered}, the filled copy is \textbf{CUI//SP-EXPT//FEDCON} and must be:
+\begin{itemize}
+    \item Stamped with compliant CUI banner via \texttt{tools/mark\_cui.py}
+    \item Distributed only via NASA ORBIT Files (preferred) or encrypted email
+    \item Handled per 32 CFR Part 2002 and NPR 2810.7
+\end{itemize}
+
+\dmsection{References}
+
+\begin{itemize}
+    \item 32 CFR Part 2002.4 (CUI definition): \url{https://www.law.cornell.edu/cfr/text/32/part-2002}
+    \item NARA CUI Registry --- Export Controlled: \url{https://www.archives.gov/cui/registry/category-detail/export-control}
+    \item NPR 2810.7 ``Controlled Unclassified Information'': \url{https://nodis3.gsfc.nasa.gov/displayDir.cfm?t=NPR&c=2810&s=7}
+    \item \texttt{docs/compliance/blank-form-cui-determination.md} --- full AI-assisted assessment with verbatim quotes, verified by correctness-check agent
+    \item \texttt{docs/compliance/correctness-review.md} --- citation verification (95\% accuracy, one hallucination corrected)
+    \item DM-2026-006 (NASA CUI Directive Requirements Absorption) --- prior decision establishing the CUI requirements framework
+    \item DM-2026-008 (Desk Instruction CUI Classification) --- companion decision for the DI-PSI-CDH-GDS guide
+\end{itemize}
+
+\end{enumerate}
+}
+
+\input{_template.tex}

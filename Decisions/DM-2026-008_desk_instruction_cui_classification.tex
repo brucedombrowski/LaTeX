@@ -1,0 +1,98 @@
+% ============================================================================
+% DM-2026-008: DI-PSI-CDH-GDS Desk Instruction CUI Classification
+% ============================================================================
+\newcommand{\UniqueID}{DM-2026-008}
+\newcommand{\DocumentDate}{April 13, 2026}
+\newcommand{\AuthorName}{Bruce Dombrowski}
+\newcommand{\AuthorTitle}{Systems Engineer, Payload Software Integration}
+\newcommand{\ToField}{PSI Team, PIM, NASA JSC CUI Program Manager}
+\newcommand{\SubjectField}{CUI Classification: DI-PSI-CDH-GDS Desk Instruction}
+\newcommand{\OPRField}{Payload Software Integration (PSI)}
+
+\newcommand{\dmContent}{%
+\begin{enumerate}
+
+\dmsection{Purpose}
+
+This memorandum documents the decision to classify the DI-PSI-CDH-GDS ``C\&DH / GDS / IT Security Coordination Meeting Guide'' desk instruction as \textbf{CUI//SP-EXPT//FEDCON} in its as-shipped state, and to flag the potential applicability of the \textbf{ISVI (Information Systems Vulnerability Information)} category for NASA JSC CUI Program Manager adjudication.
+
+\dmsection{Background}
+
+DI-PSI-CDH-GDS is a 25-page companion desk instruction for the Doc 8604 Rev D checklist. Unlike the blank checklist (which contains only empty form fields and publicly-citable SSP document numbers), the desk instruction contains \textbf{procedural knowledge about ISS information infrastructure}:
+
+\begin{itemize}
+    \item \textbf{NTP architecture:} iPEHG-2 ISS/GPS time path and SSC NTP server ground-time path
+    \item \textbf{Antivirus update distribution:} PL NAS, SSC System, and PD-uplink methods with access protocol specifics (SMB, NFS/AFP, HTTP URL)
+    \item \textbf{KuIP protocol assignment rules:} Port-numbering constraints ($>$1023), APID encoding structure, NAT IP assignment procedures, Space/Ground Node ID management
+    \item \textbf{JSL network topology:} Hirschmann Switch, WAPs, Edge Router connection types, static route handling, VLAN configuration guidance
+    \item \textbf{HOSC GDS routing:} PDSS CCSDS Space Packet routing, iVODS paths, ICU on-board LOS storage, GSE packet assignment
+    \item \textbf{D684-11372-01 identifier encoding:} APID bit-field structure, Subset ID encoding rules, PUI field definitions, KuIP PDL Log management procedures
+    \item \textbf{MAC address assignment procedures:} Configurable vs.\ hardcoded determination, who assigns (PSI vs.\ PD), and how assignments flow to the Preliminary SW ICD
+    \item \textbf{IT Security:} SSP 50974 requirements flow, malware-definition update paths, SSH key pair and X.509 certificate exchange procedures
+\end{itemize}
+
+This procedural knowledge describes \textit{how the ISS information infrastructure operates}, even without disclosing specific IP addresses or payload configurations. An adversary with this knowledge would understand the architecture, data paths, assignment authority chains, and identifier structures of the ISS C\&DH system.
+
+\dmsection{Analysis}
+
+\textbf{Export Controlled (SP-EXPT):} The desk instruction describes technical data about the ISS payload C\&DH and GDS systems that is subject to U.S. export control under the EAR (15 CFR Parts 730--774) and/or ITAR (22 CFR Parts 120--130). The ISS C\&DH system architecture, including protocol assignment rules, identifier encoding, and network topology, constitutes controlled technical data about a space system. \textbf{SP-EXPT applies.}
+
+\textbf{Information Systems Vulnerability Information (ISVI):} The CUI Registry defines ISVI as information about vulnerabilities in information systems. The desk instruction describes:
+\begin{itemize}
+    \item Network topology (which devices connect where)
+    \item Authentication paths (SSH key exchange, X.509 certificate procedures)
+    \item Time-synchronization architecture (NTP sources)
+    \item Malware-definition update distribution channels
+    \item Identifier encoding that could aid spoofing (APID bit-field structure)
+\end{itemize}
+
+Whether this constitutes ``vulnerability information'' or merely ``system description'' is a judgment call that \textbf{requires NASA JSC CUI PM adjudication}. This decision conservatively marks the document as SP-EXPT and flags ISVI for determination.
+
+\textbf{Limited Dissemination Control --- FEDCON:} The desk instruction is used by Boeing PSI engineers (federal contractors) supporting NASA payloads. The ISS is an international-partner program (JAXA, ESA, CSA, Roscosmos), so NOFORN is inappropriate. FEDCON (Federal Employees and Contractors Only) is the correct LDC. If international-partner access is needed, the NASA JSC CUI PM may authorize REL TO markings on a case-by-case basis.
+
+\dmsection{Decision}
+
+\textbf{DI-PSI-CDH-GDS is classified as CUI//SP-EXPT//FEDCON.}
+
+\begin{itemize}
+    \item The desk instruction carries CUI//SP-EXPT//FEDCON banner on every page (running header and footer)
+    \item The cover page explicitly states the classification and notes the ISVI-pending determination
+    \item The desk instruction must be distributed only via NASA ORBIT Files (preferred) or encrypted email (DoD SAFE, NASA Box CUI, FIPS 140-2/3 S/MIME)
+    \item The desk instruction must not be committed to any public repository
+    \item The desk instruction must not be emailed unencrypted
+    \item Destroy copies per NIST SP 800-88
+\end{itemize}
+
+\textbf{Pending action:} NASA JSC CUI PM to adjudicate whether ISVI additionally applies. If yes, the banner becomes \textbf{CUI//SP-EXPT/ISVI//FEDCON}. This is tracked as compliance finding F-12 in \texttt{docs/compliance/findings-and-recommendations.md}.
+
+\textbf{Distinction from the blank checklist:} Per DM-2026-007, the blank Doc 8604 Rev D checklist form is NOT CUI because it contains only empty fields and publicly-citable document numbers. The desk instruction is CUI because it contains the \textit{procedural answers} --- the infrastructure knowledge that the blank form merely asks about.
+
+\dmsection{Implementation}
+
+\begin{itemize}
+    \item CUI//SP-EXPT//FEDCON banner added to DI-PSI-CDH-GDS-Meeting-Guide.pdf running header/footer via \texttt{docs/di-pandoc-header.tex}
+    \item Cover page classification block updated via \texttt{docs/di-pandoc-before-body.tex}
+    \item ISVI-pending note included on cover page referencing compliance finding F-12
+    \item Repository (\texttt{ISS\_Payload\_CDH\_Interface\_PSI\_Checklist}) is PRIVATE on GitHub --- verified, no public-release violation
+    \item The companion PSI Training Module spreadsheets (\texttt{PSI-TrainingModule\_600-601*.xltx}, \texttt{PSI-TrainingModule\_602*.xlsx}) are also CUI//SP-EXPT and co-reside in the same private repository
+\end{itemize}
+
+\dmsection{References}
+
+\begin{itemize}
+    \item 32 CFR Part 2002.4 (CUI definition): \url{https://www.law.cornell.edu/cfr/text/32/part-2002}
+    \item 32 CFR Part 2002.20 (CUI marking requirements): \url{https://www.law.cornell.edu/cfr/text/32/section-2002.20}
+    \item NARA CUI Registry --- Export Controlled: \url{https://www.archives.gov/cui/registry/category-detail/export-control}
+    \item NARA CUI Registry --- ISVI: \url{https://www.archives.gov/cui/registry/category-detail/information-systems-vulnerability-information}
+    \item NPR 2810.7 ``Controlled Unclassified Information'': \url{https://nodis3.gsfc.nasa.gov/displayDir.cfm?t=NPR&c=2810&s=7}
+    \item \texttt{docs/compliance/findings-and-recommendations.md} --- Finding F-12 (ISVI dual-category question)
+    \item \texttt{docs/compliance/blank-form-cui-determination.md} --- blank-form NOT CUI determination
+    \item \texttt{docs/compliance/correctness-review.md} --- citation verification
+    \item DM-2026-006 (NASA CUI Directive Requirements Absorption)
+    \item DM-2026-007 (Blank Checklist NOT CUI Determination)
+\end{itemize}
+
+\end{enumerate}
+}
+
+\input{_template.tex}
