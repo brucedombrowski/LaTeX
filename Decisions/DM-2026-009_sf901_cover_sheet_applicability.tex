@@ -1,0 +1,124 @@
+% ============================================================================
+% DM-2026-009: SF 901 Cover Sheet Applicability for Electronic CUI Documents
+% ============================================================================
+\newcommand{\UniqueID}{DM-2026-009}
+\newcommand{\DocumentDate}{April 13, 2026}
+\newcommand{\AuthorName}{Bruce Dombrowski}
+\newcommand{\AuthorTitle}{Systems Engineer, Payload Software Integration}
+\newcommand{\ToField}{PSI Team, ISS Program Compliance Stakeholders}
+\newcommand{\SubjectField}{SF 901 Cover Sheet Applicability for Electronic CUI Documents}
+\newcommand{\OPRField}{Payload Software Integration (PSI)}
+
+\newcommand{\dmContent}{%
+\begin{enumerate}
+
+\dmsection{Purpose}
+
+This memorandum documents the analysis and decision regarding when Standard Form 901 (SF 901) CUI cover sheets are required versus optional for ISS Program payload integration documents, with specific application to the DI-PSI-CDH-GDS desk instruction and the Doc 8604 Rev D checklist.
+
+The ISS Program has at various points required SF 901 cover sheets on CUI documents. This decision clarifies the regulatory basis for that requirement and identifies the conditions under which SF 901 is mandatory versus discretionary.
+
+\dmsection{Background}
+
+Standard Form 901 (11-18) is a cover sheet prescribed by the General Services Administration (GSA) and the Information Security Oversight Office (ISOO) under 32 CFR Part 2002. Its purpose is to alert \textbf{physical handlers} that the material behind the cover sheet is Controlled Unclassified Information requiring safeguarding.
+
+The ISS Program periodically mandates SF 901 usage for CUI documents. This creates confusion about whether the cover sheet is a \textit{regulatory requirement} for all CUI documents or a \textit{program-specific policy} triggered by specific handling contexts.
+
+\dmsection{Regulatory Analysis}
+
+\textbf{32 CFR 2002.20 --- CUI Marking Requirements:}
+
+The regulation specifies the following mandatory marking elements for CUI documents:
+
+\begin{itemize}
+    \item \textbf{\S2002.20(a):} Markings must be ``uniform and conspicuous''
+    \item \textbf{\S2002.20(b):} CUI banner (e.g., CUI//SP-EXPT//FEDCON) at the \textbf{top and bottom of every page}
+    \item \textbf{\S2002.20(d):} Designation indicator on the first page or cover (controlled by, categories, LDC, POC, decontrol)
+    \item \textbf{\S2002.20(f):} Portion markings are ``permitted and encouraged'' but \textbf{not required}
+\end{itemize}
+
+Source: 32 CFR 2002.20, verified via Cornell LII (\texttt{law.cornell.edu/cfr/text/32/part-2002}), April 10, 2026.
+
+\textbf{Critically, 32 CFR 2002.20 does not mandate SF 901 for all CUI documents.} The regulation requires banner marking, designation indicator, and uniform/conspicuous presentation --- all of which are satisfied by the banner on every page of an electronic document.
+
+\textbf{SF 901's actual scope:}
+
+SF 901 is a \textit{cover sheet} --- a physical-handling artifact. Its function is to alert a person encountering a printed document (on a desk, in a folder, in a mail pouch, at a printer output tray) that the pages behind it are CUI. For electronic documents:
+
+\begin{itemize}
+    \item The banner at the top and bottom of every page serves the same alerting function
+    \item PDF viewers display the banner immediately upon opening
+    \item Email transmission already requires encryption (DoD SAFE, NASA Box CUI, S/MIME), which itself provides handling awareness
+    \item ORBIT Files provides access-controlled delivery with audit trail
+\end{itemize}
+
+An electronic PDF with compliant banner marking on every page plus a designation indicator \textbf{fully satisfies 32 CFR 2002.20} without an SF 901 cover sheet.
+
+\dmsection{When SF 901 IS Appropriate}
+
+SF 901 cover sheets are appropriate and recommended when:
+
+\begin{itemize}
+    \item \textbf{Physical printing:} The document will be printed and handled in paper form --- e.g., in a lab environment, a test facility, or a conference room with printed handouts
+    \item \textbf{Mixed-media distribution:} The document may be both electronic and printed, and the sender cannot control which form recipients will use
+    \item \textbf{Facility posting:} The document is posted in a physical space (bulletin board, workstation binder, test-procedure holder)
+    \item \textbf{Mail or courier:} The document is transmitted via physical mail, internal courier, or diplomatic pouch
+    \item \textbf{Printer output:} The document may sit in a shared-printer output tray where unauthorized persons could see it
+\end{itemize}
+
+For the ISS Program specifically, \textbf{lab environments} are the most common scenario where SF 901 adds value: payload integration test procedures printed for a JSL test, HRDL verification procedures at a POIC workstation, or SSC configuration checklists at a HOSC console.
+
+\dmsection{When SF 901 Is NOT Required}
+
+SF 901 cover sheets are not required by 32 CFR 2002.20 when:
+
+\begin{itemize}
+    \item The document is \textbf{electronic only} (PDF distributed via ORBIT Files or encrypted email)
+    \item The document has \textbf{compliant CUI banner marking} on every page (top and bottom)
+    \item The document has a \textbf{designation indicator} on the first page
+    \item There is \textbf{no realistic expectation of physical printing}
+\end{itemize}
+
+\dmsection{Decision}
+
+\textbf{For PSI payload integration documents:}
+
+\begin{itemize}
+    \item \textbf{Electronic-only distribution (ORBIT Files, encrypted email):} SF 901 is \textbf{optional}. Banner marking on every page + designation indicator = fully compliant per 32 CFR 2002.20. Including SF 901 is a professional enhancement but not a regulatory requirement.
+    \item \textbf{Documents likely to be printed (lab procedures, test checklists, conference handouts):} SF 901 is \textbf{recommended}. The cover sheet serves its intended physical-handling alerting function.
+    \item \textbf{Mixed-media or uncertain distribution:} SF 901 is \textbf{recommended} as a conservative measure.
+\end{itemize}
+
+\textbf{Application to current documents:}
+
+\begin{itemize}
+    \item \textbf{DI-PSI-CDH-GDS (desk instruction):} Electronic distribution via ORBIT Files. SF 901 is \textbf{included} as a professional enhancement but \textbf{not required}. If the program later mandates removal to reduce page count, the document remains fully compliant without it.
+    \item \textbf{Doc 8604 Rev D (checklist):} Distributed as a fillable PDF for electronic use during meetings. SF 901 is \textbf{not included} because the document has its own CUI Designation section and banner marking capability via \texttt{tools/mark\_cui.py}. If printed for a lab walkthrough, an SF 901 cover sheet should be printed separately and placed on top.
+\end{itemize}
+
+\dmsection{Guidance for ISS Program SF 901 Mandates}
+
+When the ISS Program issues a requirement for SF 901 on CUI documents:
+
+\begin{itemize}
+    \item \textbf{Confirm the scope:} Does the mandate apply to all CUI documents or specifically to documents intended for physical handling?
+    \item \textbf{Cite the regulation:} 32 CFR 2002.20 does not require SF 901 for electronically-distributed documents with compliant banner markings. The mandate may be a program-specific policy layered on top of the regulation.
+    \item \textbf{Comply pragmatically:} If the program mandates SF 901 on all CUI documents regardless of distribution method, comply. The cover sheet adds one page and causes no harm. The regulatory basis is discretionary, but program mandates are program mandates.
+    \item \textbf{Document the distinction:} This decision memorandum serves as the documented rationale for understanding when SF 901 is regulatory versus programmatic.
+\end{itemize}
+
+\dmsection{References}
+
+\begin{itemize}
+    \item 32 CFR Part 2002.20 (CUI marking requirements): \url{https://www.law.cornell.edu/cfr/text/32/part-2002}
+    \item Standard Form 901 (11-18): Prescribed by GSA/ISOO under 32 CFR 2002
+    \item NPR 2810.7 ``Controlled Unclassified Information'': \url{https://nodis3.gsfc.nasa.gov/displayDir.cfm?t=NPR&c=2810&s=7}
+    \item DM-2026-001 (SF 901 LaTeX Recreation Decision)
+    \item DM-2026-007 (Blank Checklist NOT CUI Determination)
+    \item DM-2026-008 (Desk Instruction CUI Classification)
+\end{itemize}
+
+\end{enumerate}
+}
+
+\input{_template.tex}
