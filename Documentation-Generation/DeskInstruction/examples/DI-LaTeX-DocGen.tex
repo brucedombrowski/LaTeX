@@ -1,0 +1,278 @@
+% ============================================================================
+% DI-LATEX-DOCGEN: Desk Instruction for the LaTeX Documentation-Generation System
+% ============================================================================
+% This is both a REAL desk instruction AND the example document for the
+% Desk Instruction template. It teaches a new user how to create, build,
+% and maintain documents using the Documentation-Generation template system.
+%
+% Build:  pdflatex DI-LaTeX-DocGen.tex  (run twice for TOC)
+% ============================================================================
+
+% --- Variables ---
+\newcommand{\DITitle}{LaTeX Documentation-Generation System}
+\newcommand{\DIID}{DI-LATEX-DOCGEN}
+\newcommand{\DIDate}{April 2026}
+\newcommand{\DIVersion}{v1.0}
+\newcommand{\DIAuthor}{Documentation-Generation Project}
+\newcommand{\DISubject}{How to create, build, and maintain documents using the Documentation-Generation template system}
+\newcommand{\DIOPR}{Open Source LaTeX Templates}
+
+% ============================================================================
+% CONTENT (must be defined BEFORE \input of the base template)
+% ============================================================================
+\newcommand{\DIContent}{
+
+\section{Purpose}
+
+This desk instruction describes how to use the LaTeX Documentation-Generation template system to produce professional documents. It covers the available document types, directory conventions, how to create a new document from a template, how to build PDFs, and how to contribute new templates.
+
+\dinote{This document is itself built from the Desk Instruction template. Every callout box, procedure step, and formatting element you see here is available in your own desk instructions via the commands documented in Section~\ref{sec:commands}.}
+
+\section{Available Document Types}
+
+The Documentation-Generation project provides base templates for the following document types:
+
+\begin{center}
+\begin{tabularx}{0.95\textwidth}{@{}l l X@{}}
+\toprule
+\textbf{Type} & \textbf{Directory} & \textbf{Use Case} \\
+\midrule
+Attestation       & \texttt{Attestations/}         & Formal attestation or certification statements \\
+Decision Document & \texttt{DecisionDocument/}      & Structured decision records with rationale \\
+Decision Memorandum & \texttt{DecisionMemorandum/}  & Short-form memos documenting a decision \\
+Desk Instruction  & \texttt{DeskInstruction/}       & Procedural guides, how-to documents, training aids \\
+Meeting Agenda    & \texttt{MeetingAgenda/}         & Structured meeting agendas with action items \\
+Slide Deck        & \texttt{SlideDecks/}            & Beamer-based presentations \\
+Software ICD      & \texttt{SoftwareICD/}           & Software Interface Control Documents \\
+Technical Report  & \texttt{TechnicalReport/}       & Assessment reports, analysis, DRY reviews \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Each type follows the same directory layout:
+
+\par\vspace{4pt}\noindent\colorbox{diBgLight}{\begin{minipage}{\dimexpr\linewidth-12pt\relax}\small\ttfamily
+DocumentType/\\
+    templates/     Base .tex template(s) shared by all instances\\
+    examples/      Example documents built from the template\\
+\end{minipage}}\par\vspace{4pt}
+
+
+\section{Creating a New Document}
+\label{sec:create}
+
+\subsection{Step-by-Step Procedure}
+
+\begin{enumerate}
+
+\distep{Choose the document type.}
+Determine which template matches your need from the table above. If none fits, see Section~\ref{sec:new-template} for creating a new template type.
+
+\distep{Copy the example file.}
+Navigate to the \texttt{examples/} directory of your chosen type and copy the example \texttt{.tex} file to your working directory.
+
+\dicaution{Do not edit the base template in \texttt{templates/} directly. The template is shared by all documents of that type. Always work from a copy in your own directory or in \texttt{examples/}.}
+
+\distep{Edit the variables block.}
+Open the copied \texttt{.tex} file and update the variable definitions at the top. Each template documents its required and optional variables in comments. For example, a Desk Instruction requires:
+
+\par\vspace{4pt}\noindent\colorbox{diBgLight}{\begin{minipage}{\dimexpr\linewidth-12pt\relax}\small\ttfamily
+\textbackslash{}newcommand\{\textbackslash{}DITitle\}\{Your Title Here\}\\
+  \textbackslash{}newcommand\{\textbackslash{}DIID\}\{DI-YOUR-ID\}\\
+  \textbackslash{}newcommand\{\textbackslash{}DIDate\}\{Month YYYY\}\\
+  \textbackslash{}newcommand\{\textbackslash{}DIVersion\}\{v1.0\}\\
+  \textbackslash{}newcommand\{\textbackslash{}DIAuthor\}\{Your Name or Org\}\\
+  \textbackslash{}newcommand\{\textbackslash{}DISubject\}\{One-line description\}\\
+  \textbackslash{}newcommand\{\textbackslash{}DIOPR\}\{Your Office\}\\
+\end{minipage}}\par\vspace{4pt}
+
+
+\distep{Replace the content commands.}
+Each template has one or more content commands (\texttt{\textbackslash{}DIContent}, \texttt{\textbackslash{}DIReferences}, etc.) that you override with \texttt{\textbackslash{}renewcommand}. Write your content inside these commands.
+
+\distep{Verify the \texttt{\textbackslash input} path.}
+Ensure the \texttt{\textbackslash{}input\{../templates/desk\_instruction\_base.tex\}} path is correct relative to your file's location.
+
+\digotcha{A common mistake is copying the example to a different directory depth without updating the relative path to the template. If \texttt{pdflatex} says ``File not found,'' check this path first.}
+
+\distep{Build the PDF.}
+Run \texttt{pdflatex} twice (the second pass resolves cross-references and the table of contents):
+
+\par\vspace{4pt}\noindent\colorbox{diBgLight}{\begin{minipage}{\dimexpr\linewidth-12pt\relax}\small\ttfamily
+pdflatex YourDocument.tex\\
+  pdflatex YourDocument.tex\\
+\end{minipage}}\par\vspace{4pt}
+
+
+Or if a \texttt{Makefile} is available: \texttt{make}
+
+\distep{Review the output.}
+Open the generated PDF and verify: title page variables, table of contents, section numbering, and callout-box rendering.
+
+\end{enumerate}
+
+\section{Custom Commands Reference}
+\label{sec:commands}
+
+The Desk Instruction template provides the following custom commands. All are optional --- use them when they add clarity.
+
+\subsection{Callout Boxes}
+
+\dinote{Use \texttt{\textbackslash dinote\{text\}} for informational notes that provide helpful context.}
+
+\dicaution{Use \texttt{\textbackslash dicaution\{text\}} for cautions about non-obvious constraints or pitfalls.}
+
+\diwarning{Use \texttt{\textbackslash diwarning\{text\}} for warnings about actions that could cause data loss or process violations.}
+
+\discript{Use \texttt{\textbackslash discript\{text\}} for ``what to say'' scripts --- exact wording an operator should use in a meeting or conversation.}
+
+\digotcha{Use \texttt{\textbackslash digotcha\{text\}} for common mistakes that experienced practitioners have learned to avoid.}
+
+\subsection{Inline Commands}
+
+\begin{itemize}
+\item \texttt{\textbackslash{}distep\{title\}} --- use inside an \texttt{enumerate} environment to create a bold-titled procedure step. Example: \texttt{\textbackslash{}distep\{Open the file.\}}
+\item \texttt{\textbackslash{}diref\{doc\}\{paragraph\}\{description\}} --- inline reference callout. Renders as:\\
+  \diref{SSP 57000}{I.3.5}{Ethernet Interface Requirements}
+\end{itemize}
+
+\subsection{Section Structure}
+
+The template provides automatic table of contents, navy-colored section headers with teal accent rules, and three levels of headings (\texttt{\textbackslash{}section}, \texttt{\textbackslash{}subsection}, \texttt{\textbackslash{}subsubsection}).
+
+Optional blocks are emitted only if defined:
+\begin{itemize}
+\item \texttt{\textbackslash{}DIReferences} --- rendered as a ``References'' section
+\item \texttt{\textbackslash{}DIGlossary} --- rendered as a ``Glossary'' section
+\item \texttt{\textbackslash{}DIAppendix} --- rendered after \texttt{\textbackslash{}appendix} command (sections become A, B, C...)
+\end{itemize}
+
+\section{Design Conventions}
+
+\subsection{Variable Naming}
+
+All template variables use a two-letter prefix matching the document type:
+
+\begin{center}
+\begin{tabular}{@{}l l@{}}
+\toprule
+\textbf{Type} & \textbf{Prefix} \\
+\midrule
+Desk Instruction & \texttt{\textbackslash{}DI...} \\
+Technical Report & \texttt{\textbackslash{}Report...} \\
+Decision Memo    & \texttt{\textbackslash{}DM...} or direct names \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Color Palette}
+
+The Desk Instruction template uses a consistent color palette:
+
+\begin{center}
+\begin{tabular}{@{}l l l@{}}
+\toprule
+\textbf{Name} & \textbf{Hex} & \textbf{Use} \\
+\midrule
+diNavy    & \texttt{\#0B2545} & Headings, primary text emphasis \\
+diAccent  & \texttt{\#1A8FA6} & Title-page rules, accent elements \\
+diMuted   & \texttt{\#6C757D} & Footer text, secondary metadata \\
+diBgLight & \texttt{\#F8F9FB} & Light background tint \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Other document types may define their own palettes.
+
+\subsection{File Naming}
+
+\begin{itemize}
+\item Templates: \texttt{<type>\_base.tex} in \texttt{templates/}
+\item Examples: \texttt{DI-<ShortName>.tex} in \texttt{examples/}
+\item Built PDFs: same base name with \texttt{.pdf} extension
+\end{itemize}
+
+\section{Creating a New Template Type}
+\label{sec:new-template}
+
+If none of the existing templates fits your document type:
+
+\begin{enumerate}
+\distep{Create the directory structure.}
+\par\vspace{4pt}\noindent\colorbox{diBgLight}{\begin{minipage}{\dimexpr\linewidth-12pt\relax}\small\ttfamily
+mkdir -p NewType/templates NewType/examples\\
+\end{minipage}}\par\vspace{4pt}
+
+
+\distep{Write the base template.}
+Copy the closest existing template (e.g., \texttt{desk\_instruction\_base.tex}) and adapt:
+\begin{itemize}
+\item Rename the variable prefix (e.g., \texttt{\textbackslash{}NT...})
+\item Adjust the header/footer to reflect the new document type name
+\item Add or remove custom commands as needed
+\item Update the \texttt{\textbackslash{}hypersetup} metadata
+\end{itemize}
+
+\distep{Write the example document.}
+The example should be \textbf{self-documenting} --- it explains how to use the template \textit{by being an instance of it}. This is the convention across the project.
+
+\dicaution{The example must not contain organization-specific, proprietary, or classified content. This is a public repository. Use generic or meta-referencing examples.}
+
+\distep{Build and verify.}
+Build the example, verify TOC, headers, footers, callout boxes, and page numbering.
+
+\distep{Update the project documentation.}
+Add the new type to the table in \texttt{AGENTS.md} (if it exists) and to this desk instruction's ``Available Document Types'' table.
+\end{enumerate}
+
+\section{Troubleshooting}
+
+\subsection{pdflatex fails with ``File not found''}
+Check the \texttt{\textbackslash{}input\{...\}} path relative to your .tex file's location. Use \texttt{../templates/} when building from \texttt{examples/}.
+
+\subsection{Table of contents is empty}
+Run \texttt{pdflatex} twice. The first pass generates the \texttt{.toc} file; the second pass reads it.
+
+\subsection{tcolorbox package not found}
+The callout boxes require the \texttt{tcolorbox} package. Install it via your TeX distribution's package manager (\texttt{tlmgr install tcolorbox} for TeX Live).
+
+\subsection{Fonts look wrong}
+The template uses \texttt{lmodern} (Latin Modern) with sans-serif default. Ensure \texttt{lmodern} is installed (\texttt{tlmgr install lm}).
+
+} % end \DIContent
+
+% ============================================================================
+% REFERENCES
+% ============================================================================
+\newcommand{\DIReferences}{
+\begin{itemize}
+\item \textbf{LaTeX Documentation-Generation} --- GitHub repository containing all templates.
+\item \textbf{The \LaTeX{} Companion} (3rd ed.) --- Mittelbach et al. General \LaTeX{} reference.
+\item \textbf{tcolorbox documentation} --- \url{https://ctan.org/pkg/tcolorbox}. Reference for callout-box styling.
+\item \textbf{fancyhdr documentation} --- \url{https://ctan.org/pkg/fancyhdr}. Header/footer configuration.
+\item \textbf{booktabs documentation} --- \url{https://ctan.org/pkg/booktabs}. Table formatting.
+\end{itemize}
+}
+
+% ============================================================================
+% GLOSSARY
+% ============================================================================
+\newcommand{\DIGlossary}{
+\begin{tabularx}{\textwidth}{@{}l X@{}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+DI    & Desk Instruction \\
+DM    & Decision Memorandum \\
+OPR   & Office of Primary Responsibility \\
+PDF   & Portable Document Format \\
+TOC   & Table of Contents \\
+TR    & Technical Report \\
+ICD   & Interface Control Document \\
+CEF   & Change Evaluation Form \\
+\bottomrule
+\end{tabularx}
+}
+
+% --- Load the base template (must come AFTER all variable/content definitions) ---
+\input{../templates/desk_instruction_base.tex}
