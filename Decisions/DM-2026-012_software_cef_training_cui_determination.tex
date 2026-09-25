@@ -1,0 +1,128 @@
+% ============================================================================
+% DM-2026-012: Software CEF Creation Training Package CUI Determination
+% ============================================================================
+\newcommand{\UniqueID}{DM-2026-012}
+\newcommand{\DocumentDate}{September 25, 2026}
+\newcommand{\AuthorName}{Bruce Dombrowski}
+\newcommand{\AuthorTitle}{Systems Engineer, Payload Software Integration}
+\newcommand{\ToField}{PSI Team, PIM Community, NASA JSC CUI Program Manager}
+\newcommand{\SubjectField}{CUI Determination: Software CEF Creation Training Package (NOT CUI)}
+\newcommand{\OPRField}{Payload Software Integration (PSI)}
+
+\newcommand{\dmContent}{%
+\begin{enumerate}
+
+\dmsection{Purpose}
+
+This memorandum documents the determination that the \textbf{Software CEF Creation training package} --- a lunch-and-learn session for ISS Payload Integration Managers and its accompanying artifacts --- is \textbf{NOT CUI}, and records the controls that keep that determination true rather than merely asserted.
+
+It also states, in advance, the specific conditions that would reverse the determination, so that a future contributor does not have to re-derive the analysis before deciding whether an addition is safe.
+
+\dmsection{Background}
+
+The package consists of five work products, produced in the private repository \texttt{PSI-Training}:
+
+\begin{itemize}
+    \item a slide deck (30-minute session, 15 slides) on creating software CEFs in ORBIT;
+    \item a one-page participant reference sheet, split so that half of it can be forwarded to a payload developer as a data call;
+    \item a narrated recording of the same material, with captions and a transcript, intended for a permanent link in \textbf{ORBIT Help};
+    \item redacted example security artifacts (malware scan, signed attestation, checksum manifest, interface inventory, vulnerability check), shown so that a payload developer can see what evidence is expected of them;
+    \item this determination.
+\end{itemize}
+
+The teaching content is procedural in the administrative sense --- which ORBIT fields exist, in what order they are completed, who supplies which value, and why a reviewer needs each one. It is not procedural in the technical sense: it does not tell the reader how any ISS system works.
+
+Two properties of the audience and the distribution drove the analysis. The audience is the PIM community, which includes personnel outside PSI. The intended distribution includes ORBIT Files and a persistent ORBIT Help link, which means the material will be read by people who were not in the room and who will not receive a verbal caveat.
+
+\dmsection{Analysis}
+
+\textbf{The governing precedent is DM-2026-007, not DM-2026-008.} Those two memoranda drew a line through closely related material. The blank Doc 8604 Rev D checklist was determined \textbf{NOT CUI} because it contains only empty form fields and publicly-citable SSP document numbers --- it \textit{asks} questions. The companion desk instruction was determined \textbf{CUI//SP-EXPT//FEDCON} because it contains the procedural answers: NTP architecture, KuIP port-numbering constraints, APID and Subset ID encoding structure, JSL network topology, MAC address assignment procedures, and malware-definition distribution paths.
+
+The training package sits unambiguously on the blank-form side of that line. It names fields and explains why a reviewer needs them. It contains none of the infrastructure knowledge that made the desk instruction controlled.
+
+\textbf{Export Controlled (SP-EXPT) --- does not apply.} The package was examined specifically for the categories of technical data that trigger SP-EXPT under the DM-2026-008 reasoning, and contains none of them:
+
+\begin{itemize}
+    \item no IP addresses, NAT mappings, or port assignments;
+    \item no APID, Subset ID, or PUI values, and no description of their encoding structure;
+    \item no MAC address assignments;
+    \item no network topology, switch, VLAN, or routing detail;
+    \item no NTP, antivirus-distribution, or ground-system data paths;
+    \item no payload configuration data of any kind.
+\end{itemize}
+
+Every ORBIT screen shown is a \textbf{synthetic recreation} populated with a fictional payload. The worked example throughout --- a second science mode adding two commands and three telemetry parameters --- is invented, and is deliberately written at a level of abstraction (``two new commands,'' ``three parameters at 1 Hz'') that carries no assignment or encoding information.
+
+\textbf{Information Systems Vulnerability Information (ISVI) --- does not apply.} Nothing in the package describes a vulnerability, a security control, or the security architecture of any information system. The security evidence samples require specific attention, because scan output is the kind of artifact that can carry ISVI. These samples do not: they were generated for public distribution by the \texttt{security-toolkit} repository's own redaction pass, which replaces MAC addresses, IP addresses, hostnames, serial numbers, checksums, and versions with placeholders while preserving only pass/fail status, control mappings, and document structure. They describe no ISS system --- they are outputs from a development workstation, shown as \textit{format} examples. Each file carries a header recording the source and redaction-script hashes, so the redaction is itself auditable. The copies were re-verified on import: no IP or MAC address patterns are present.
+
+\textbf{Privacy --- does not apply.} No personnel names appear in any artifact. No CEF numbers appear either; although CEF ID numbers alone are not CUI, the material names no specific change, which also serves the separate purpose described in Section 5.
+
+\textbf{Limited Dissemination Controls --- not applicable in the absence of a CUI category.} FEDCON would be the appropriate control if the determination were reversed, for the reason given in DM-2026-008: the ISS is an international-partner program, so NOFORN would be inappropriate.
+
+\textbf{Over-marking is a real cost, not a safe default.} Marking a non-CUI product as CUI is itself a compliance defect: it obstructs distribution the program wants (an ORBIT Help link that PIMs can actually reach), and it dilutes the meaning of the marking on the material that genuinely carries it. The determination below is therefore deliberate, not permissive.
+
+\dmsection{Decision}
+
+\textbf{The Software CEF Creation training package is NOT CUI.}
+
+\begin{itemize}
+    \item No CUI banner, no portion marking, and no SF 901 cover sheet (contrast DM-2026-009, which governs when the cover sheet does apply).
+    \item Distribution is unrestricted within the ISS Program: suitable for ORBIT Files, for a persistent ORBIT Help link, for a calendar invitation, and for forwarding to payload developers.
+    \item The participant reference sheet carries the footer statement \textbf{``Contains no CUI''} with a reference to this memorandum. This is a determination statement, not a marking; it exists so that a recipient who is deciding whether they may forward the sheet does not have to ask.
+\end{itemize}
+
+\dmsection{Controls}
+
+The determination holds only while the following remain true. Each is enforced by configuration rather than by intention, so that a contributor who does not read this memorandum still cannot invalidate it accidentally.
+
+\begin{enumerate}
+    \item \textbf{Captured ORBIT material never enters the repository.} Source captures are placed in \texttt{modules/*/assets/reference/}, which is excluded by \texttt{.gitignore}. Verify with \texttt{git check-ignore -v modules/*/assets/reference/*}. The directory's own README states the rule for anyone who opens it.
+    \item \textbf{Published screens are synthetic.} Recreations are built by reading a capture locally and reproducing layout, labels, and control types with invented values.
+    \item \textbf{Issue text only.} GitHub is not an approved CUI enclave, private repository or not. Screen-detail questions filed against this module request field labels, control types, validation rules, and navigation paths --- which are blank-form information under DM-2026-007 --- and explicitly direct captures to the ignored directory instead.
+    \item \textbf{Security samples are imported from public redacted output}, never generated against an ISS system, and are re-verified for address patterns on copy.
+    \item \textbf{No names and no CEF numbers.}
+\end{enumerate}
+
+\dmsection{Conditions that reverse this determination}
+
+Any one of the following makes the affected artifact \textbf{CUI//SP-EXPT//FEDCON}, at which point the banner, the SF 901 cover sheet per DM-2026-009, and the distribution restrictions of DM-2026-008 (ORBIT Files or encrypted email only; no public repository; destruction per NIST SP 800-88) all apply:
+
+\begin{itemize}
+    \item a screen capture of a populated ORBIT record, including payload titles or personnel names;
+    \item a worked example taken from a real CEF rather than invented;
+    \item any actual identifier assignment --- IP address, port, MAC address, APID, Subset ID --- or any description of how such identifiers are structured;
+    \item any network topology, data path, or infrastructure procedure of the kind enumerated in DM-2026-008;
+    \item scan output generated against an ISS or payload system rather than imported from public redacted examples.
+\end{itemize}
+
+A contributor who wants any of the above should expect to produce a second, separately-marked build rather than to re-mark the distributed one. The non-CUI version is the artifact the program actually needs in ORBIT Help.
+
+\dmsection{Implementation}
+
+\begin{itemize}
+    \item Controls 1 through 5 are recorded in \texttt{PSI-Training/CLAUDE.md} (rule 1) and \texttt{README.md}, and enforced in \texttt{.gitignore}.
+    \item \texttt{modules/software-cef-creation/assets/reference/README.md} carries the rule and the verification command at the point of use.
+    \item \texttt{modules/software-cef-creation/assets/security-samples/README.md} records the provenance and the re-verification of the imported samples.
+    \item The repository is private. That is defence in depth, not the basis of this determination --- the determination is that the content may be published within the program.
+    \item A PDF of this memorandum is carried in \texttt{PSI-Training/decisions/}, following the pattern used for DM-2026-007 through DM-2026-009 in the \texttt{ISS\_Payload\_CDH\_Interface\_PSI\_Checklist} repository.
+\end{itemize}
+
+\dmsection{References}
+
+\begin{itemize}
+    \item 32 CFR Part 2002.4 (CUI definition): \url{https://www.law.cornell.edu/cfr/text/32/part-2002}
+    \item 32 CFR Part 2002.20 (CUI marking requirements): \url{https://www.law.cornell.edu/cfr/text/32/section-2002.20}
+    \item NARA CUI Registry --- Export Controlled: \url{https://www.archives.gov/cui/registry/category-detail/export-control}
+    \item NARA CUI Registry --- ISVI: \url{https://www.archives.gov/cui/registry/category-detail/information-systems-vulnerability-information}
+    \item NPR 2810.7 ``Controlled Unclassified Information'': \url{https://nodis3.gsfc.nasa.gov/displayDir.cfm?t=NPR&c=2810&s=7}
+    \item DM-2026-007 (Blank Checklist NOT CUI Determination) --- the governing precedent
+    \item DM-2026-008 (Desk Instruction CUI Classification) --- the contrasting case, and the source of the reversal conditions
+    \item DM-2026-009 (SF 901 Cover Sheet Applicability)
+    \item \texttt{PSI-Training/README.md} --- module plan and CUI posture
+    \item \texttt{security-toolkit}, \texttt{scripts/redact-examples.sh} --- provenance of the evidence samples
+\end{itemize}
+
+\end{enumerate}
+}
+
+\input{_template.tex}
