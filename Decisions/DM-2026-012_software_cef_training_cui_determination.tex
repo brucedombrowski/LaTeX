@@ -53,7 +53,7 @@ The training package sits unambiguously on the blank-form side of that line. It 
 
 Every ORBIT screen shown is a \textbf{synthetic recreation} populated with a fictional payload. The worked example throughout --- a second science mode adding two commands and three telemetry parameters --- is invented, and is deliberately written at a level of abstraction (``two new commands,'' ``three parameters at 1 Hz'') that carries no assignment or encoding information.
 
-\textbf{Information Systems Vulnerability Information (ISVI) --- does not apply.} Nothing in the package describes a vulnerability, a security control, or the security architecture of any information system. The security evidence samples require specific attention, because scan output is the kind of artifact that can carry ISVI. These samples do not: they were generated for public distribution by the \texttt{security-toolkit} repository's own redaction pass, which replaces MAC addresses, IP addresses, hostnames, serial numbers, checksums, and versions with placeholders while preserving only pass/fail status, control mappings, and document structure. They describe no ISS system --- they are outputs from a development workstation, shown as \textit{format} examples. Each file carries a header recording the source and redaction-script hashes, so the redaction is itself auditable. The copies were re-verified on import: no IP or MAC address patterns are present.
+\textbf{Information Systems Vulnerability Information (ISVI) --- does not apply.} Nothing in the package describes a vulnerability, a security control, or the security architecture of any information system. The security evidence samples require specific attention, because scan output is the kind of artifact that can carry ISVI. These samples do not: they were generated for public distribution by the Security Verification Toolkit's own redaction pass, which replaces MAC addresses, IP addresses, hostnames, serial numbers, checksums, and versions with placeholders while preserving only pass/fail status, control mappings, and document structure. They describe no ISS system --- they are outputs from a development workstation, shown as \textit{format} examples. Each file carries a header recording the source and redaction-script hashes, so the redaction is itself auditable. The copies were re-verified on import: no IP or MAC address patterns are present.
 
 \textbf{Privacy --- does not apply.} No personnel names appear in any artifact. No CEF numbers appear either; although CEF ID numbers alone are not CUI, the material names no specific change, which also serves the separate purpose described in Section 5.
 
@@ -78,7 +78,7 @@ The determination holds only while the following remain true. Each is enforced b
 \begin{enumerate}
     \item \textbf{Captured ORBIT material never enters the repository.} Source captures are placed in \texttt{modules/*/assets/reference/}, which is excluded by \texttt{.gitignore}. Verify with \texttt{git check-ignore -v modules/*/assets/reference/*}. The directory's own README states the rule for anyone who opens it.
     \item \textbf{Published screens are synthetic.} Recreations are built by reading a capture locally and reproducing layout, labels, and control types with invented values.
-    \item \textbf{Issue text only.} GitHub is not an approved CUI enclave, private repository or not. Screen-detail questions filed against this module request field labels, control types, validation rules, and navigation paths --- which are blank-form information under DM-2026-007 --- and explicitly direct captures to the ignored directory instead.
+    \item \textbf{Issue text only.} The issue tracker is not an approved CUI enclave, private or not. Screen-detail questions filed against this module request field labels, control types, validation rules, and navigation paths --- which are blank-form information under DM-2026-007 --- and explicitly direct captures to the ignored directory instead.
     \item \textbf{Security samples are imported from public redacted output}, never generated against an ISS system, and are re-verified for address patterns on copy.
     \item \textbf{No names and no CEF numbers.}
 \end{enumerate}
@@ -100,7 +100,7 @@ A contributor who wants any of the above should expect to produce a second, sepa
 \dmsection{Implementation}
 
 \begin{itemize}
-    \item Controls 1 through 5 are recorded in \texttt{PSI-Training/CLAUDE.md} (rule 1) and \texttt{README.md}, and enforced in \texttt{.gitignore}.
+    \item Controls 1 through 5 are recorded in the package's written working rules and its \texttt{README.md}, and enforced by the repository's ignore rules.
     \item \texttt{modules/software-cef-creation/assets/reference/README.md} carries the rule and the verification command at the point of use.
     \item \texttt{modules/software-cef-creation/assets/security-samples/README.md} records the provenance and the re-verification of the imported samples.
     \item The repository is private. That is defence in depth, not the basis of this determination --- the determination is that the content may be published within the program.
