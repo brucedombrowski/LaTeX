@@ -1,0 +1,81 @@
+% ============================================================================
+% EXAMPLE — a decision memorandum, redacted for public release
+% ============================================================================
+% Not a real determination. No real recipient, artifact, or programme.
+%
+% Two capabilities are on show here:
+%   1. Producing a decision memorandum from the shared template.
+%   2. Redacting one so the reasoning survives and the specifics do not.
+%
+% The redaction convention: structure and argument stay, because that is what
+% makes a determination reviewable. Recipients, the artifact under
+% determination, and anything that identifies a system are replaced with a
+% bracketed marker naming WHAT was removed, so a reader can tell the difference
+% between a redaction and an omission.
+% ============================================================================
+\newcommand{\UniqueID}{DM-EXAMPLE}
+\newcommand{\DocumentDate}{[REDACTED --- date of determination]}
+\newcommand{\AuthorName}{[REDACTED --- author]}
+\newcommand{\AuthorTitle}{[REDACTED --- author title]}
+\newcommand{\ToField}{[REDACTED --- recipient offices]}
+\newcommand{\SubjectField}{CUI Determination: [REDACTED --- artifact] (NOT CUI)}
+\newcommand{\OPRField}{[REDACTED --- office of primary responsibility]}
+
+\newcommand{\dmContent}{%
+\begin{enumerate}
+
+\dmsection{Purpose}
+
+\item This example shows the shape of a determination after redaction. The
+argument is intact and checkable; the specifics are gone. A reviewer can still
+tell whether the reasoning holds, which is the property worth preserving.
+
+\dmsection{Background}
+
+\item The artifact under determination is [REDACTED --- artifact]. It was
+produced by [REDACTED --- office] for [REDACTED --- audience].
+
+\item The governing references are cited by number rather than restated. That
+is not a redaction --- it is the normal practice for controlled documents, and
+it means a citation never has to be removed later.
+
+\dmsection{Analysis}
+
+\item \textbf{Individually public facts can aggregate.} Two pieces of
+information that are each unremarkable may, together, state something that
+neither states alone. Determinations frequently turn on this, and the reasoning
+can be published even when the instance cannot.
+
+\item \textbf{Structure is not sensitive.} Which fields a form has, what a
+process requires, and how a decision was reached are ordinarily releasable.
+What is sensitive is the populated instance. Redaction that removes the
+structure as well is over-redaction, and it destroys the document's usefulness
+without improving its handling.
+
+\item \textbf{A marker is better than a gap.} \texttt{[REDACTED --- recipient
+offices]} tells a reader something was removed and what kind of thing it was.
+Silent deletion leaves them unable to distinguish redaction from oversight.
+
+\dmsection{Decision}
+
+\item [REDACTED --- determination]. The reasoning above stands on its own and
+can be reviewed without it.
+
+\dmsection{Conditions that reverse this determination}
+
+\item Publishing these unchanged would be the error this example exists to
+avoid: a redacted determination is evidence of capability, not a template for
+the next real one. Start a real determination from
+\texttt{Decisions/\_template.tex}.
+
+\dmsection{References}
+
+\item \texttt{Decisions/\_template.tex} --- the shared memorandum template.
+
+\item \texttt{Compliance-Marking/CUI/} --- SF 901 cover sheet templates and
+marking examples.
+
+\end{enumerate}
+}
+
+\input{../_template.tex}
