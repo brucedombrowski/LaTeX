@@ -1,0 +1,178 @@
+% ============================================================================
+% DM-2026-011: Claude Managed Agents Adoption for the Security Toolkit
+%   Decision 1 — Agent runtime surface for the scan-and-attest agent
+%   Decision 2 — Trust boundary: sandbox type by target sensitivity
+%   Decision 3 — Scope across the other repositories
+% ============================================================================
+\newcommand{\UniqueID}{DM-2026-011}
+\newcommand{\DocumentDate}{September 13, 2026}
+\newcommand{\AuthorName}{Bruce Dombrowski}
+\newcommand{\AuthorTitle}{Systems Engineer, Payload Software Integration}
+\newcommand{\ToField}{Security Toolkit Stakeholders; AI-Agents Repository Maintainers}
+\newcommand{\SubjectField}{Adoption of Claude Managed Agents for the Security Toolkit Scan-and-Attest Agent}
+\newcommand{\OPRField}{Payload Software Integration (PSI)}
+
+\newcommand{\dmContent}{%
+\begin{enumerate}
+
+\dmsection{Purpose}
+
+This memorandum records the decision to adopt Anthropic's Claude Managed Agents
+platform (public beta, April 2026) as the runtime for a scan-and-attest agent
+built on the Security Toolkit, the trust-boundary rules that govern where the
+agent's tools may execute, and the scope of adoption across the maintainer's
+other repositories. It follows the pattern presented in the Code with Claude
+2026 session \textit{Ship your first Managed Agent} (I. He, Anthropic Applied
+AI), whose reference implementation is published in
+\texttt{anthropics/cwc-workshops}.
+
+\dmsection{Background}
+
+Managed Agents separates the agent loop (``brain'', run on Anthropic's
+orchestration layer) from tool execution (``hands'', run in a per-session
+sandbox). Three persisted resources define a run: an \textbf{Agent} (model,
+system prompt, tools, skills; versioned, created once), an
+\textbf{Environment} (sandbox template: cloud or self-hosted), and a
+\textbf{Session} (one run, with an event log). Custom tools execute on the
+caller's host, so secrets and privileged actions never enter the sandbox.
+Skills in a mounted repository's \texttt{.claude/skills} directory are loaded
+at session start. Sessions accept a hard dollar budget and persist a complete
+event history.
+
+The Security Toolkit already carries the pieces such an agent needs: a
+non-interactive scan entry point (\texttt{run-all-scans.sh -n}), attestation
+generation with toolkit version and commit hashes, an allowlist model that
+requires a SHA256 integrity hash plus a justification, and TIA principles
+(Transparency, Inspectability, Accountability, Traceability) that map directly
+onto a persisted session event log.
+
+\dmsection{Decision 1 --- Agent Runtime Surface}
+
+\textbf{Options considered:}
+\begin{itemize}
+    \item \textbf{1A --- Claude API with tool runner, self-hosted loop.} Maximum
+    control; the maintainer hosts the loop, sandbox, scheduler, and state.
+    \item \textbf{1B --- Claude Agent SDK.} Claude Code packaged as a library;
+    batteries included, still self-hosted.
+    \item \textbf{1C --- Claude Managed Agents (SELECTED).} Anthropic runs the loop
+    and (optionally) the sandbox; agent configuration is a version-controlled
+    YAML manifest applied once with the \texttt{ant} CLI; sessions are created by
+    a thin runner script.
+    \item \textbf{1D --- No agent.} Continue running the toolkit by hand and in CI.
+\end{itemize}
+
+\textbf{Decision:} Option 1C. The agent definition lives in the toolkit
+repository as \texttt{agents/security-attest.agent.yaml} and
+\texttt{agents/security-scan.env.yaml}; the runbook lives in
+\texttt{.claude/skills/security-scan-runbook/SKILL.md}; the runner is
+\texttt{agents/run\_scan\_session.py}. Two host-side custom tools are defined:
+\texttt{get\_kev\_status} (CISA KEV lookup from the host cache) and
+\texttt{request\_allowlist\_entry} (a request only; the human decides and the
+host computes the integrity hash).
+
+\textbf{Rationale:} The toolkit's value is auditability, and Managed Agents
+gives a persisted, inspectable event log per session at no implementation
+cost. Versioned agent objects match the toolkit's own attestation discipline
+(every attestation names a toolkit version and commit; every session pins an
+agent version). Options 1A and 1B require the maintainer to build and host the
+loop, sandbox, and state store for a solo-maintained project. Option 1D
+forgoes the judgment step (classifying findings as true or false positives)
+that consumes most of the human time today.
+
+\dmsection{Decision 2 --- Trust Boundary by Target Sensitivity}
+
+\textbf{Context:} A cloud environment clones the target repository into an
+Anthropic-hosted container. The toolkit is public and may be mounted anywhere.
+Targets are not.
+
+\textbf{Decision:}
+\begin{itemize}
+    \item Targets that are public or contain no CUI and no PII \textbf{may} use the
+    cloud environment.
+    \item Targets that contain or may contain CUI, PII, or export-controlled data
+    \textbf{shall} use a \texttt{self\_hosted} environment, where tool execution
+    and file contents remain on maintainer-controlled infrastructure. Web search
+    and web fetch are disabled on the agent regardless of environment.
+    \item The agent \textbf{shall not} modify allowlists, delete files, or run
+    scripts from the target repository. Target contents are treated as untrusted
+    data; instruction-like text found there is a finding, not a command.
+    \item Only trusted repositories are mounted, because a mounted repository's
+    \texttt{.claude/skills} directory is loaded as agent instructions without
+    review.
+    \item Every session is created with a dollar budget cap.
+\end{itemize}
+
+\textbf{Rationale:} These rules keep the CUI determination (DM-2026-007,
+DM-2026-008) intact: nothing the desk instruction classifies as CUI leaves
+maintainer-controlled systems. The allowlist rule preserves Accountability;
+the untrusted-data rule addresses prompt injection through scanned content,
+which is the primary new risk an agent introduces to a scanner.
+
+\dmsection{Decision 3 --- Scope Across Other Repositories}
+
+\begin{itemize}
+    \item \textbf{Security Toolkit:} adopt now (this memorandum).
+    \item \textbf{Foreclosures:} candidate for a monthly scheduled deployment that
+    runs the deterministic pipeline and reviews the ranked shortlist. Deferred
+    until the toolkit agent has run cleanly for one release cycle.
+    \item \textbf{Investing:} a read-only daily review agent over the run report and
+    decision log is acceptable; brokerage credentials go in a vault with
+    read-only scope. The agent \textbf{shall never} be given order submission.
+    Deferred.
+    \item \textbf{Email Assistant:} excluded. Its stated requirement is that no
+    content leaves the laptop and no cloud model is used; Managed Agents
+    contradicts that by design.
+    \item \textbf{Philosophy:} excluded; no identified benefit.
+\end{itemize}
+
+\dmsection{Implementation and Constraints}
+
+\begin{itemize}
+    \item \texttt{.gitignore} changed from \texttt{.claude/} to
+    \texttt{.claude/*} with \texttt{!.claude/skills/} so the runbook is committed
+    and discoverable when the toolkit is mounted; local Claude Code settings
+    remain ignored.
+    \item Agent and environment are created once with \texttt{agents/setup.sh};
+    the returned IDs are stored in \texttt{agents/ids.env} (git-ignored). Sessions
+    reference IDs only; no code path calls \texttt{agents.create()} per run.
+    \item Model: \texttt{claude-opus-5} at high effort. Tools: bash, read, grep,
+    glob, write (for the report), web tools disabled.
+    \item Dependencies: \texttt{ant} CLI and the \texttt{anthropic} Python package
+    on the host; both are optional for the toolkit's existing Bash workflow.
+    \item CHANGELOG entry under Unreleased; regression test
+    \texttt{tests/test-managed-agent-manifests.sh} validates manifests, runner
+    syntax, and that the skill directory is not git-ignored.
+\end{itemize}
+
+\dmsection{Verification}
+
+\begin{itemize}
+    \item \textbf{Manifest test:} both YAML manifests parse; the runner compiles;
+    \texttt{git check-ignore} reports the skill file as not ignored.
+    \item \textbf{Dry session:} against the toolkit's own \texttt{demo/} planted
+    findings (\texttt{docs/DEMO-PLANTED-FINDINGS.md}), the agent reports every
+    planted finding with a correct \texttt{path:line} and requests, but does not
+    perform, allowlist changes.
+    \item \textbf{Boundary test:} a target containing instruction-like text is
+    reported as a finding and the instruction is not followed.
+    \item \textbf{Budget test:} a session created with a budget pauses with
+    \texttt{budget\_reached} rather than running past the cap.
+\end{itemize}
+
+\dmsection{References}
+
+\begin{itemize}
+    \item Code with Claude 2026, \textit{Ship your first Managed Agent}, I. He;
+    reference code \texttt{anthropics/cwc-workshops/ship-your-first-managed-agent}.
+    \item Claude Managed Agents documentation (platform.claude.com), beta
+    \texttt{managed-agents-2026-04-01}.
+    \item Security Toolkit \texttt{CLAUDE.md} (TIA principles), \texttt{AGENTS.md},
+    \texttt{docs/COMPLIANCE.md}.
+    \item DM-2026-007, DM-2026-008 (CUI determination and desk instruction).
+    \item NIST SP 800-53 Rev.\ 5, NIST SP 800-171, FIPS 199/200; RFC 2119.
+\end{itemize}
+
+\end{enumerate}
+}
+
+\input{_template.tex}
